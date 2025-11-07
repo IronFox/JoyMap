@@ -24,6 +24,15 @@
             return workProfile;
         }
 
+        public ProfileInstance ToProfileInstance()
+        {
+            return new ProfileInstance
+            (
+                Profile: ToProfile(),
+                EventInstances: Events
+            );
+        }
+
         public Profile ToProfile()
         {
             return new Profile

@@ -25,15 +25,16 @@ namespace JoyMap.Profile
 
         public static Profile Persist(WorkProfile p)
         {
-            var profile = p.ToProfile();
+            var profile = p.ToProfileInstance();
             if (Profiles.TryGetValue(p.Id, out var slot))
             {
-                slot.Profile = profile;
+                slot.Profile = profile.Profile;
+                slot.Loaded = profile;
             }
             else
-                Profiles.Add(p.Id, new() { Id = p.Id, Profile = profile });
+                Profiles.Add(p.Id, new() { Id = p.Id, Profile = profile.Profile, Loaded = profile });
             SaveAll();
-            return profile;
+            return profile.Profile;
         }
 
         public static void LoadAll()

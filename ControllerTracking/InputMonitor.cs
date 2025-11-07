@@ -60,7 +60,7 @@ namespace JoyMap.ControllerTracking
                     Owner.SignalDisturbance(this);
                     return;
                 }
-                await Task.Delay(50, cancel).ConfigureAwait(false);
+                await Task.Delay(5, cancel).ConfigureAwait(false);
             }
         }
 
