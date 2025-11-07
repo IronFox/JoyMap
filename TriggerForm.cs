@@ -20,7 +20,7 @@ namespace JoyMap
             {
                 Event = form.Result.Value;
                 textDevice.Text = Event.Value.DeviceName;
-                textInput.Text = $"{Event.Value.Which}{(Event.Value.Signed ? (Event.Value.Positive ? " Positive" : " Negative") : "")}";
+                textInput.Text = $"{Event.Value.InputId.Axis}{(Event.Value.InputId.AxisSigned ? (Event.Value.InputId.AxisNegated ? " Negative" : " Positive") : "")}";
                 if (textLabel.Text == LastAutoText)
                     textLabel.Text = LastAutoText = $"{textDevice.Text} - {textInput.Text}";
             }
@@ -52,7 +52,7 @@ namespace JoyMap
             if (Event is not null)
             {
                 var state = Event.Value.GetLatestStatus();
-                if (!Event.Value.Positive)
+                if (Event.Value.InputId.AxisNegated && state is not null)
                 {
                     state = -state;
                     labelStatus.Text = PickDeviceInputForm.Status2Str(state) + " (flipped)";

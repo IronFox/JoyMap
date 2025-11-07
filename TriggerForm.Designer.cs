@@ -212,7 +212,7 @@
             // statusUpdateTimer
             // 
             statusUpdateTimer.Enabled = true;
-            statusUpdateTimer.Interval = 1000;
+            statusUpdateTimer.Interval = 200;
             statusUpdateTimer.Tick += statusUpdateTimer_Tick;
             // 
             // TriggerForm

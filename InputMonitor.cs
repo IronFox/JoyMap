@@ -1,12 +1,12 @@
-﻿using SharpDX.DirectInput;
+﻿using JoyMap.ControllerTracking;
+using SharpDX.DirectInput;
 using System.Collections.Concurrent;
 
 namespace JoyMap
 {
 
-    record TrackedInput(InputMonitor Owner, DeviceInstance Device) : IDisposable
+    record TrackedInput(InputMonitor Owner, DeviceInstance Device, InstanceStatus TargetStatus) : IDisposable
     {
-        public InputState? LastState { get; set; }
         public Joystick? Joystick { get; private set; }
         public bool IsAcquired { get; private set; } = false;
 
@@ -31,6 +31,8 @@ namespace JoyMap
                 Joystick.Acquire();
                 IsAcquired = true;
 
+                TargetStatus.SignalBegin(Device.InstanceGuid);
+
                 Task.Run(() => RunAsync(cancel).ConfigureAwait(false));
             }
             catch (Exception ex)
@@ -41,72 +43,18 @@ namespace JoyMap
         }
 
 
-        private float XOf(int[] povs, int index)
-        {
-            if (povs.Length > index)
-            {
-                var pov = povs[index];
-                if (pov >= 0 && pov <= 36000)
-                {
-                    var deg = pov / 100f;
-                    var rad = deg * (MathF.PI / 180f);
-                    var rs = MathF.Sin(rad);
-                    return rs;
-                }
-            }
-            return 0;
-        }
-        private float YOf(int[] povs, int index)
-        {
-            if (povs.Length > index)
-            {
-                var pov = povs[index];
-                if (pov >= 0 && pov <= 36000)
-                {
-                    var deg = pov / 100f;
-                    var rad = deg * (MathF.PI / 180f);
-                    var rs = MathF.Cos(rad);
-                    return rs;
-                }
-            }
-            return 0;
-        }
 
         private async Task RunAsync(CancellationToken cancel)
         {
             if (Joystick is null)
                 return;
-            List<InputAxisChange> changes = [];
             while (IsAcquired)
             {
                 cancel.ThrowIfCancellationRequested();
                 try
                 {
                     Joystick.Poll();
-                    var state = Joystick.GetCurrentState();
-                    if (state != null)
-                    {
-                        //state.PointOfViewControllers
-                        var currentState = new InputState(
-                            Slider: (float)state.Sliders.Length > 0 ? (float)state.Sliders[0] / Resolution : 0,
-                            PovX: XOf(state.PointOfViewControllers, 0),
-                            PovY: YOf(state.PointOfViewControllers, 0),
-                            X: (float)state.X / Resolution,
-                            Y: (float)state.Y / Resolution,
-                            Z: (float)state.Z / Resolution,
-                            RotationX: (float)state.RotationX / Resolution,
-                            RotationY: (float)state.RotationY / Resolution,
-                            RotationZ: (float)state.RotationZ / Resolution,
-                            Buttons: (bool[])state.Buttons.Clone());
-
-                        if (LastState != null)
-                        {
-                            InputState.DetectSignificantChanges(LastState.Value, currentState, changes);
-                            if (changes.Count > 0)
-                                EventRecorder.SignalSignificantChanges(this, changes);
-                        }
-                        LastState = currentState;
-                    }
+                    TargetStatus.UpdateInstance(Joystick.GetCurrentState(), Resolution);
                 }
                 catch (Exception)
                 {
@@ -121,6 +69,7 @@ namespace JoyMap
         {
             if (IsAcquired && Joystick != null)
             {
+                TargetStatus.SignalEnd(Device.InstanceGuid);
                 try
                 {
                     Joystick.Unacquire();
@@ -142,12 +91,6 @@ namespace JoyMap
             }
         }
 
-        internal float GetLatestValue(Input which)
-        {
-            if (this.LastState is null)
-                return 0;
-            return LastState.Value.Get(which);
-        }
     }
 
     internal readonly record struct EventKey(
@@ -157,44 +100,42 @@ namespace JoyMap
     {
         public EventKey(Event ev)
         : this(
-              DeviceInstanceId: ev.DeviceInstance.InstanceGuid,
-              Which: ev.Which)
+              DeviceInstanceId: ev.InputId.ControllerId.InstanceGuid,
+              Which: ev.InputId.Axis)
         { }
     }
 
     internal readonly record struct EventValue(
-        DeviceInstance DeviceInstance,
+        ControllerInputId InputId,
         float Status,
-        Func<float> GetLatestStatus
+        Func<float?> GetLatestStatus
         );
 
     public readonly record struct Event(
-        DeviceInstance DeviceInstance,
-        Input Which,
+        ControllerInputId InputId,
         float Status,
-        Func<float> GetLatestStatus
+        Func<float?> GetLatestStatus
         )
     {
-        public bool Signed => Which < Input.Button0;
-        public bool Positive => Status >= 0 || !Signed;
-        public string DeviceName => DeviceInstance.ProductName;
+        public string DeviceName => InputId.ControllerName;
     }
 
     public class EventRecorder : IDisposable
     {
         private static ConcurrentDictionary<EventRecorder, bool> Active { get; } = new();
         private ConcurrentDictionary<EventKey, EventValue> Events = new();
-        internal static void SignalSignificantChanges(TrackedInput input, IReadOnlyCollection<InputAxisChange> changes)
+        internal static void SignalSignificantChanges(InstanceStatus state, IReadOnlyCollection<InputAxisChange> changes)
         {
+            var devId = state.ControllerId;
             foreach (var change in changes)
             {
                 var ev = new EventKey(
-                    DeviceInstanceId: input.Device.InstanceGuid,
+                    DeviceInstanceId: state.Id,
                     Which: change.Which);
 
                 foreach (var recorder in Active.Keys)
                 {
-                    var nv = new EventValue(input.Device, change.Status, () => input.GetLatestValue(change.Which));
+                    var nv = new EventValue(new(devId, state.ControllerName, change.Which, change.Status < 0), change.Status, () => state.Get(change.Which));
                     recorder.Events.AddOrUpdate(ev, nv, (_, _) => nv);
                 }
             }
@@ -224,8 +165,7 @@ namespace JoyMap
         public IEnumerable<Event> GetAll()
         {
             return Events.Select(kvp => new Event(
-                DeviceInstance: kvp.Value.DeviceInstance,
-                Which: kvp.Key.Which,
+                InputId: kvp.Value.InputId,
                 Status: kvp.Value.Status,
                 GetLatestStatus: kvp.Value.GetLatestStatus));
         }
@@ -248,6 +188,9 @@ namespace JoyMap
 
         private ConcurrentDictionary<Guid, TrackedInput> TrackedInputs { get; } = new();
 
+        private ConcurrentDictionary<Guid, ControllerStatus> ProductStatusMap { get; } = new();
+        private ConcurrentDictionary<ControllerId, InstanceStatus> InstanceStatusMap { get; } = new();
+
         private async Task RunAsync(DirectInput di, IntPtr windowHandle, CancellationToken cancel)
         {
             try
@@ -259,7 +202,11 @@ namespace JoyMap
                     foreach (var dev in devices)
                     {
                         TrackedInput? instantiated = null;
-                        var instance = TrackedInputs.GetOrAdd(dev.InstanceGuid, _ => instantiated = new(this, dev));
+                        var productStatus = ProductStatusMap.GetOrAdd(dev.ProductGuid, id => new ControllerStatus(id));
+                        var iid = ControllerId.From(dev);
+                        var instanceStatus = InstanceStatusMap.GetOrAdd(iid, _ => new InstanceStatus(iid.InstanceGuid, dev.ProductName, productStatus));
+
+                        var instance = TrackedInputs.GetOrAdd(dev.InstanceGuid, _ => instantiated = new(this, dev, instanceStatus));
                         if (instance == instantiated)
                             instance.Begin(di, windowHandle, cancel);
                     }

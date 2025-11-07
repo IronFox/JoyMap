@@ -34,7 +34,7 @@ namespace JoyMap
                 if (includedInputs.Add(key))
                 {
                     var row = inputList.Items.Add(ev.DeviceName);
-                    row.SubItems.Add(ev.Which.ToString());
+                    row.SubItems.Add(ev.InputId.Axis.ToString());
                     row.SubItems.Add(Status2Str(ev.Status));
                     row.Tag = ev;
                 }
@@ -67,9 +67,11 @@ namespace JoyMap
 
         public Event? Result { get; private set; } = null;
 
-        public static string Status2Str(float status)
+        public static string Status2Str(float? status)
         {
-            return Math.Round(status * 100, 2).ToString(CultureInfo.InvariantCulture) + " %";
+            if (status is null)
+                return "N/A";
+            return Math.Round(status.Value * 100, 2).ToString(CultureInfo.InvariantCulture) + " %";
         }
 
         private void inputList_SelectedIndexChanged(object sender, EventArgs e)
