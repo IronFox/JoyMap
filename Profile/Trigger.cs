@@ -9,7 +9,7 @@ namespace JoyMap.Profile
         );
 
 
-    public readonly record struct TriggerInstance(
+    public record TriggerInstance(
         Trigger Trigger,
         Func<float?> GetCurrentValue
         )

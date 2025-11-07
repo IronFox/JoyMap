@@ -32,7 +32,7 @@
             label1 = new Label();
             textBox1 = new TextBox();
             label2 = new Label();
-            listView1 = new ListView();
+            triggerListView = new ListView();
             columnHeader6 = new ColumnHeader();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
@@ -51,6 +51,7 @@
             btnOk = new Button();
             label4 = new Label();
             triggerCombiner = new ComboBox();
+            statusUpdateTimer = new System.Windows.Forms.Timer(components);
             triggerMenu.SuspendLayout();
             actionMenu.SuspendLayout();
             SuspendLayout();
@@ -81,18 +82,18 @@
             label2.TabIndex = 2;
             label2.Text = "Triggers";
             // 
-            // listView1
+            // triggerListView
             // 
-            listView1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            listView1.Columns.AddRange(new ColumnHeader[] { columnHeader6, columnHeader1, columnHeader2, columnHeader3 });
-            listView1.ContextMenuStrip = triggerMenu;
-            listView1.FullRowSelect = true;
-            listView1.Location = new Point(12, 103);
-            listView1.Name = "listView1";
-            listView1.Size = new Size(900, 265);
-            listView1.TabIndex = 3;
-            listView1.UseCompatibleStateImageBehavior = false;
-            listView1.View = View.Details;
+            triggerListView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            triggerListView.Columns.AddRange(new ColumnHeader[] { columnHeader6, columnHeader1, columnHeader2, columnHeader3 });
+            triggerListView.ContextMenuStrip = triggerMenu;
+            triggerListView.FullRowSelect = true;
+            triggerListView.Location = new Point(12, 103);
+            triggerListView.Name = "triggerListView";
+            triggerListView.Size = new Size(900, 265);
+            triggerListView.TabIndex = 3;
+            triggerListView.UseCompatibleStateImageBehavior = false;
+            triggerListView.View = View.Details;
             // 
             // columnHeader6
             // 
@@ -226,6 +227,12 @@
             triggerCombiner.TabIndex = 9;
             triggerCombiner.Text = "Or";
             // 
+            // statusUpdateTimer
+            // 
+            statusUpdateTimer.Enabled = true;
+            statusUpdateTimer.Interval = 200;
+            statusUpdateTimer.Tick += statusUpdateTimer_Tick;
+            // 
             // EventForm
             // 
             AcceptButton = btnOk;
@@ -239,7 +246,7 @@
             Controls.Add(btnCancel);
             Controls.Add(listView2);
             Controls.Add(label3);
-            Controls.Add(listView1);
+            Controls.Add(triggerListView);
             Controls.Add(label2);
             Controls.Add(textBox1);
             Controls.Add(label1);
@@ -256,7 +263,7 @@
         private Label label1;
         private TextBox textBox1;
         private Label label2;
-        private ListView listView1;
+        private ListView triggerListView;
         private Label label3;
         private ListView listView2;
         private Button btnCancel;
@@ -275,5 +282,6 @@
         private ToolStripMenuItem deleteToolStripMenuItem;
         private ToolStripMenuItem pickAddToolStripMenuItem;
         private ToolStripMenuItem deleteToolStripMenuItem1;
+        private System.Windows.Forms.Timer statusUpdateTimer;
     }
 }
