@@ -26,8 +26,25 @@
                 parts.Add("Shift");
             }
             var keyOnly = k & Keys.KeyCode;
-            parts.Add(keyOnly.ToString());
+
+            parts.Add(KeyName(keyOnly));
             return string.Join(" + ", parts);
+        }
+
+        private static string KeyName(Keys k)
+        {
+            return k switch
+            {
+                Keys.Oem1 => ";",
+                Keys.Oem2 => "/",
+                Keys.Oem3 => "`",
+                Keys.Oem4 => "[",
+                Keys.Oem5 => "\\",
+                Keys.Oem6 => "]",
+                Keys.Oem7 => "'",
+                Keys.OemMinus => "-",
+                _ => k.ToString()
+            };
         }
 
         private void UpdateList()

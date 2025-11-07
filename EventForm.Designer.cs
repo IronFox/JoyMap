@@ -30,7 +30,7 @@
         {
             components = new System.ComponentModel.Container();
             label1 = new Label();
-            textBox1 = new TextBox();
+            textName = new TextBox();
             label2 = new Label();
             triggerListView = new ListView();
             columnHeader6 = new ColumnHeader();
@@ -66,13 +66,14 @@
             label1.TabIndex = 0;
             label1.Text = "Name:";
             // 
-            // textBox1
+            // textName
             // 
-            textBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBox1.Location = new Point(81, 12);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(831, 31);
-            textBox1.TabIndex = 1;
+            textName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textName.Location = new Point(81, 12);
+            textName.Name = "textName";
+            textName.Size = new Size(831, 31);
+            textName.TabIndex = 1;
+            textName.TextChanged += AnyChanged;
             // 
             // label2
             // 
@@ -213,6 +214,7 @@
             // 
             btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnOk.DialogResult = DialogResult.OK;
+            btnOk.Enabled = false;
             btnOk.Location = new Point(342, 724);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(282, 34);
@@ -240,6 +242,8 @@
             triggerCombiner.Size = new Size(256, 33);
             triggerCombiner.TabIndex = 9;
             triggerCombiner.Text = "Or";
+            triggerCombiner.SelectedIndexChanged += AnyChanged;
+            triggerCombiner.TextChanged += AnyChanged;
             // 
             // statusUpdateTimer
             // 
@@ -262,8 +266,9 @@
             Controls.Add(label3);
             Controls.Add(triggerListView);
             Controls.Add(label2);
-            Controls.Add(textBox1);
+            Controls.Add(textName);
             Controls.Add(label1);
+            MinimumSize = new Size(946, 826);
             Name = "EventForm";
             Text = "Event";
             triggerMenu.ResumeLayout(false);
@@ -275,7 +280,7 @@
         #endregion
 
         private Label label1;
-        private TextBox textBox1;
+        private TextBox textName;
         private Label label2;
         private ListView triggerListView;
         private Label label3;

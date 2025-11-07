@@ -37,6 +37,12 @@ namespace JoyMap.Profile
             }
         }
 
-
+        internal static TriggerInstance Load(InputMonitor monitor, Trigger t)
+        {
+            return new TriggerInstance(
+                Trigger: t,
+                GetCurrentValue: monitor.GetFunction(t.InputId)
+                );
+        }
     }
 }

@@ -11,7 +11,7 @@ namespace JoyMap
             InitializeComponent();
             if (t is not null)
             {
-                Event = new Event(
+                Event = new DeviceEvent(
                     InputId: t.Trigger.InputId,
                     Status: t.GetCurrentValue() ?? 0,
                     GetLatestStatus: t.GetCurrentValue
@@ -25,7 +25,7 @@ namespace JoyMap
             }
         }
 
-        private Event? Event { get; set; }
+        private DeviceEvent? Event { get; set; }
 
 
         private void btnPickDeviceInput_Click(object sender, EventArgs e)

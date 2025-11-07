@@ -16,5 +16,14 @@ namespace JoyMap.Extensions
             }
             return null;
         }
+
+
+        public static IEnumerable<ListViewItem> ToEnumerable(this ListView.ListViewItemCollection items)
+        {
+            foreach (ListViewItem item in items)
+            {
+                yield return item;
+            }
+        }
     }
 }

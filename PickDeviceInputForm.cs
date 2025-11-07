@@ -18,6 +18,11 @@ namespace JoyMap
             EventRecorder.Dispose();
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            updateDeviceListTimer.Stop();
+            base.OnFormClosing(e);
+        }
 
         private void PickDeviceInputForm_Load(object sender, EventArgs e)
         {
@@ -44,7 +49,7 @@ namespace JoyMap
 
             foreach (ListViewItem item in inputList.Items)
             {
-                if (item.Tag is Event record)
+                if (item.Tag is DeviceEvent record)
                 {
                     var key = new EventKey(record);
                     if (status.TryGetValue(key, out var stat))
@@ -66,7 +71,7 @@ namespace JoyMap
 
         }
 
-        public Event? Result { get; private set; } = null;
+        public DeviceEvent? Result { get; private set; } = null;
 
         public static string Status2Str(float? status)
         {
@@ -84,7 +89,7 @@ namespace JoyMap
 
                 if (okay)
                 {
-                    if (item.Tag is Event ev)
+                    if (item.Tag is DeviceEvent ev)
                     {
                         Result = ev;
                     }

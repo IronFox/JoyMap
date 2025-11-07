@@ -97,7 +97,7 @@ namespace JoyMap.ControllerTracking
         InputAxis Which
         )
     {
-        public EventKey(Event ev)
+        public EventKey(DeviceEvent ev)
         : this(
               DeviceInstanceId: ev.InputId.ControllerId.InstanceGuid,
               Which: ev.InputId.Axis)
@@ -110,7 +110,7 @@ namespace JoyMap.ControllerTracking
         Func<float?> GetLatestStatus
         );
 
-    public readonly record struct Event(
+    public readonly record struct DeviceEvent(
         ControllerInputId InputId,
         float Status,
         Func<float?> GetLatestStatus
@@ -161,9 +161,9 @@ namespace JoyMap.ControllerTracking
             Active.TryRemove(this, out _);
         }
 
-        public IEnumerable<Event> GetAll()
+        public IEnumerable<DeviceEvent> GetAll()
         {
-            return Events.Select(kvp => new Event(
+            return Events.Select(kvp => new DeviceEvent(
                 InputId: kvp.Value.InputId,
                 Status: kvp.Value.Status,
                 GetLatestStatus: kvp.Value.GetLatestStatus));
@@ -201,9 +201,9 @@ namespace JoyMap.ControllerTracking
                     foreach (var dev in devices)
                     {
                         TrackedInput? instantiated = null;
-                        var productStatus = ProductStatusMap.GetOrAdd(dev.ProductGuid, id => new ControllerStatus(id));
                         var iid = ControllerId.From(dev);
-                        var instanceStatus = InstanceStatusMap.GetOrAdd(iid, _ => new InstanceStatus(iid.InstanceGuid, dev.ProductName, productStatus));
+
+                        var instanceStatus = CreateInstanceStatus(iid, dev.ProductName);
 
                         var instance = TrackedInputs.GetOrAdd(dev.InstanceGuid, _ => instantiated = new(this, dev, instanceStatus));
                         if (instance == instantiated)
@@ -235,6 +235,12 @@ namespace JoyMap.ControllerTracking
             di.Dispose();
         }
 
+        private InstanceStatus CreateInstanceStatus(ControllerId iid, string productName)
+        {
+            var productStatus = ProductStatusMap.GetOrAdd(iid.ProductGuid, id => new ControllerStatus(id));
+            return InstanceStatusMap.GetOrAdd(iid, _ => new InstanceStatus(iid.InstanceGuid, productName, productStatus));
+        }
+
         internal void SignalDisturbance(TrackedInput trackedInput)
         {
             if (TrackedInputs.TryRemove(trackedInput.Device.InstanceGuid, out var input))
@@ -242,5 +248,13 @@ namespace JoyMap.ControllerTracking
                 input.Dispose();
             }
         }
+
+        internal Func<float?> GetFunction(ControllerInputId inputId)
+        {
+            var instanceStatus = CreateInstanceStatus(inputId.ControllerId, inputId.ControllerName);
+            return () => instanceStatus.Get(inputId.Axis);
+        }
+
+
     }
 }
