@@ -33,7 +33,7 @@
         /// </summary>
         /// <param name="which"></param>
         /// <returns></returns>
-        internal float? Get(Input which)
+        internal float? Get(InputAxis which)
         {
             if (LastState is null || AcquiredBy.Count != 1)
                 return null;

@@ -1,7 +1,7 @@
-﻿namespace JoyMap
+﻿namespace JoyMap.ControllerTracking
 {
     public readonly record struct InputAxisChange(
-        Input Which,
+        InputAxis Which,
         float Status
         );
 
@@ -25,77 +25,77 @@
             const float threshold = 0.05f;
             if (Math.Abs(previous.Slider - updated.Slider) > threshold)
             {
-                changes.Add(new InputAxisChange(Input.Slider, updated.Slider));
+                changes.Add(new InputAxisChange(InputAxis.Slider, updated.Slider));
             }
             if (Math.Abs(previous.X - updated.X) > threshold)
             {
-                changes.Add(new InputAxisChange(Input.X, updated.X));
+                changes.Add(new InputAxisChange(InputAxis.X, updated.X));
             }
             if (Math.Abs(previous.Y - updated.Y) > threshold)
             {
-                changes.Add(new InputAxisChange(Input.Y, updated.Y));
+                changes.Add(new InputAxisChange(InputAxis.Y, updated.Y));
             }
             if (Math.Abs(previous.Z - updated.Z) > threshold)
             {
-                changes.Add(new InputAxisChange(Input.Z, updated.Z));
+                changes.Add(new InputAxisChange(InputAxis.Z, updated.Z));
             }
             if (Math.Abs(previous.PovX - updated.PovX) > threshold)
             {
-                changes.Add(new InputAxisChange(Input.PovX, updated.PovX));
+                changes.Add(new InputAxisChange(InputAxis.PovX, updated.PovX));
             }
             if (Math.Abs(previous.PovY - updated.PovY) > threshold)
             {
-                changes.Add(new InputAxisChange(Input.PovY, updated.PovY));
+                changes.Add(new InputAxisChange(InputAxis.PovY, updated.PovY));
             }
             if (Math.Abs(previous.RotationX - updated.RotationX) > threshold)
             {
-                changes.Add(new InputAxisChange(Input.RotationX, updated.RotationX));
+                changes.Add(new InputAxisChange(InputAxis.RotationX, updated.RotationX));
             }
             if (Math.Abs(previous.RotationY - updated.RotationY) > threshold)
             {
-                changes.Add(new InputAxisChange(Input.RotationY, updated.RotationY));
+                changes.Add(new InputAxisChange(InputAxis.RotationY, updated.RotationY));
             }
             if (Math.Abs(previous.RotationZ - updated.RotationZ) > threshold)
             {
-                changes.Add(new InputAxisChange(Input.RotationZ, updated.RotationZ));
+                changes.Add(new InputAxisChange(InputAxis.RotationZ, updated.RotationZ));
             }
             int len = Math.Min(previous.Buttons.Length, updated.Buttons.Length);
             for (int i = 0; i < len; i++)
             {
                 if (previous.Buttons[i] != updated.Buttons[i])
                 {
-                    changes.Add(new InputAxisChange((Input)((int)Input.Button0 + i), updated.Buttons[i] ? 1f : 0f));
+                    changes.Add(new InputAxisChange((InputAxis)((int)InputAxis.Button0 + i), updated.Buttons[i] ? 1f : 0f));
                 }
             }
         }
 
-        internal float Get(Input which)
+        internal float Get(InputAxis which)
         {
             switch (which)
             {
-                case Input.X:
+                case InputAxis.X:
                     return X;
-                case Input.Y:
+                case InputAxis.Y:
                     return Y;
-                case Input.Z:
+                case InputAxis.Z:
                     return Z;
-                case Input.Slider:
+                case InputAxis.Slider:
                     return Slider;
-                case Input.RotationX:
+                case InputAxis.RotationX:
                     return RotationX;
-                case Input.RotationY:
+                case InputAxis.RotationY:
                     return RotationY;
-                case Input.RotationZ:
+                case InputAxis.RotationZ:
                     return RotationZ;
-                case Input.PovX:
+                case InputAxis.PovX:
                     return PovX;
-                case Input.PovY:
+                case InputAxis.PovY:
                     return PovY;
                 default:
                     {
-                        if (which >= Input.Button0 && which <= Input.Button31)
+                        if (which >= InputAxis.Button0 && which <= InputAxis.Button31)
                         {
-                            int index = (int)which - (int)Input.Button0;
+                            int index = (int)which - (int)InputAxis.Button0;
                             if (index >= 0 && index < Buttons.Length)
                             {
                                 return Buttons[index] ? 1f : 0f;

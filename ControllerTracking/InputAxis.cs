@@ -1,6 +1,6 @@
-﻿namespace JoyMap
+﻿namespace JoyMap.ControllerTracking
 {
-    public enum Input
+    public enum InputAxis
     {
         None,
 

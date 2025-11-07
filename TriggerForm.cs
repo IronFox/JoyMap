@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using JoyMap.ControllerTracking;
+using JoyMap.Profile;
+using System.Globalization;
 
 namespace JoyMap
 {
@@ -11,7 +13,6 @@ namespace JoyMap
 
         private Event? Event { get; set; }
 
-        private string LastAutoText { get; set; } = "";
 
         private void btnPickDeviceInput_Click(object sender, EventArgs e)
         {
@@ -20,10 +21,11 @@ namespace JoyMap
             {
                 Event = form.Result.Value;
                 textDevice.Text = Event.Value.DeviceName;
-                textInput.Text = $"{Event.Value.InputId.Axis}{(Event.Value.InputId.AxisSigned ? (Event.Value.InputId.AxisNegated ? " Negative" : " Positive") : "")}";
-                if (textLabel.Text == LastAutoText)
-                    textLabel.Text = LastAutoText = $"{textDevice.Text} - {textInput.Text}";
+                textInput.Text = Event.Value.InputId.AxisName;
+
+                RebuildResult();
             }
+
         }
 
         private float? GetMin()
@@ -78,6 +80,38 @@ namespace JoyMap
                 labelStatus.Text = "N/A";
                 labelActive.Text = "N/A";
             }
+        }
+
+        public TriggerInstance? Result { get; private set; } = null;
+
+
+        private void RebuildResult()
+        {
+            var min = GetMin();
+            var max = GetMax();
+            if (Event is not null && min is not null && max is not null)
+            {
+                Result = new TriggerInstance(
+                    Trigger: new(Event.Value.InputId, min.Value, max.Value),
+                    GetCurrentValue: Event.Value.GetLatestStatus
+                    );
+                btnOk.Enabled = true;
+            }
+            else
+            {
+                Result = null;
+                btnOk.Enabled = false;
+            }
+        }
+
+        private void btnOk_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textMin_TextChanged(object sender, EventArgs e)
+        {
+            RebuildResult();
         }
     }
 }

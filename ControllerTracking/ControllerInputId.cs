@@ -4,11 +4,13 @@
     (
         ControllerId ControllerId,
         string ControllerName,
-        Input Axis,
+        InputAxis Axis,
         bool AxisNegated
     )
     {
-        public bool AxisSigned => Axis > Input.None && Axis < Input.Button0;
+        public bool AxisSigned => Axis > InputAxis.None && Axis < InputAxis.Button0;
 
+        public string AxisName =>
+             $"{Axis}{(AxisSigned ? (AxisNegated ? " Negative" : " Positive") : "")}";
     }
 }

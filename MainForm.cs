@@ -1,3 +1,5 @@
+using JoyMap.ControllerTracking;
+
 namespace JoyMap
 {
     public partial class MainForm : Form

@@ -1,8 +1,7 @@
-﻿using JoyMap.ControllerTracking;
-using SharpDX.DirectInput;
+﻿using SharpDX.DirectInput;
 using System.Collections.Concurrent;
 
-namespace JoyMap
+namespace JoyMap.ControllerTracking
 {
 
     record TrackedInput(InputMonitor Owner, DeviceInstance Device, InstanceStatus TargetStatus) : IDisposable
@@ -95,7 +94,7 @@ namespace JoyMap
 
     internal readonly record struct EventKey(
         Guid DeviceInstanceId,
-        Input Which
+        InputAxis Which
         )
     {
         public EventKey(Event ev)

@@ -32,7 +32,7 @@ namespace JoyMap.ControllerTracking
         /// </summary>
         /// <param name="which"></param>
         /// <returns></returns>
-        public new float? Get(Input which)
+        public new float? Get(InputAxis which)
         {
             return Product?.Get(which) ?? base.Get(which);
         }
