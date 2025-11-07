@@ -44,6 +44,7 @@
             actionListView = new ListView();
             columnHeader4 = new ColumnHeader();
             columnHeader5 = new ColumnHeader();
+            columnHeader7 = new ColumnHeader();
             actionMenu = new ContextMenuStrip(components);
             addToolStripMenuItem = new ToolStripMenuItem();
             deleteToolStripMenuItem = new ToolStripMenuItem();
@@ -52,7 +53,6 @@
             label4 = new Label();
             triggerCombiner = new ComboBox();
             statusUpdateTimer = new System.Windows.Forms.Timer(components);
-            columnHeader7 = new ColumnHeader();
             triggerMenu.SuspendLayout();
             actionMenu.SuspendLayout();
             SuspendLayout();
@@ -170,25 +170,32 @@
             columnHeader5.Text = "Type";
             columnHeader5.Width = 100;
             // 
+            // columnHeader7
+            // 
+            columnHeader7.Text = "Action";
+            columnHeader7.Width = 200;
+            // 
             // actionMenu
             // 
             actionMenu.ImageScalingSize = new Size(24, 24);
             actionMenu.Items.AddRange(new ToolStripItem[] { addToolStripMenuItem, deleteToolStripMenuItem });
             actionMenu.Name = "actionMenu";
-            actionMenu.Size = new Size(136, 68);
+            actionMenu.Size = new Size(241, 101);
+            actionMenu.Opening += actionMenu_Opening;
             // 
             // addToolStripMenuItem
             // 
             addToolStripMenuItem.Name = "addToolStripMenuItem";
-            addToolStripMenuItem.Size = new Size(135, 32);
+            addToolStripMenuItem.Size = new Size(240, 32);
             addToolStripMenuItem.Text = "Add ...";
             addToolStripMenuItem.Click += addToolStripMenuItem_Click;
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new Size(135, 32);
+            deleteToolStripMenuItem.Size = new Size(240, 32);
             deleteToolStripMenuItem.Text = "Delete";
+            deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
             // 
             // btnCancel
             // 
@@ -238,11 +245,6 @@
             statusUpdateTimer.Enabled = true;
             statusUpdateTimer.Interval = 200;
             statusUpdateTimer.Tick += statusUpdateTimer_Tick;
-            // 
-            // columnHeader7
-            // 
-            columnHeader7.Text = "Action";
-            columnHeader7.Width = 200;
             // 
             // EventForm
             // 

@@ -1,4 +1,5 @@
-﻿using JoyMap.Profile;
+﻿using JoyMap.KeyEffects;
+using JoyMap.Profile;
 
 namespace JoyMap
 {
@@ -109,6 +110,30 @@ namespace JoyMap
                 row.Tag = action;
             }
 
+        }
+
+        private void actionMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            deleteToolStripMenuItem.Enabled = actionListView.SelectedItems.Count > 0;
+
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var query = "Delete selected actions?";
+            if (actionListView.SelectedItems.Count == 1)
+            {
+                var item = actionListView.SelectedItems[0];
+                var action = item.Tag as InputEffect;
+                query = "Delete selected action (" + action?.Name + ")?";
+            }
+            if (MessageBox.Show(this, query, "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                foreach (ListViewItem item in actionListView.SelectedItems)
+                {
+                    actionListView.Items.Remove(item);
+                }
+            }
         }
     }
 }
