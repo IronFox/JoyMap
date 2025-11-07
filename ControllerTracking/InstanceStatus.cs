@@ -30,24 +30,22 @@ namespace JoyMap.ControllerTracking
         /// <summary>
         /// Fetches the latest status value for the specified input.
         /// </summary>
-        /// <param name="which"></param>
-        /// <returns></returns>
         public new float? Get(InputAxis which)
         {
-            return Product?.Get(which) ?? base.Get(which);
+            return Product.Get(which) ?? base.Get(which);
         }
+
         internal override void SignalBegin(Guid instanceGuid)
         {
             base.SignalBegin(instanceGuid);
-            Product?.SignalBegin(instanceGuid);
+            Product.SignalBegin(instanceGuid);
         }
 
         internal override void SignalEnd(Guid instanceGuid)
         {
             base.SignalEnd(instanceGuid);
-            Product?.SignalEnd(instanceGuid);
+            Product.SignalEnd(instanceGuid);
         }
-
 
         private float XOf(int[] povs, int index)
         {
@@ -64,6 +62,7 @@ namespace JoyMap.ControllerTracking
             }
             return 0;
         }
+
         private float YOf(int[] povs, int index)
         {
             if (povs.Length > index)
@@ -79,19 +78,40 @@ namespace JoyMap.ControllerTracking
             }
             return 0;
         }
+
+        private static ulong PackButtons(bool[]? buttons)
+        {
+            if (buttons is null || buttons.Length == 0)
+                return 0UL;
+            ulong bits = 0UL;
+            int count = Math.Min(buttons.Length, 64);
+            for (int i = 0; i < count; i++)
+            {
+                if (buttons[i])
+                    bits |= (1UL << i);
+            }
+            return bits;
+        }
+
         internal void UpdateInstance(JoystickState state, int axisResolution)
         {
+            var buttons = state.Buttons;
+            int buttonCount = buttons?.Length ?? 0;
+            ulong buttonsBits = PackButtons(buttons);
+
             var currentState = new InputState(
-                Slider: (float)state.Sliders.Length > 0 ? (float)state.Sliders[0] / axisResolution : 0,
+                X: state.X / (float)axisResolution,
+                Y: state.Y / (float)axisResolution,
+                Z: state.Z / (float)axisResolution,
+                Slider1: state.Sliders.Length > 0 ? state.Sliders[0] / (float)axisResolution : 0f,
+                RotationX: state.RotationX / (float)axisResolution,
+                RotationY: state.RotationY / (float)axisResolution,
+                RotationZ: state.RotationZ / (float)axisResolution,
                 PovX: XOf(state.PointOfViewControllers, 0),
                 PovY: YOf(state.PointOfViewControllers, 0),
-                X: (float)state.X / axisResolution,
-                Y: (float)state.Y / axisResolution,
-                Z: (float)state.Z / axisResolution,
-                RotationX: (float)state.RotationX / axisResolution,
-                RotationY: (float)state.RotationY / axisResolution,
-                RotationZ: (float)state.RotationZ / axisResolution,
-                Buttons: (bool[])state.Buttons.Clone());
+                ButtonCount: buttonCount,
+                ButtonsBits: buttonsBits
+            );
             Update(currentState);
         }
     }

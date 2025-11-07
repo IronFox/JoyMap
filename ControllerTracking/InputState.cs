@@ -9,62 +9,56 @@
         float X,
         float Y,
         float Z,
-        float Slider,
+        float Slider1,
         float RotationX,
         float RotationY,
         float RotationZ,
         float PovX,
         float PovY,
-        bool[] Buttons
+        int ButtonCount,
+        ulong ButtonsBits
         )
     {
+        private static bool GetBit(ulong bits, int index) => ((bits >> index) & 1UL) != 0;
 
         public static void DetectSignificantChanges(InputState previous, InputState updated, List<InputAxisChange> changes)
         {
             changes.Clear();
             const float threshold = 0.05f;
-            if (Math.Abs(previous.Slider - updated.Slider) > threshold)
-            {
-                changes.Add(new InputAxisChange(InputAxis.Slider, updated.Slider));
-            }
+
+            if (Math.Abs(previous.Slider1 - updated.Slider1) > threshold)
+                changes.Add(new InputAxisChange(InputAxis.Slider1, updated.Slider1));
             if (Math.Abs(previous.X - updated.X) > threshold)
-            {
                 changes.Add(new InputAxisChange(InputAxis.X, updated.X));
-            }
             if (Math.Abs(previous.Y - updated.Y) > threshold)
-            {
                 changes.Add(new InputAxisChange(InputAxis.Y, updated.Y));
-            }
             if (Math.Abs(previous.Z - updated.Z) > threshold)
-            {
                 changes.Add(new InputAxisChange(InputAxis.Z, updated.Z));
-            }
             if (Math.Abs(previous.PovX - updated.PovX) > threshold)
-            {
                 changes.Add(new InputAxisChange(InputAxis.PovX, updated.PovX));
-            }
             if (Math.Abs(previous.PovY - updated.PovY) > threshold)
-            {
                 changes.Add(new InputAxisChange(InputAxis.PovY, updated.PovY));
-            }
             if (Math.Abs(previous.RotationX - updated.RotationX) > threshold)
-            {
                 changes.Add(new InputAxisChange(InputAxis.RotationX, updated.RotationX));
-            }
             if (Math.Abs(previous.RotationY - updated.RotationY) > threshold)
-            {
                 changes.Add(new InputAxisChange(InputAxis.RotationY, updated.RotationY));
-            }
             if (Math.Abs(previous.RotationZ - updated.RotationZ) > threshold)
-            {
                 changes.Add(new InputAxisChange(InputAxis.RotationZ, updated.RotationZ));
-            }
-            int len = Math.Min(previous.Buttons.Length, updated.Buttons.Length);
-            for (int i = 0; i < len; i++)
+
+            if (previous.ButtonsBits != updated.ButtonsBits)
             {
-                if (previous.Buttons[i] != updated.Buttons[i])
+                const int MaxButtonEnumSpan = (int)InputAxis.Button63 - (int)InputAxis.Button0 + 1;
+
+                int maxCount = Math.Max(previous.ButtonCount, updated.ButtonCount);
+                int limit = Math.Min(maxCount, MaxButtonEnumSpan);
+                for (int i = 0; i < limit; i++)
                 {
-                    changes.Add(new InputAxisChange((InputAxis)((int)InputAxis.Button0 + i), updated.Buttons[i] ? 1f : 0f));
+                    bool prevPressed = i < previous.ButtonCount && GetBit(previous.ButtonsBits, i);
+                    bool updatedPressed = i < updated.ButtonCount && GetBit(updated.ButtonsBits, i);
+                    if (prevPressed != updatedPressed)
+                    {
+                        changes.Add(new InputAxisChange((InputAxis)((int)InputAxis.Button0 + i), updatedPressed ? 1f : 0f));
+                    }
                 }
             }
         }
@@ -73,36 +67,26 @@
         {
             switch (which)
             {
-                case InputAxis.X:
-                    return X;
-                case InputAxis.Y:
-                    return Y;
-                case InputAxis.Z:
-                    return Z;
-                case InputAxis.Slider:
-                    return Slider;
-                case InputAxis.RotationX:
-                    return RotationX;
-                case InputAxis.RotationY:
-                    return RotationY;
-                case InputAxis.RotationZ:
-                    return RotationZ;
-                case InputAxis.PovX:
-                    return PovX;
-                case InputAxis.PovY:
-                    return PovY;
+                case InputAxis.X: return X;
+                case InputAxis.Y: return Y;
+                case InputAxis.Z: return Z;
+                case InputAxis.Slider1: return Slider1;
+                case InputAxis.RotationX: return RotationX;
+                case InputAxis.RotationY: return RotationY;
+                case InputAxis.RotationZ: return RotationZ;
+                case InputAxis.PovX: return PovX;
+                case InputAxis.PovY: return PovY;
                 default:
+                    // After this range check we know (int)which - Button0 is in [0,63].
+                    if (which >= InputAxis.Button0 && which <= InputAxis.Button63)
                     {
-                        if (which >= InputAxis.Button0 && which <= InputAxis.Button31)
-                        {
-                            int index = (int)which - (int)InputAxis.Button0;
-                            if (index >= 0 && index < Buttons.Length)
-                            {
-                                return Buttons[index] ? 1f : 0f;
-                            }
-                        }
-                        return 0;
+                        int index = (int)which - (int)InputAxis.Button0;
+                        // Only need to verify index < ButtonCount; index >=0 and <64 are implied by enum range.
+                        if (index < ButtonCount && GetBit(ButtonsBits, index))
+                            return 1f;
+                        return 0f;
                     }
+                    return 0f;
             }
         }
     }
