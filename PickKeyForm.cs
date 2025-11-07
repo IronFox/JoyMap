@@ -72,6 +72,18 @@
                     RelayKey(rest, isPressed);
                 return;
             }
+
+            if (k == Keys.ControlKey)
+            {
+                RelayKey(Keys.LControlKey, isPressed);
+                RelayKey(Keys.RControlKey, isPressed);
+            }
+            if (k == Keys.ShiftKey)
+            {
+                RelayKey(Keys.LShiftKey, isPressed);
+                RelayKey(Keys.RShiftKey, isPressed);
+            }
+
             Status[k] = isPressed;
             UpdateList();
         }
