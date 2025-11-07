@@ -68,6 +68,10 @@ namespace JoyMap
                     }
                     triggerListView.Items.Remove(item);
                 }
+                foreach (var t in Triggers)
+                {
+                    t.Row.SubItems[0].Text = $"T{t.Row.Index}";
+                }
             }
         }
 
@@ -134,6 +138,28 @@ namespace JoyMap
                     actionListView.Items.Remove(item);
                 }
             }
+        }
+
+        private void actionListView_DoubleClick(object sender, EventArgs e)
+        {
+            if (actionListView.SelectedItems.Count == 1)
+            {
+                var item = actionListView.SelectedItems[0];
+                if (item.Tag is InputEffect action)
+                {
+                    var form = new ActionForm(action);
+                    var result = form.ShowDialog(this);
+                    if (result == DialogResult.OK && form.Result is not null)
+                    {
+                        var updated = form.Result;
+                        item.SubItems[0].Text = updated.Name;
+                        item.SubItems[1].Text = updated.TypeName;
+                        item.SubItems[2].Text = updated.Action;
+                        item.Tag = updated;
+                    }
+                }
+            }
+
         }
     }
 }

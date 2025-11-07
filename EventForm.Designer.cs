@@ -159,6 +159,7 @@
             actionListView.TabIndex = 5;
             actionListView.UseCompatibleStateImageBehavior = false;
             actionListView.View = View.Details;
+            actionListView.DoubleClick += actionListView_DoubleClick;
             // 
             // columnHeader4
             // 
@@ -180,20 +181,20 @@
             actionMenu.ImageScalingSize = new Size(24, 24);
             actionMenu.Items.AddRange(new ToolStripItem[] { addToolStripMenuItem, deleteToolStripMenuItem });
             actionMenu.Name = "actionMenu";
-            actionMenu.Size = new Size(241, 101);
+            actionMenu.Size = new Size(136, 68);
             actionMenu.Opening += actionMenu_Opening;
             // 
             // addToolStripMenuItem
             // 
             addToolStripMenuItem.Name = "addToolStripMenuItem";
-            addToolStripMenuItem.Size = new Size(240, 32);
+            addToolStripMenuItem.Size = new Size(135, 32);
             addToolStripMenuItem.Text = "Add ...";
             addToolStripMenuItem.Click += addToolStripMenuItem_Click;
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new Size(240, 32);
+            deleteToolStripMenuItem.Size = new Size(135, 32);
             deleteToolStripMenuItem.Text = "Delete";
             deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
             // 
