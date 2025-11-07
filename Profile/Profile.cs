@@ -1,4 +1,5 @@
 ﻿using JoyMap.ControllerTracking;
+using System.Text.RegularExpressions;
 
 namespace JoyMap.Profile
 {
@@ -12,9 +13,15 @@ namespace JoyMap.Profile
 
     public record ProfileInstance(
         Profile Profile,
+        Regex WindowNameRegex,
         IReadOnlyList<EventInstance> EventInstances
         )
     {
+        public bool Is(string windowName)
+        {
+            return WindowNameRegex.IsMatch(windowName);
+        }
+
         public static ProfileInstance Load(InputMonitor monitor, Profile profile)
         {
             var eventInstances = profile.Events
@@ -22,6 +29,7 @@ namespace JoyMap.Profile
                 .ToList();
             return new ProfileInstance(
                 Profile: profile,
+                WindowNameRegex: new Regex(profile.WindowNameRegex, RegexOptions.Compiled),
                 EventInstances: eventInstances
                 );
         }

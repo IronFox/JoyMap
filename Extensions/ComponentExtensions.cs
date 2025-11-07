@@ -18,6 +18,29 @@ namespace JoyMap.Extensions
         }
 
 
+        public static bool IsChildOf(this Form? child, Form parent)
+        {
+            if (child is null)
+                return false;
+            var p = child.Parent;
+            while (p is not null)
+            {
+                if (p == parent)
+                    return true;
+                p = p.Parent;
+            }
+            return false;
+        }
+
+
+        public static IEnumerable<object> ToEnumerable(this ComboBox.ObjectCollection items)
+        {
+            foreach (var item in items)
+            {
+                yield return item;
+            }
+        }
+
         public static IEnumerable<ListViewItem> ToEnumerable(this ListView.ListViewItemCollection items)
         {
             foreach (ListViewItem item in items)

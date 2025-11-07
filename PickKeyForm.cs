@@ -100,6 +100,10 @@
                 RelayKey(Keys.LShiftKey, isPressed);
                 RelayKey(Keys.RShiftKey, isPressed);
             }
+            if (k == Keys.PageUp)
+            {
+
+            }
 
             Status[k] = isPressed;
             UpdateList();

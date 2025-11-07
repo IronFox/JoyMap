@@ -11,6 +11,7 @@ namespace JoyMap
             if (instance is not null)
             {
                 textName.Text = instance.Event.Name;
+                triggerCombiner.Text = instance.Event.TriggerCombiner;
                 foreach (var t in instance.TriggerInstances)
                 {
                     var idx = Triggers.Count;
@@ -37,7 +38,7 @@ namespace JoyMap
 
         private void pickAddToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = new TriggerForm();
+            using var form = new TriggerForm();
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -112,7 +113,7 @@ namespace JoyMap
                 var item = triggerListView.SelectedItems[0];
                 if (item.Tag is TriggerInstance t)
                 {
-                    var form = new TriggerForm(t);
+                    using var form = new TriggerForm(t);
                     var result = form.ShowDialog(this);
                     if (result == DialogResult.OK && form.Result is not null)
                     {
@@ -134,7 +135,7 @@ namespace JoyMap
 
         private void addToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = new ActionForm();
+            using var form = new ActionForm();
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -182,7 +183,7 @@ namespace JoyMap
                 var item = actionListView.SelectedItems[0];
                 if (item.Tag is EventAction action)
                 {
-                    var form = new ActionForm(action);
+                    using var form = new ActionForm(action);
                     var result = form.ShowDialog(this);
                     if (result == DialogResult.OK && form.Result is not null)
                     {
@@ -212,6 +213,7 @@ namespace JoyMap
                         .Where(x => x is not null).ToList();
                 var eventObj = new EventInstance(
                     Event: new(
+                        TriggerCombiner: triggerCombiner.Text,
                         Name: textName.Text.Trim(),
                         Triggers: this.Triggers.Select(x => x.Trigger.Trigger).ToList(),
                         Actions: actions!

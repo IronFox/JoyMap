@@ -1,6 +1,7 @@
 ﻿using JoyMap.ControllerTracking;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace JoyMap.Profile
 {
@@ -12,6 +13,7 @@ namespace JoyMap.Profile
             public Guid Id { get; set; }
             public required Profile Profile { get; set; }
             public ProfileInstance? Loaded { get; set; }
+            public Regex? WindowNameRegex { get; set; }
         }
 
         private static Dictionary<Guid, ProfileSlot> Profiles { get; } = [];
@@ -23,6 +25,29 @@ namespace JoyMap.Profile
             Converters = { new JsonStringEnumConverter() }
         };
 
+        public static ProfileInstance? FindAndLoadForWindow(string windowName, InputMonitor monitor)
+        {
+            foreach (var slot in Profiles.Values)
+            {
+                if (slot.WindowNameRegex is null)
+                {
+                    if (slot.Loaded is not null)
+                    {
+                        slot.WindowNameRegex = slot.Loaded.WindowNameRegex;
+                    }
+                    else
+                        slot.WindowNameRegex = new Regex(slot.Profile.WindowNameRegex, RegexOptions.Compiled);
+                }
+                if (slot.WindowNameRegex.IsMatch(windowName))
+                {
+                    if (slot.Loaded is not null)
+                        return slot.Loaded;
+                    return slot.Loaded = ProfileInstance.Load(monitor, slot.Profile);
+                }
+            }
+            return null;
+        }
+
         public static Profile Persist(WorkProfile p)
         {
             var profile = p.ToProfileInstance();
@@ -30,10 +55,13 @@ namespace JoyMap.Profile
             {
                 slot.Profile = profile.Profile;
                 slot.Loaded = profile;
+                slot.WindowNameRegex = profile.WindowNameRegex;
             }
             else
                 Profiles.Add(p.Id, new() { Id = p.Id, Profile = profile.Profile, Loaded = profile });
             SaveAll();
+
+            p.RestartListenIfRunning();
             return profile.Profile;
         }
 
@@ -82,7 +110,7 @@ namespace JoyMap.Profile
 
         internal static IEnumerable<Profile> GetAllProfiles()
         {
-            return Profiles.Values.Select(x => x.Profile);
+            return Profiles.Values.Select(x => x.Profile).OrderBy(x => x.Name);
         }
 
         public static ProfileInstance? Instantiate(InputMonitor monitor, Profile? profile)

@@ -1,4 +1,6 @@
-﻿namespace JoyMap.Profile
+﻿using JoyMap.Windows;
+
+namespace JoyMap.Profile
 {
     public class WorkProfile
     {
@@ -29,6 +31,7 @@
             return new ProfileInstance
             (
                 Profile: ToProfile(),
+                WindowNameRegex: new System.Text.RegularExpressions.Regex(WindowRegex, System.Text.RegularExpressions.RegexOptions.Compiled),
                 EventInstances: Events
             );
         }
@@ -43,6 +46,69 @@
                 Events: Events.Select(x => x.Event).ToList()
             );
 
+        }
+
+        private CancellationTokenSource ListenCancel { get; set; } = new();
+        private Form? ListenOwner { get; set; } = null;
+        internal void StartListen(Form owner)
+        {
+            ListenCancel = new CancellationTokenSource();
+            ListenOwner = owner;
+            var cancel = ListenCancel.Token;
+            var processors = Events.Select(ev => ev.ToProcessor()).ToList();
+            var handle = owner.Handle;
+            Task.Run(() => ListenLoop(processors, handle, cancel), cancel);
+
+        }
+
+        internal void RestartListenIfRunning()
+        {
+            if (ListenOwner is not null)
+            {
+                Stop();
+                StartListen(ListenOwner);
+            }
+        }
+
+        private async Task ListenLoop(List<EventProcessor> processors, IntPtr ownerHandle, CancellationToken cancel)
+        {
+            try
+            {
+                while (true)
+                {
+                    var focused = WindowReference.OfFocused();
+                    if (focused is not null && !focused.Value.IsChildOf(ownerHandle))
+                    {
+                        foreach (var p in processors)
+                        {
+                            p.Update();
+                        }
+                    }
+                    await Task.Delay(5, cancel).ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                foreach (var processor in processors)
+                {
+                    processor.Stop();
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                Console.WriteLine($"ListenLoop Exception: {ex}");
+            }
+            finally
+            {
+                ListenOwner = null;
+            }
+        }
+
+        internal void Stop()
+        {
+            ListenCancel.Cancel();
         }
     }
 }

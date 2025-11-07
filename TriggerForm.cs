@@ -30,7 +30,7 @@ namespace JoyMap
 
         private void btnPickDeviceInput_Click(object sender, EventArgs e)
         {
-            var form = new PickDeviceInputForm();
+            using var form = new PickDeviceInputForm();
             if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
             {
                 Event = form.Result.Value;

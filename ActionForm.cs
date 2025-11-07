@@ -42,7 +42,7 @@ namespace JoyMap
         private void btnSimplePickKey_Click(object sender, EventArgs e)
         {
 
-            var form = new PickKeyForm();
+            using var form = new PickKeyForm();
             if (form.ShowDialog() == DialogResult.OK)
             {
                 SimpleKey = form.Result;

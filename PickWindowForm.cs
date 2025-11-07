@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Text;
+﻿using JoyMap.Windows;
 
 namespace JoyMap
 {
@@ -29,7 +28,7 @@ namespace JoyMap
                     ? windowListView.SelectedIndices[0]
                     : (windowListView.FocusedItem?.Index ?? -1);
 
-                var windows = EnumerateTopLevelWindows().ToList();
+                var windows = WindowReference.OfAll();
                 var existing = new HashSet<string>(windows.Select(x => x.Title));
                 foreach (var win in windows)
                 {
@@ -96,76 +95,7 @@ namespace JoyMap
             base.OnFormClosing(e);
         }
 
-        private static IEnumerable<WindowInfo> EnumerateTopLevelWindows()
-        {
-            var list = new List<WindowInfo>();
-            EnumWindows((hWnd, lParam) =>
-            {
-                if (!IsWindowVisible(hWnd))
-                    return true;
 
-                int len = GetWindowTextLength(hWnd);
-                if (len == 0)
-                    return true;
-
-                var sb = new StringBuilder(len + 1);
-                GetWindowText(hWnd, sb, sb.Capacity);
-                var title = sb.ToString();
-                if (string.IsNullOrWhiteSpace(title))
-                    return true;
-
-                if (!GetWindowRect(hWnd, out var rect))
-                    return true;
-
-                var info = new WindowInfo(hWnd, rect, title);
-                // Skip zero-sized or minimized windows
-                if (info.Width <= 0 || info.Height <= 0)
-                    return true;
-
-                list.Add(info);
-                return true;
-            }, IntPtr.Zero);
-
-            // Sort by title for easier browsing
-            list.Sort((a, b) => string.Compare(a.Title, b.Title, StringComparison.CurrentCultureIgnoreCase));
-            return list;
-        }
-
-        private readonly struct WindowInfo
-        {
-            public IntPtr Hwnd { get; }
-            public string Title { get; }
-            public int Left => Rect.Left;
-            public int Top => Rect.Top;
-            public int Width => Rect.Right - Rect.Left;
-            public int Height => Rect.Bottom - Rect.Top;
-
-            private RECT Rect { get; }
-
-            public WindowInfo(IntPtr hwnd, RECT rect, string title)
-            {
-                Hwnd = hwnd;
-                Rect = rect;
-                Title = title;
-            }
-        }
-
-        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-
-        [DllImport("user32.dll")]
-        private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
-
-        [DllImport("user32.dll")]
-        private static extern bool IsWindowVisible(IntPtr hWnd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
-
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern int GetWindowTextLength(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
         private void updateWindowListTimer_Tick(object sender, EventArgs e)
         {
@@ -191,13 +121,6 @@ namespace JoyMap
             }
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        private struct RECT
-        {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
-        }
+
     }
 }

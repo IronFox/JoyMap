@@ -3,6 +3,7 @@
 namespace JoyMap.Profile
 {
     public record Event(string Name,
+        string TriggerCombiner,
         IReadOnlyList<Trigger> Triggers,
         IReadOnlyList<EventAction> Actions
         )
@@ -26,5 +27,11 @@ namespace JoyMap.Profile
                 TriggerInstances: triggerInstances
                 );
         }
+
+        public EventProcessor ToProcessor()
+        {
+            return new EventProcessor(this);
+        }
+
     }
 }

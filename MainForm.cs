@@ -1,5 +1,7 @@
 using JoyMap.ControllerTracking;
+using JoyMap.Extensions;
 using JoyMap.Profile;
+using JoyMap.Windows;
 using System.Text.RegularExpressions;
 
 namespace JoyMap
@@ -35,7 +37,7 @@ namespace JoyMap
         {
             if (ActiveProfile is null)
                 return;
-            var form = new EventForm();
+            using var form = new EventForm();
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -51,13 +53,14 @@ namespace JoyMap
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = new PickWindowForm();
+            using var form = new PickWindowForm();
             if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
             {
                 WorkProfile p = new WorkProfile { Name = form.Result, WindowRegex = Regex.Escape(form.Result) };
-
-                cbProfile.Items.Add(new ProfileSelection(Registry.Persist(p)));
-                cbProfile.SelectedIndex = cbProfile.Items.Count - 1;
+                Registry.Persist(p);
+                cbProfile.Items.Clear();
+                cbProfile.Items.AddRange(Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray());
+                cbProfile.SelectedIndex = cbProfile.Items.ToEnumerable().ToList().FindIndex(x => (x as ProfileSelection)?.Profile.Id == p.Id);
             }
         }
 
@@ -65,9 +68,11 @@ namespace JoyMap
 
         private void LoadProfile(WorkProfile? profile)
         {
-            Flush();
-            if (profile is null)
+
+            if (profile is null || profile.Id == ActiveProfile?.Id)
                 return;
+            if (ActiveProfile is not null)
+                ActiveProfile.Stop();
             ActiveProfile = profile;
             textWindowRegex.Text = profile.WindowRegex;
             textWindowRegex.Enabled = true;
@@ -83,13 +88,14 @@ namespace JoyMap
                 row.SubItems.Add(string.Join(", ", ev.Actions.Select(x => x.Action)));
                 row.SubItems.Add("");
             }
+            profile.StartListen(this);
         }
 
         private void btnAddPickWindow_Click(object sender, EventArgs e)
         {
             if (ActiveProfile is null)
                 return;
-            var form = new PickWindowForm();
+            using var form = new PickWindowForm();
             if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
             {
                 if (Regex.Escape(ActiveProfile.Name) == ActiveProfile.WindowRegex)
@@ -102,6 +108,8 @@ namespace JoyMap
 
         private void Flush()
         {
+            if (ActiveProfile is not null)
+                ActiveProfile.Stop();
             ActiveProfile = null;
             textWindowRegex.Text = "";
             textWindowRegex.Enabled = false;
@@ -164,12 +172,13 @@ namespace JoyMap
 
         private void cbProfile_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Flush();
             var profile = Registry.Instantiate(InputMonitor, (cbProfile.SelectedItem as ProfileSelection)?.Profile);
             if (profile is not null)
             {
                 LoadProfile(WorkProfile.Load(profile));
             }
+            else
+                Flush();
         }
 
         private void eventListView_DoubleClick(object sender, EventArgs e)
@@ -181,7 +190,7 @@ namespace JoyMap
             var item = eventListView.SelectedItems[0];
             if (item.Tag is not EventInstance ev)
                 return;
-            var form = new EventForm(ev);
+            using var form = new EventForm(ev);
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -212,6 +221,19 @@ namespace JoyMap
                     }
                 }
                 row.SubItems[3].Text = any ? "A" : "";
+            }
+
+
+            WindowReference? focusedWindow = WindowReference.OfFocused();
+            if (focusedWindow is not null)
+            {
+
+                var match = Registry.FindAndLoadForWindow(focusedWindow.Value.Title, InputMonitor);
+
+                if (match != null && match.Profile.Id != ActiveProfile?.Id)
+                {
+                    LoadProfile(WorkProfile.Load(match));
+                }
             }
         }
     }
