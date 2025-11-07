@@ -6,9 +6,23 @@ namespace JoyMap
 {
     public partial class TriggerForm : Form
     {
-        public TriggerForm()
+        public TriggerForm(TriggerInstance? t = null)
         {
             InitializeComponent();
+            if (t is not null)
+            {
+                Event = new Event(
+                    InputId: t.Trigger.InputId,
+                    Status: t.GetCurrentValue() ?? 0,
+                    GetLatestStatus: t.GetCurrentValue
+                    );
+                textDevice.Text = Event.Value.DeviceName;
+                textInput.Text = Event.Value.InputId.AxisName;
+                textMin.Text = (t.Trigger.MinValue * 100).ToString(CultureInfo.InvariantCulture);
+                textMax.Text = (t.Trigger.MaxValue * 100).ToString(CultureInfo.InvariantCulture);
+                RebuildResult();
+
+            }
         }
 
         private Event? Event { get; set; }

@@ -38,5 +38,62 @@ namespace JoyMap
             }
 
         }
+
+        private void triggerMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            deleteToolStripMenuItem1.Enabled = triggerListView.SelectedItems.Count > 0;
+        }
+
+        private void deleteToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var query = "Delete selected triggers?";
+            if (triggerListView.SelectedItems.Count == 1)
+            {
+                var item = triggerListView.SelectedItems[0];
+                var trigger = item.Tag as TriggerInstance;
+                query = "Delete selected trigger (" + trigger?.Trigger.InputId.ControllerName + " - " + trigger?.Trigger.InputId.AxisName + ")?";
+            }
+            if (MessageBox.Show(this, query, "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                foreach (ListViewItem item in triggerListView.SelectedItems)
+                {
+                    if (item.Tag is TriggerInstance t)
+                    {
+                        var toRemove = Triggers.FirstOrDefault(x => x.Trigger == t);
+                        if (toRemove.Trigger is not null)
+                        {
+                            Triggers.Remove(toRemove);
+                        }
+                    }
+                    triggerListView.Items.Remove(item);
+                }
+            }
+        }
+
+        private void triggerListView_DoubleClick(object sender, EventArgs e)
+        {
+            if (triggerListView.SelectedItems.Count == 1)
+            {
+                var item = triggerListView.SelectedItems[0];
+                if (item.Tag is TriggerInstance t)
+                {
+                    var form = new TriggerForm(t);
+                    var result = form.ShowDialog(this);
+                    if (result == DialogResult.OK && form.Result is not null)
+                    {
+                        var updated = form.Result;
+                        item.SubItems[1].Text = updated.Trigger.InputId.ControllerName;
+                        item.SubItems[2].Text = updated.Trigger.InputId.AxisName;
+                        item.Tag = updated;
+                        var idx = Triggers.FindIndex(x => x.Trigger == t);
+                        if (idx >= 0)
+                        {
+                            Triggers[idx] = (updated, item);
+                        }
+                    }
+                }
+            }
+
+        }
     }
 }

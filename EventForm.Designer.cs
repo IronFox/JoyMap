@@ -94,6 +94,7 @@
             triggerListView.TabIndex = 3;
             triggerListView.UseCompatibleStateImageBehavior = false;
             triggerListView.View = View.Details;
+            triggerListView.DoubleClick += triggerListView_DoubleClick;
             // 
             // columnHeader6
             // 
@@ -120,6 +121,7 @@
             triggerMenu.Items.AddRange(new ToolStripItem[] { pickAddToolStripMenuItem, deleteToolStripMenuItem1 });
             triggerMenu.Name = "triggerMenu";
             triggerMenu.Size = new Size(174, 68);
+            triggerMenu.Opening += triggerMenu_Opening;
             // 
             // pickAddToolStripMenuItem
             // 
@@ -133,6 +135,7 @@
             deleteToolStripMenuItem1.Name = "deleteToolStripMenuItem1";
             deleteToolStripMenuItem1.Size = new Size(173, 32);
             deleteToolStripMenuItem1.Text = "Delete";
+            deleteToolStripMenuItem1.Click += deleteToolStripMenuItem1_Click;
             // 
             // label3
             // 
