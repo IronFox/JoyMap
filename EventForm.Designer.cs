@@ -41,7 +41,7 @@
             pickAddToolStripMenuItem = new ToolStripMenuItem();
             deleteToolStripMenuItem1 = new ToolStripMenuItem();
             label3 = new Label();
-            listView2 = new ListView();
+            actionListView = new ListView();
             columnHeader4 = new ColumnHeader();
             columnHeader5 = new ColumnHeader();
             actionMenu = new ContextMenuStrip(components);
@@ -52,6 +52,7 @@
             label4 = new Label();
             triggerCombiner = new ComboBox();
             statusUpdateTimer = new System.Windows.Forms.Timer(components);
+            columnHeader7 = new ColumnHeader();
             triggerMenu.SuspendLayout();
             actionMenu.SuspendLayout();
             SuspendLayout();
@@ -146,18 +147,18 @@
             label3.TabIndex = 4;
             label3.Text = "Actions";
             // 
-            // listView2
+            // actionListView
             // 
-            listView2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            listView2.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader5 });
-            listView2.ContextMenuStrip = actionMenu;
-            listView2.FullRowSelect = true;
-            listView2.Location = new Point(12, 422);
-            listView2.Name = "listView2";
-            listView2.Size = new Size(900, 296);
-            listView2.TabIndex = 5;
-            listView2.UseCompatibleStateImageBehavior = false;
-            listView2.View = View.Details;
+            actionListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            actionListView.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader5, columnHeader7 });
+            actionListView.ContextMenuStrip = actionMenu;
+            actionListView.FullRowSelect = true;
+            actionListView.Location = new Point(12, 422);
+            actionListView.Name = "actionListView";
+            actionListView.Size = new Size(900, 296);
+            actionListView.TabIndex = 5;
+            actionListView.UseCompatibleStateImageBehavior = false;
+            actionListView.View = View.Details;
             // 
             // columnHeader4
             // 
@@ -167,6 +168,7 @@
             // columnHeader5
             // 
             columnHeader5.Text = "Type";
+            columnHeader5.Width = 100;
             // 
             // actionMenu
             // 
@@ -180,6 +182,7 @@
             addToolStripMenuItem.Name = "addToolStripMenuItem";
             addToolStripMenuItem.Size = new Size(135, 32);
             addToolStripMenuItem.Text = "Add ...";
+            addToolStripMenuItem.Click += addToolStripMenuItem_Click;
             // 
             // deleteToolStripMenuItem
             // 
@@ -236,6 +239,11 @@
             statusUpdateTimer.Interval = 200;
             statusUpdateTimer.Tick += statusUpdateTimer_Tick;
             // 
+            // columnHeader7
+            // 
+            columnHeader7.Text = "Action";
+            columnHeader7.Width = 200;
+            // 
             // EventForm
             // 
             AcceptButton = btnOk;
@@ -247,7 +255,7 @@
             Controls.Add(label4);
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
-            Controls.Add(listView2);
+            Controls.Add(actionListView);
             Controls.Add(label3);
             Controls.Add(triggerListView);
             Controls.Add(label2);
@@ -268,7 +276,7 @@
         private Label label2;
         private ListView triggerListView;
         private Label label3;
-        private ListView listView2;
+        private ListView actionListView;
         private Button btnCancel;
         private Button btnOk;
         private ColumnHeader columnHeader1;
@@ -286,5 +294,6 @@
         private ToolStripMenuItem pickAddToolStripMenuItem;
         private ToolStripMenuItem deleteToolStripMenuItem1;
         private System.Windows.Forms.Timer statusUpdateTimer;
+        private ColumnHeader columnHeader7;
     }
 }

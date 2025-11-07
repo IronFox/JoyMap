@@ -1,6 +1,6 @@
 ﻿using JoyMap.ControllerTracking;
+using JoyMap.Extensions;
 using JoyMap.Profile;
-using System.Globalization;
 
 namespace JoyMap
 {
@@ -18,8 +18,8 @@ namespace JoyMap
                     );
                 textDevice.Text = Event.Value.DeviceName;
                 textInput.Text = Event.Value.InputId.AxisName;
-                textMin.Text = (t.Trigger.MinValue * 100).ToString(CultureInfo.InvariantCulture);
-                textMax.Text = (t.Trigger.MaxValue * 100).ToString(CultureInfo.InvariantCulture);
+                textMin.Text = (t.Trigger.MinValue * 100).ToStr();
+                textMax.Text = (t.Trigger.MaxValue * 100).ToStr();
                 RebuildResult();
 
             }
@@ -43,25 +43,10 @@ namespace JoyMap
         }
 
         private float? GetMin()
-        {
-            var s = textMin.Text.Replace(',', '.');
-
-            if (float.TryParse(s, CultureInfo.InvariantCulture, out var val))
-            {
-                return val / 100;
-            }
-            return null;
-        }
+            => textMin.GetFloat(true);
 
         private float? GetMax()
-        {
-            var s = textMax.Text.Replace(',', '.');
-            if (float.TryParse(s, CultureInfo.InvariantCulture, out var val))
-            {
-                return val / 100;
-            }
-            return null;
-        }
+            => textMax.GetFloat(true);
 
         private void statusUpdateTimer_Tick(object sender, EventArgs e)
         {

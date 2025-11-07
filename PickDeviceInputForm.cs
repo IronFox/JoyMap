@@ -1,5 +1,5 @@
 ﻿using JoyMap.ControllerTracking;
-using System.Globalization;
+using JoyMap.Extensions;
 
 namespace JoyMap
 {
@@ -72,7 +72,7 @@ namespace JoyMap
         {
             if (status is null)
                 return "N/A";
-            return Math.Round(status.Value * 100, 2).ToString(CultureInfo.InvariantCulture) + " %";
+            return Math.Round(status.Value * 100, 2).ToStr() + " %";
         }
 
         private void inputList_SelectedIndexChanged(object sender, EventArgs e)

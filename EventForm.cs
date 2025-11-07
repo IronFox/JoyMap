@@ -95,5 +95,20 @@ namespace JoyMap
             }
 
         }
+
+        private void addToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = new ActionForm();
+            var result = form.ShowDialog(this);
+            if (result == DialogResult.OK && form.Result is not null)
+            {
+                var action = form.Result;
+                var row = actionListView.Items.Add(action.Name);
+                row.SubItems.Add(action.TypeName);
+                row.SubItems.Add(action.Action);
+                row.Tag = action;
+            }
+
+        }
     }
 }
