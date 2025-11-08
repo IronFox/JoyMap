@@ -2,34 +2,31 @@
 
 namespace JoyMap.Undo.Action
 {
-    internal class MoveEventInstanceDownAction : CommonAction, IUndoableAction
+    internal class MoveEventInstanceDownAction : CommonMoveInstanceAction, IUndoableAction
     {
-        public MoveEventInstanceDownAction(MainForm mainForm, WorkProfile activeProfile, int oldRowIndex)
-            : base(mainForm, activeProfile)
-        {
-            OldRowIndex = oldRowIndex;
-            EventName = TargetProfile.Events[oldRowIndex].Event.Name;
-        }
-
-        public int OldRowIndex { get; }
-        public string EventName { get; }
-
-        public string Name => $"Move '{EventName}' Down";
+        public MoveEventInstanceDownAction(MainForm mainForm, WorkProfile activeProfile, IReadOnlyList<int> selectedRowIndexes)
+            : base(mainForm, activeProfile, selectedRowIndexes)
+        { }
 
         public void Execute()
         {
-            if (!IsValid || OldRowIndex >= TargetProfile.Events.Count - 1)
+            if (!IsValid)
                 return;
-
-            var eventInstance = TargetProfile.Events[OldRowIndex];
-            TargetProfile.Events.RemoveAt(OldRowIndex);
-            TargetProfile.Events.Insert(OldRowIndex + 1, eventInstance);
             Form.EventListView.BeginUpdate();
             try
             {
-                var row = Form.EventListView.Items[OldRowIndex];
-                Form.EventListView.Items.RemoveAt(OldRowIndex);
-                Form.EventListView.Items.Insert(OldRowIndex + 1, row);
+                for (int i = SelectedRowIndexes.Count - 1; i >= 0; i--)
+                {
+                    var oldRowIndex = SelectedRowIndexes[i];
+                    if (oldRowIndex >= TargetProfile.Events.Count - 1)
+                        continue;
+                    var eventInstance = TargetProfile.Events[oldRowIndex];
+                    TargetProfile.Events.RemoveAt(oldRowIndex);
+                    TargetProfile.Events.Insert(oldRowIndex + 1, eventInstance);
+                    var row = Form.EventListView.Items[oldRowIndex];
+                    Form.EventListView.Items.RemoveAt(oldRowIndex);
+                    Form.EventListView.Items.Insert(oldRowIndex + 1, row);
+                }
                 Registry.Persist(TargetProfile);
             }
             finally
@@ -40,18 +37,22 @@ namespace JoyMap.Undo.Action
 
         public void Undo()
         {
-            if (!IsValid || OldRowIndex >= TargetProfile.Events.Count - 1)
+            if (!IsValid)
                 return;
-
-            var eventInstance = TargetProfile.Events[OldRowIndex + 1];
-            TargetProfile.Events.RemoveAt(OldRowIndex + 1);
-            TargetProfile.Events.Insert(OldRowIndex, eventInstance);
             Form.EventListView.BeginUpdate();
             try
             {
-                var row = Form.EventListView.Items[OldRowIndex + 1];
-                Form.EventListView.Items.RemoveAt(OldRowIndex + 1);
-                Form.EventListView.Items.Insert(OldRowIndex, row);
+                foreach (var oldRowIndex in SelectedRowIndexes)
+                {
+                    if (oldRowIndex >= TargetProfile.Events.Count - 1)
+                        continue;
+                    var eventInstance = TargetProfile.Events[oldRowIndex + 1];
+                    TargetProfile.Events.RemoveAt(oldRowIndex + 1);
+                    TargetProfile.Events.Insert(oldRowIndex, eventInstance);
+                    var row = Form.EventListView.Items[oldRowIndex + 1];
+                    Form.EventListView.Items.RemoveAt(oldRowIndex + 1);
+                    Form.EventListView.Items.Insert(oldRowIndex, row);
+                }
                 Registry.Persist(TargetProfile);
             }
             finally

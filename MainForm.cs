@@ -126,7 +126,7 @@ namespace JoyMap
         private void eventListView_SelectedIndexChanged(object sender, EventArgs e)
         {
             btnUp.Enabled = eventListView.SelectedItems.Count > 0 && eventListView.SelectedItems[0].Index > 0;
-            btnDown.Enabled = eventListView.SelectedItems.Count > 0 && eventListView.SelectedItems[0].Index < eventListView.Items.Count - 1;
+            btnDown.Enabled = eventListView.SelectedItems.Count > 0 && eventListView.SelectedItems[eventListView.SelectedItems.Count - 1].Index < eventListView.Items.Count - 1;
         }
 
         private void btnUp_Click(object sender, EventArgs e)
@@ -139,10 +139,7 @@ namespace JoyMap
 
             if (eventListView.SelectedItems.Count == 0)
                 return;
-            var idx = eventListView.SelectedIndices[0];
-            if (idx == 0)
-                return;
-            ActiveProfile.History.ExecuteAction(new MoveEventInstanceUpAction(this, ActiveProfile, idx));
+            ActiveProfile.History.ExecuteAction(new MoveEventInstanceUpAction(this, ActiveProfile, eventListView.SelectedIndices.ToArray()));
         }
 
         private void btnDown_Click(object sender, EventArgs e)
@@ -154,9 +151,7 @@ namespace JoyMap
             }
             if (eventListView.SelectedItems.Count == 0)
                 return;
-            var idx = eventListView.SelectedIndices[0];
-
-            ActiveProfile.History.ExecuteAction(new MoveEventInstanceDownAction(this, ActiveProfile, idx));
+            ActiveProfile.History.ExecuteAction(new MoveEventInstanceDownAction(this, ActiveProfile, eventListView.SelectedIndices.ToArray()));
 
         }
 
@@ -246,6 +241,9 @@ namespace JoyMap
             var copied = ClipboardUtil.GetCopiedEvents();
             pasteOverToolStripMenuItem.Enabled = copied?.Count == eventListView.SelectedItems.Count;
             pasteInsertToolStripMenuItem.Enabled = copied is not null;
+            moveSelectedUpToolStripMenuItem.Enabled = btnUp.Enabled;
+            moveSelectedDownToolStripMenuItem.Enabled = btnDown.Enabled;
+            selectAllToolStripMenuItem.Enabled = eventListView.Items.Count > 0;
         }
 
         private void copySelectedToolStripMenuItem_Click(object sender, EventArgs e)
@@ -389,6 +387,58 @@ namespace JoyMap
                 e.Handled = true;
                 return;
             }
+
+            if (e.KeyCode == Keys.Delete)
+            {
+                deleteToolStripMenuItem_Click(this, EventArgs.Empty);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Control && e.KeyCode == Keys.N)
+            {
+                newToolStripMenuItem1_Click(this, EventArgs.Empty);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Control && e.KeyCode == Keys.Up)
+            {
+                btnUp_Click(this, EventArgs.Empty);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Control && e.KeyCode == Keys.Down)
+            {
+                btnDown_Click(this, EventArgs.Empty);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                selectAllToolStripMenuItem_Click(this, EventArgs.Empty);
+                e.Handled = true;
+                return;
+            }
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var selectedIndexes = eventListView.SelectedItems.ToEnumerable().Select(item => item.Index).ToList();
+            if (selectedIndexes.Count == 0)
+                return;
+            ActiveProfile.History.ExecuteAction(new DeleteEventInstancesAction(this, ActiveProfile, selectedIndexes));
+
+        }
+
+        private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < eventListView.Items.Count; i++)
+                eventListView.SelectedIndices.Add(i);
         }
     }
 }

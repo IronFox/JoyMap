@@ -33,6 +33,34 @@ namespace JoyMap.Extensions
         }
 
 
+        public static int[] ToArray(this ListView.SelectedIndexCollection items)
+        {
+            var arr = new int[items.Count];
+            for (int i = 0; i < items.Count; i++)
+            {
+                arr[i] = items[i];
+            }
+            return arr;
+        }
+
+        public static IEnumerable<int> ToEnumerable(this ListView.SelectedIndexCollection items)
+        {
+            foreach (int item in items)
+            {
+                yield return item;
+            }
+        }
+
+        public static object?[] ToArray(this ComboBox.ObjectCollection items)
+        {
+            var arr = new object?[items.Count];
+            for (int i = 0; i < items.Count; i++)
+            {
+                arr[i] = items[i];
+            }
+            return arr;
+        }
+
         public static IEnumerable<object> ToEnumerable(this ComboBox.ObjectCollection items)
         {
             foreach (var item in items)
