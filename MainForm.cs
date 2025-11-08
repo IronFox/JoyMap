@@ -222,10 +222,13 @@ namespace JoyMap
             var lastOpenedForm = Application.OpenForms.Cast<Form>().Last();
             WorkProfile.SuppressEventProcessingBecauseJoyMapIsFocused = lastOpenedForm.ContainsFocus;
 
-            foreach (ListViewItem row in eventListView.Items)
+            if (WorkProfile.SuppressEventProcessingBecauseJoyMapIsFocused)
             {
-                if (row.Tag is not EventInstance ev) continue;
-                row.SubItems[3].Text = ev.IsTriggered() ? "A" : "";
+                foreach (ListViewItem row in eventListView.Items)
+                {
+                    if (row.Tag is not EventInstance ev) continue;
+                    row.SubItems[3].Text = ev.IsTriggered() ? "A" : "";
+                }
             }
 
 
@@ -507,7 +510,7 @@ namespace JoyMap
         private void runOnlyWhenGameIsFocusedToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             if (ActiveProfile is null) return;
-            WorkProfile.SuppressEventProcessingBecauseJoyMapIsFocused = runOnlyWhenGameIsFocusedToolStripMenuItem.Checked;
+            SuppressIfGameIsNotFocused = runOnlyWhenGameIsFocusedToolStripMenuItem.Checked;
         }
 
         private void saveDebugOnlyToolStripMenuItem_Click(object sender, EventArgs e)
