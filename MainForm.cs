@@ -220,7 +220,7 @@ namespace JoyMap
             if (focusedWindow is not null)
             {
 
-                var match = Registry.FindAndLoadForWindow(focusedWindow.Value.Title, InputMonitor);
+                var match = Registry.FindAndLoadForWindow(focusedWindow.Title, InputMonitor);
 
                 if (match != null && match.Profile.Id != ActiveProfile?.Id)
                 {

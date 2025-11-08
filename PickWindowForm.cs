@@ -36,6 +36,7 @@ namespace JoyMap
                     {
                         item = new ListViewItem(win.Title);
                         item.SubItems.Add($"{win.Width} * {win.Height}");
+                        item.SubItems.Add(win.GetProcessName());
                         item.Tag = win.Title;
                         windowListView.Items.Add(item);
                         WindowRows[win.Title] = item;
@@ -44,6 +45,7 @@ namespace JoyMap
                     {
                         // Update existing
                         item.SubItems[1].Text = $"{win.Width} * {win.Height}";
+                        //item.SubItems[2].Text = win.GetProcessName();
                     }
                 }
                 // Remove closed windows

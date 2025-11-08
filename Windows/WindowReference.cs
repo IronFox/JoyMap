@@ -12,16 +12,33 @@ namespace JoyMap.Windows
         public int Bottom;
     }
 
-    public readonly record struct WindowReference(
+    public record WindowReference(
         string Title,
         IntPtr Handle,
         RECT Rect)
     {
-        // Plan (pseudocode):
-        // 1. Declare missing P/Invoke for GetParent from user32.dll returning IntPtr.
-        // 2. Keep IsChildOf logic: walk up parent chain until IntPtr.Zero or match.
-        // 3. No other behavioral changes.
-        // 4. Ensure ordering with other DllImports.
+        private string? ProcessNameCache { get; set; } = null;
+
+        public string? GetProcessName()
+        {
+            if (ProcessNameCache is not null)
+                return ProcessNameCache;
+            try
+            {
+                _ = GetWindowThreadProcessId(Handle, out uint pid);
+                if (pid == 0)
+                    return null;
+
+                var process = System.Diagnostics.Process.GetProcessById((int)pid);
+                ProcessNameCache = process.ProcessName;
+                return ProcessNameCache;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
 
         public bool IsChildOf(IntPtr parentHandle)
         {
@@ -61,6 +78,10 @@ namespace JoyMap.Windows
         // Added implementation for GetParent used in IsChildOf
         [DllImport("user32.dll")]
         private static extern IntPtr GetParent(IntPtr hWnd);
+
+        // Added: Direct P/Invoke to avoid inaccessible NativeMethods and correctly retrieve PID
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         internal static WindowReference? OfFocused()
         {

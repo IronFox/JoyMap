@@ -36,12 +36,13 @@
             btnOk = new Button();
             btnCancel = new Button();
             updateWindowListTimer = new System.Windows.Forms.Timer(components);
+            columnHeader3 = new ColumnHeader();
             SuspendLayout();
             // 
             // windowListView
             // 
             windowListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            windowListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
+            windowListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3 });
             windowListView.FullRowSelect = true;
             windowListView.Location = new Point(12, 12);
             windowListView.Name = "windowListView";
@@ -91,6 +92,11 @@
             updateWindowListTimer.Interval = 500;
             updateWindowListTimer.Tick += updateWindowListTimer_Tick;
             // 
+            // columnHeader3
+            // 
+            columnHeader3.Text = "Process Name";
+            columnHeader3.Width = 200;
+            // 
             // PickWindowForm
             // 
             AcceptButton = btnOk;
@@ -116,5 +122,6 @@
         private Button btnOk;
         private Button btnCancel;
         private System.Windows.Forms.Timer updateWindowListTimer;
+        private ColumnHeader columnHeader3;
     }
 }
