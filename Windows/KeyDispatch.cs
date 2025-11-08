@@ -144,7 +144,7 @@ namespace JoyMap.Windows
             rs.U.mi.mouseData = mouseData;
             rs.U.mi.dwFlags = flags;
             rs.U.mi.time = 0;
-            rs.U.mi.dwExtraInfo = IntPtr.Zero;
+            rs.U.mi.dwExtraInfo = Win32.GetMessageExtraInfo();
             return rs;
         }
 
@@ -186,6 +186,14 @@ namespace JoyMap.Windows
             public static int Size => Marshal.SizeOf<INPUT>();
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct HardwareInput
+        {
+            public uint uMsg;
+            public ushort wParamL;
+            public ushort wParamH;
+        }
+
         [StructLayout(LayoutKind.Explicit)]
         internal struct InputUnion
         {
@@ -193,6 +201,8 @@ namespace JoyMap.Windows
             public MOUSEINPUT mi;
             [FieldOffset(0)]
             public KEYBDINPUT ki;
+            [FieldOffset(0)]
+            public HardwareInput hi;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -221,5 +231,8 @@ namespace JoyMap.Windows
 
         [DllImport("user32.dll")]
         internal static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+        [DllImport("user32.dll")]
+        internal static extern IntPtr GetMessageExtraInfo();
     }
 }
