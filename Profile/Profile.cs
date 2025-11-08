@@ -1,25 +1,26 @@
 ﻿using JoyMap.ControllerTracking;
-using System.Text.RegularExpressions;
+using JoyMap.Windows;
 
 namespace JoyMap.Profile
 {
     public record Profile(
         Guid Id,
         string Name,
-        string WindowNameRegex,
+        string? ProcessNameRegex,
+        string? WindowNameRegex,
         IReadOnlyList<Event> Events
         );
 
 
     public record ProfileInstance(
         Profile Profile,
-        Regex WindowNameRegex,
+        ProcessRegex ProcessNameRegex,
         IReadOnlyList<EventInstance> EventInstances
         )
     {
-        public bool Is(string windowName)
+        public bool Is(WindowReference wr)
         {
-            return WindowNameRegex.IsMatch(windowName);
+            return ProcessNameRegex.IsMatch(wr);
         }
 
         public static ProfileInstance Load(InputMonitor monitor, Profile profile)
@@ -29,7 +30,7 @@ namespace JoyMap.Profile
                 .ToList();
             return new ProfileInstance(
                 Profile: profile,
-                WindowNameRegex: new Regex(profile.WindowNameRegex, RegexOptions.Compiled),
+                ProcessNameRegex: new(profile.ProcessNameRegex, profile.WindowNameRegex),
                 EventInstances: eventInstances
                 );
         }

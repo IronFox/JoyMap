@@ -1,7 +1,7 @@
 ﻿using JoyMap.ControllerTracking;
 using JoyMap.Util;
+using JoyMap.Windows;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace JoyMap.Profile
 {
@@ -13,27 +13,27 @@ namespace JoyMap.Profile
             public Guid Id { get; set; }
             public required Profile Profile { get; set; }
             public ProfileInstance? Loaded { get; set; }
-            public Regex? WindowNameRegex { get; set; }
+            public ProcessRegex? ProcessNameRegex { get; set; }
         }
 
         private static Dictionary<Guid, ProfileSlot> Profiles { get; } = [];
 
 
 
-        public static ProfileInstance? FindAndLoadForWindow(string windowName, InputMonitor monitor)
+        public static ProfileInstance? FindAndLoadForWindow(WindowReference window, InputMonitor monitor)
         {
             foreach (var slot in Profiles.Values)
             {
-                if (slot.WindowNameRegex is null)
+                if (slot.ProcessNameRegex is null)
                 {
                     if (slot.Loaded is not null)
                     {
-                        slot.WindowNameRegex = slot.Loaded.WindowNameRegex;
+                        slot.ProcessNameRegex = slot.Loaded.ProcessNameRegex;
                     }
                     else
-                        slot.WindowNameRegex = new Regex(slot.Profile.WindowNameRegex, RegexOptions.Compiled);
+                        slot.ProcessNameRegex = new(slot.Profile.ProcessNameRegex, slot.Profile.WindowNameRegex);
                 }
-                if (slot.WindowNameRegex.IsMatch(windowName))
+                if (slot.ProcessNameRegex.IsMatch(window))
                 {
                     if (slot.Loaded is not null)
                         return slot.Loaded;
@@ -53,7 +53,7 @@ namespace JoyMap.Profile
             {
                 slot.Profile = profile.Profile;
                 slot.Loaded = profile;
-                slot.WindowNameRegex = profile.WindowNameRegex;
+                slot.ProcessNameRegex = profile.ProcessNameRegex;
             }
             else
                 Profiles.Add(p.Id, new() { Id = p.Id, Profile = profile.Profile, Loaded = profile });
@@ -125,6 +125,12 @@ namespace JoyMap.Profile
             if (slot.Loaded is not null)
                 return slot.Loaded;
             return slot.Loaded = ProfileInstance.Load(monitor, profile);
+        }
+
+        internal static void DeleteProfile(Guid profileId)
+        {
+            Profiles.Remove(profileId);
+            SaveAll();
         }
     }
 }

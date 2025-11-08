@@ -7,7 +7,8 @@ namespace JoyMap.Profile
     {
         public Guid Id { get; init; } = Guid.NewGuid();
         public string Name { get; set; } = "";
-        public string WindowRegex { get; set; } = "";
+        public string ProcessNameRegex { get; set; } = "";
+        public string WindowNameRegex { get; set; } = "";
         public List<EventInstance> Events { get; init; } = [];
 
         public static bool SuppressEventProcessing { get; set; } = false;
@@ -25,7 +26,8 @@ namespace JoyMap.Profile
             {
                 Id = profile.Profile.Id,
                 Name = profile.Profile.Name,
-                WindowRegex = profile.Profile.WindowNameRegex,
+                ProcessNameRegex = profile.Profile.ProcessNameRegex ?? "",
+                WindowNameRegex = profile.Profile.WindowNameRegex ?? "",
                 Events = [.. profile.EventInstances]
             };
             return workProfile;
@@ -36,7 +38,7 @@ namespace JoyMap.Profile
             return new ProfileInstance
             (
                 Profile: ToProfile(),
-                WindowNameRegex: new System.Text.RegularExpressions.Regex(WindowRegex, System.Text.RegularExpressions.RegexOptions.Compiled),
+                ProcessNameRegex: new(ProcessNameRegex, WindowNameRegex),
                 EventInstances: Events
             );
         }
@@ -47,7 +49,8 @@ namespace JoyMap.Profile
             (
                 Id: Id,
                 Name: Name,
-                WindowNameRegex: WindowRegex,
+                ProcessNameRegex: ProcessNameRegex,
+                WindowNameRegex: WindowNameRegex,
                 Events: Events.Select(x => x.Event).ToList()
             );
 

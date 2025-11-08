@@ -10,39 +10,52 @@ namespace JoyMap.Windows
         public int Top;
         public int Right;
         public int Bottom;
+
+        public readonly int Width => Right - Left;
+        public readonly int Height => Bottom - Top;
     }
 
     public record WindowReference(
-        string Title,
-        IntPtr Handle,
-        RECT Rect)
+        string WindowTitle,
+        IntPtr WindowHandle,
+        System.Diagnostics.Process? Process)
     {
-        private string? ProcessNameCache { get; set; } = null;
 
-        public string? GetProcessName()
+        public bool IsAlive
         {
-            if (ProcessNameCache is not null)
-                return ProcessNameCache;
-            try
+            get
             {
-                _ = GetWindowThreadProcessId(Handle, out uint pid);
-                if (pid == 0)
-                    return null;
-
-                var process = System.Diagnostics.Process.GetProcessById((int)pid);
-                ProcessNameCache = process.ProcessName;
-                return ProcessNameCache;
+                try
+                {
+                    return Process?.HasExited == false;
+                }
+                catch
+                {
+                    return false;
+                }
             }
-            catch
+        }
+
+        public string? ProcessName
+        {
+            get
             {
-                return null;
+                try
+                {
+                    return Process?.ProcessName;
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
 
 
+
         public bool IsChildOf(IntPtr parentHandle)
         {
-            IntPtr hWnd = Handle;
+            IntPtr hWnd = WindowHandle;
             while (hWnd != IntPtr.Zero)
             {
                 if (hWnd == parentHandle)
@@ -52,8 +65,15 @@ namespace JoyMap.Windows
             return false;
         }
 
-        public int Width => Rect.Right - Rect.Left;
-        public int Height => Rect.Bottom - Rect.Top;
+        public RECT Rect
+        {
+            get
+            {
+                if (GetWindowRect(WindowHandle, out var rect))
+                    return rect;
+                return new RECT();
+            }
+        }
 
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
@@ -95,10 +115,25 @@ namespace JoyMap.Windows
                 GetWindowText(hWnd, sb, sb.Capacity);
             var title = sb.ToString();
 
-            if (!GetWindowRect(hWnd, out var rect))
-                rect = new RECT();
+            System.Diagnostics.Process? process = null;
+            try
+            {
+                GetWindowThreadProcessId(hWnd, out uint pid);
+                int processId = (int)pid;
+                process = processId != 0
+                    ? System.Diagnostics.Process.GetProcessById(processId)
+                    : null;
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
 
-            return new WindowReference(title, hWnd, rect);
+            return new WindowReference(
+                WindowTitle: title,
+                WindowHandle: hWnd,
+                Process: process
+            );
         }
 
         public static IReadOnlyList<WindowReference> OfAll()
@@ -119,15 +154,26 @@ namespace JoyMap.Windows
                 if (string.IsNullOrWhiteSpace(title))
                     return true;
 
-                if (!GetWindowRect(hWnd, out var rect))
-                    return true;
+                System.Diagnostics.Process? process = null;
+                try
+                {
+                    GetWindowThreadProcessId(hWnd, out uint pid);
+                    int processId = (int)pid;
+                    process = processId != 0
+                        ? System.Diagnostics.Process.GetProcessById(processId)
+                        : null;
+                }
+                catch
+                {
+                    // ignored
+                }
 
-                var info = new WindowReference(title, hWnd, rect);
+                var info = new WindowReference(title, hWnd, process);
                 list.Add(info);
                 return true;
             }, IntPtr.Zero);
 
-            list.Sort((a, b) => string.Compare(a.Title, b.Title, StringComparison.CurrentCultureIgnoreCase));
+            list.Sort((a, b) => string.Compare(a.WindowTitle, b.WindowTitle, StringComparison.CurrentCultureIgnoreCase));
             return list;
         }
     }

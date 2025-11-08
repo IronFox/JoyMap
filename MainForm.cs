@@ -50,9 +50,17 @@ namespace JoyMap
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using var form = new PickWindowForm();
-            if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
+            if (form.ShowDialog(this) == DialogResult.OK)
             {
-                WorkProfile p = new WorkProfile { Name = form.Result, WindowRegex = Regex.Escape(form.Result) };
+                var procName = form.Result?.ProcessName;
+                if (procName is null)
+                    return;
+                WorkProfile p = new WorkProfile
+                {
+                    Name = procName,
+                    ProcessNameRegex = Regex.Escape(procName),
+                    WindowNameRegex = Regex.Escape(form.Result!.WindowTitle)
+                };
                 Registry.Persist(p);
                 cbProfile.Items.Clear();
                 cbProfile.Items.AddRange(Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray());
@@ -72,12 +80,15 @@ namespace JoyMap
             ActiveProfile = profile;
             WithNoEvent(() =>
             {
-                textWindowRegex.Text = profile.WindowRegex;
-                textWindowRegex.Enabled = true;
+                textProcessNameRegex.Text = profile.ProcessNameRegex;
+                textProcessNameRegex.Enabled = true;
+                textWindowNameRegex.Text = profile.WindowNameRegex;
+                textWindowNameRegex.Enabled = true;
                 textProfileName.Text = profile.Name;
                 textProfileName.Enabled = true;
                 btnAddPickWindow.Enabled = true;
                 eventListView.ContextMenuStrip = eventContextMenu;
+                btnDeleteCurrentProfile.Enabled = true;
                 eventListView.Items.Clear();
                 foreach (var ev in profile.Events)
                 {
@@ -96,16 +107,30 @@ namespace JoyMap
             if (ActiveProfile is null)
                 return;
             using var form = new PickWindowForm();
-            if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
+            if (form.ShowDialog(this) == DialogResult.OK)
             {
-                textWindowRegex.Text = Regex.Escape(form.Result);
-                //ActiveProfile.History.ExecuteAction(new SetWindowRegexAction(this, ActiveProfile, form.Result));
+                var procName = form.Result?.ProcessName;
+                if (procName is null)
+                    return;
+                ActiveProfile.History.ExecuteAction(
+                    new SetAllRegexAction(
+                        this,
+                        ActiveProfile,
+                        processName: Regex.Escape(procName),
+                        windowName: Regex.Escape(form.Result!.WindowTitle),
+                        textProcessNameRegex,
+                        textWindowNameRegex
+                        )
+                    );
+                WithNoEvent(() =>
+                {
+                    textProcessNameRegex.Text = Regex.Escape(procName);
+                    textWindowNameRegex.Text = Regex.Escape(form.Result!.WindowTitle);
+                });
             }
 
         }
 
-        public TextBox TextWindowRegex => textWindowRegex;
-        public TextBox TextProfileName => textProfileName;
         public ListView EventListView => eventListView;
 
         private void Flush()
@@ -113,14 +138,15 @@ namespace JoyMap
             if (ActiveProfile is not null)
                 ActiveProfile.Stop();
             ActiveProfile = null;
-            textWindowRegex.Text = "";
-            textWindowRegex.Enabled = false;
+            textProcessNameRegex.Text = "";
+            textProcessNameRegex.Enabled = false;
             textProfileName.Text = "";
             textProfileName.Enabled = false;
             eventListView.Items.Clear();
             eventListView.ContextMenuStrip = null;
             btnUp.Enabled = false;
             btnDown.Enabled = false;
+            btnDeleteCurrentProfile.Enabled = false;
         }
 
         private void eventListView_SelectedIndexChanged(object sender, EventArgs e)
@@ -216,11 +242,11 @@ namespace JoyMap
             }
 
 
-            WindowReference? focusedWindow = WindowReference.OfFocused();
+            var focusedWindow = WindowReference.OfFocused();
             if (focusedWindow is not null)
             {
 
-                var match = Registry.FindAndLoadForWindow(focusedWindow.Title, InputMonitor);
+                var match = Registry.FindAndLoadForWindow(focusedWindow, InputMonitor);
 
                 if (match != null && match.Profile.Id != ActiveProfile?.Id)
                 {
@@ -308,20 +334,42 @@ namespace JoyMap
                 return;
             if (ActiveProfile is null)
             {
-                textWindowRegex.Enabled = false;
+                textWindowNameRegex.Enabled = false;
                 return;
             }
 
             var lastUndo = ActiveProfile.History.NextUndoAction;
-            if (lastUndo is SetWindowRegexAction swra)
+            if (lastUndo is SetWindowNameRegexAction swra)
             {
-                swra.UpdateNewValue(textWindowRegex.Text);
+                swra.UpdateNewValue(textWindowNameRegex.Text);
             }
             else
             {
-                ActiveProfile.History.ExecuteAction(new SetWindowRegexAction(this, ActiveProfile, textWindowRegex.Text));
+                ActiveProfile.History.ExecuteAction(new SetWindowNameRegexAction(this, ActiveProfile, textWindowNameRegex));
             }
         }
+
+        private void textProcessNameRegex_TextChanged(object sender, EventArgs e)
+        {
+            if (NoEventFlag)
+                return;
+            if (ActiveProfile is null)
+            {
+                textProcessNameRegex.Enabled = false;
+                return;
+            }
+
+            var lastUndo = ActiveProfile.History.NextUndoAction;
+            if (lastUndo is SetProcessNameRegexAction swra)
+            {
+                swra.UpdateNewValue(textProcessNameRegex.Text);
+            }
+            else
+            {
+                ActiveProfile.History.ExecuteAction(new SetProcessNameRegexAction(this, ActiveProfile, textProcessNameRegex));
+            }
+        }
+
 
         internal void WithNoEvent(Action update)
         {
@@ -439,6 +487,30 @@ namespace JoyMap
         {
             for (int i = 0; i < eventListView.Items.Count; i++)
                 eventListView.SelectedIndices.Add(i);
+        }
+
+        private void btnDeleteCurrentProfile_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            if (MessageBox.Show(this, $"Are you sure you want to delete profile '{ActiveProfile.Name}'? This operation cannot be undone!", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                var profileId = ActiveProfile.Id;
+                Flush();
+                Registry.DeleteProfile(profileId);
+                cbProfile.Items.Clear();
+                cbProfile.Items.AddRange(Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray());
+                if (cbProfile.Items.Count > 0)
+                    cbProfile.SelectedIndex = 0;
+            }
+
+        }
+
+
+        private void quitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+
         }
     }
 }

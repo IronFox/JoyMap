@@ -29,22 +29,23 @@ namespace JoyMap
                     : (windowListView.FocusedItem?.Index ?? -1);
 
                 var windows = WindowReference.OfAll();
-                var existing = new HashSet<string>(windows.Select(x => x.Title));
+                var existing = new HashSet<string>(windows.Select(x => x.WindowTitle));
                 foreach (var win in windows)
                 {
-                    if (!WindowRows.TryGetValue(win.Title, out var item))
+                    var rect = win.Rect;
+                    if (!WindowRows.TryGetValue(win.WindowTitle, out var item))
                     {
-                        item = new ListViewItem(win.Title);
-                        item.SubItems.Add($"{win.Width} * {win.Height}");
-                        item.SubItems.Add(win.GetProcessName());
-                        item.Tag = win.Title;
+                        item = new ListViewItem(win.WindowTitle);
+                        item.SubItems.Add($"{rect.Width} * {rect.Height}");
+                        item.SubItems.Add(win.ProcessName);
+                        item.Tag = win;
                         windowListView.Items.Add(item);
-                        WindowRows[win.Title] = item;
+                        WindowRows[win.WindowTitle] = item;
                     }
                     else
                     {
                         // Update existing
-                        item.SubItems[1].Text = $"{win.Width} * {win.Height}";
+                        item.SubItems[1].Text = $"{rect.Width} * {rect.Height}";
                         //item.SubItems[2].Text = win.GetProcessName();
                     }
                 }
@@ -104,12 +105,12 @@ namespace JoyMap
             RefreshWindowList();
         }
 
-        public string? Result;
+        public WindowReference? Result;
 
         private void windowListView_SelectedIndexChanged(object sender, EventArgs e)
         {
             Result = windowListView.SelectedItems.Count > 0
-                ? windowListView.SelectedItems[0].Tag as string
+                ? windowListView.SelectedItems[0].Tag as WindowReference
                 : null;
             btnOk.Enabled = Result is not null;
         }

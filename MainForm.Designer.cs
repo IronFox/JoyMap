@@ -43,7 +43,7 @@
             label2 = new Label();
             textProfileName = new TextBox();
             label3 = new Label();
-            textWindowRegex = new TextBox();
+            textProcessNameRegex = new TextBox();
             btnAddPickWindow = new Button();
             eventListView = new ListView();
             columnHeader2 = new ColumnHeader();
@@ -52,6 +52,10 @@
             columnHeader5 = new ColumnHeader();
             eventContextMenu = new ContextMenuStrip(components);
             newToolStripMenuItem1 = new ToolStripMenuItem();
+            toolStripMenuItem4 = new ToolStripSeparator();
+            selectAllToolStripMenuItem = new ToolStripMenuItem();
+            moveSelectedDownToolStripMenuItem = new ToolStripMenuItem();
+            moveSelectedUpToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem2 = new ToolStripSeparator();
             copySelectedToolStripMenuItem = new ToolStripMenuItem();
             copyAllToolStripMenuItem = new ToolStripMenuItem();
@@ -65,10 +69,9 @@
             btnDown = new Button();
             notifyIcon1 = new NotifyIcon(components);
             statusTimer = new System.Windows.Forms.Timer(components);
-            moveSelectedUpToolStripMenuItem = new ToolStripMenuItem();
-            moveSelectedDownToolStripMenuItem = new ToolStripMenuItem();
-            toolStripMenuItem4 = new ToolStripSeparator();
-            selectAllToolStripMenuItem = new ToolStripMenuItem();
+            btnDeleteCurrentProfile = new Button();
+            textWindowNameRegex = new TextBox();
+            label5 = new Label();
             mainMenu.SuspendLayout();
             eventContextMenu.SuspendLayout();
             SuspendLayout();
@@ -93,8 +96,9 @@
             // quitToolStripMenuItem
             // 
             quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            quitToolStripMenuItem.Size = new Size(148, 34);
+            quitToolStripMenuItem.Size = new Size(270, 34);
             quitToolStripMenuItem.Text = "Quit";
+            quitToolStripMenuItem.Click += quitToolStripMenuItem_Click;
             // 
             // profilesToolStripMenuItem
             // 
@@ -158,7 +162,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(12, 128);
+            label2.Location = new Point(12, 95);
             label2.Name = "label2";
             label2.Size = new Size(63, 25);
             label2.TabIndex = 5;
@@ -166,38 +170,38 @@
             // 
             // textProfileName
             // 
+            textProfileName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textProfileName.Enabled = false;
-            textProfileName.Location = new Point(81, 125);
+            textProfileName.Location = new Point(81, 92);
             textProfileName.Name = "textProfileName";
-            textProfileName.Size = new Size(390, 31);
+            textProfileName.Size = new Size(1012, 31);
             textProfileName.TabIndex = 6;
             textProfileName.KeyDown += GlobalShortcuts;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(489, 128);
+            label3.Location = new Point(12, 131);
             label3.Name = "label3";
-            label3.Size = new Size(179, 25);
+            label3.Size = new Size(173, 25);
             label3.TabIndex = 7;
-            label3.Text = "Window name regex:";
+            label3.Text = "Process name regex:";
             // 
-            // textWindowRegex
+            // textProcessNameRegex
             // 
-            textWindowRegex.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textWindowRegex.Enabled = false;
-            textWindowRegex.Location = new Point(674, 125);
-            textWindowRegex.Name = "textWindowRegex";
-            textWindowRegex.Size = new Size(419, 31);
-            textWindowRegex.TabIndex = 8;
-            textWindowRegex.TextChanged += textWindowRegex_TextChanged;
-            textWindowRegex.KeyDown += GlobalShortcuts;
+            textProcessNameRegex.Enabled = false;
+            textProcessNameRegex.Location = new Point(191, 128);
+            textProcessNameRegex.Name = "textProcessNameRegex";
+            textProcessNameRegex.Size = new Size(377, 31);
+            textProcessNameRegex.TabIndex = 8;
+            textProcessNameRegex.TextChanged += textProcessNameRegex_TextChanged;
+            textProcessNameRegex.KeyDown += GlobalShortcuts;
             // 
             // btnAddPickWindow
             // 
             btnAddPickWindow.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnAddPickWindow.Enabled = false;
-            btnAddPickWindow.Location = new Point(1099, 122);
+            btnAddPickWindow.Location = new Point(1099, 126);
             btnAddPickWindow.Name = "btnAddPickWindow";
             btnAddPickWindow.Size = new Size(112, 34);
             btnAddPickWindow.TabIndex = 9;
@@ -245,7 +249,7 @@
             eventContextMenu.ImageScalingSize = new Size(24, 24);
             eventContextMenu.Items.AddRange(new ToolStripItem[] { newToolStripMenuItem1, toolStripMenuItem4, selectAllToolStripMenuItem, moveSelectedDownToolStripMenuItem, moveSelectedUpToolStripMenuItem, toolStripMenuItem2, copySelectedToolStripMenuItem, copyAllToolStripMenuItem, toolStripMenuItem1, pasteOverToolStripMenuItem, pasteInsertToolStripMenuItem, toolStripMenuItem3, deleteToolStripMenuItem });
             eventContextMenu.Name = "eventContextMenu";
-            eventContextMenu.Size = new Size(351, 349);
+            eventContextMenu.Size = new Size(351, 316);
             eventContextMenu.Opening += eventContextMenu_Opening;
             // 
             // newToolStripMenuItem1
@@ -254,6 +258,35 @@
             newToolStripMenuItem1.Size = new Size(350, 32);
             newToolStripMenuItem1.Text = "New ...";
             newToolStripMenuItem1.Click += newToolStripMenuItem1_Click;
+            // 
+            // toolStripMenuItem4
+            // 
+            toolStripMenuItem4.Name = "toolStripMenuItem4";
+            toolStripMenuItem4.Size = new Size(347, 6);
+            // 
+            // selectAllToolStripMenuItem
+            // 
+            selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+            selectAllToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.A;
+            selectAllToolStripMenuItem.Size = new Size(350, 32);
+            selectAllToolStripMenuItem.Text = "Select All";
+            selectAllToolStripMenuItem.Click += selectAllToolStripMenuItem_Click;
+            // 
+            // moveSelectedDownToolStripMenuItem
+            // 
+            moveSelectedDownToolStripMenuItem.Name = "moveSelectedDownToolStripMenuItem";
+            moveSelectedDownToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Down;
+            moveSelectedDownToolStripMenuItem.Size = new Size(350, 32);
+            moveSelectedDownToolStripMenuItem.Text = "Move Selected Down";
+            moveSelectedDownToolStripMenuItem.Click += btnDown_Click;
+            // 
+            // moveSelectedUpToolStripMenuItem
+            // 
+            moveSelectedUpToolStripMenuItem.Name = "moveSelectedUpToolStripMenuItem";
+            moveSelectedUpToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Up;
+            moveSelectedUpToolStripMenuItem.Size = new Size(350, 32);
+            moveSelectedUpToolStripMenuItem.Text = "Move Selected Up";
+            moveSelectedUpToolStripMenuItem.Click += btnUp_Click;
             // 
             // toolStripMenuItem2
             // 
@@ -356,46 +389,52 @@
             statusTimer.Interval = 200;
             statusTimer.Tick += statusTimer_Tick;
             // 
-            // moveSelectedUpToolStripMenuItem
+            // btnDeleteCurrentProfile
             // 
-            moveSelectedUpToolStripMenuItem.Name = "moveSelectedUpToolStripMenuItem";
-            moveSelectedUpToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Up;
-            moveSelectedUpToolStripMenuItem.Size = new Size(350, 32);
-            moveSelectedUpToolStripMenuItem.Text = "Move Selected Up";
-            moveSelectedUpToolStripMenuItem.Click += btnUp_Click;
+            btnDeleteCurrentProfile.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnDeleteCurrentProfile.Enabled = false;
+            btnDeleteCurrentProfile.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnDeleteCurrentProfile.Location = new Point(1099, 92);
+            btnDeleteCurrentProfile.Name = "btnDeleteCurrentProfile";
+            btnDeleteCurrentProfile.Size = new Size(112, 34);
+            btnDeleteCurrentProfile.TabIndex = 14;
+            btnDeleteCurrentProfile.Text = "Delete";
+            btnDeleteCurrentProfile.UseVisualStyleBackColor = true;
+            btnDeleteCurrentProfile.Click += btnDeleteCurrentProfile_Click;
             // 
-            // moveSelectedDownToolStripMenuItem
+            // textWindowNameRegex
             // 
-            moveSelectedDownToolStripMenuItem.Name = "moveSelectedDownToolStripMenuItem";
-            moveSelectedDownToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Down;
-            moveSelectedDownToolStripMenuItem.Size = new Size(350, 32);
-            moveSelectedDownToolStripMenuItem.Text = "Move Selected Down";
-            moveSelectedDownToolStripMenuItem.Click += btnDown_Click;
+            textWindowNameRegex.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textWindowNameRegex.Enabled = false;
+            textWindowNameRegex.Location = new Point(753, 128);
+            textWindowNameRegex.Name = "textWindowNameRegex";
+            textWindowNameRegex.Size = new Size(340, 31);
+            textWindowNameRegex.TabIndex = 16;
+            textWindowNameRegex.TextChanged += textWindowRegex_TextChanged;
             // 
-            // toolStripMenuItem4
+            // label5
             // 
-            toolStripMenuItem4.Name = "toolStripMenuItem4";
-            toolStripMenuItem4.Size = new Size(347, 6);
-            // 
-            // selectAllToolStripMenuItem
-            // 
-            selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            selectAllToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.A;
-            selectAllToolStripMenuItem.Size = new Size(350, 32);
-            selectAllToolStripMenuItem.Text = "Select All";
-            selectAllToolStripMenuItem.Click += selectAllToolStripMenuItem_Click;
+            label5.AutoSize = true;
+            label5.Location = new Point(574, 131);
+            label5.Name = "label5";
+            label5.Size = new Size(179, 25);
+            label5.TabIndex = 15;
+            label5.Text = "Window name regex:";
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1223, 837);
+            Controls.Add(textWindowNameRegex);
+            Controls.Add(label5);
+            Controls.Add(btnDeleteCurrentProfile);
             Controls.Add(btnDown);
             Controls.Add(btnUp);
             Controls.Add(label4);
             Controls.Add(eventListView);
             Controls.Add(btnAddPickWindow);
-            Controls.Add(textWindowRegex);
+            Controls.Add(textProcessNameRegex);
             Controls.Add(label3);
             Controls.Add(textProfileName);
             Controls.Add(label2);
@@ -427,7 +466,7 @@
         private Label label2;
         private TextBox textProfileName;
         private Label label3;
-        private TextBox textWindowRegex;
+        private TextBox textProcessNameRegex;
         private Button btnAddPickWindow;
         private ListView eventListView;
         private Label label4;
@@ -456,5 +495,8 @@
         private ToolStripMenuItem selectAllToolStripMenuItem;
         private ToolStripMenuItem moveSelectedDownToolStripMenuItem;
         private ToolStripMenuItem moveSelectedUpToolStripMenuItem;
+        private Button btnDeleteCurrentProfile;
+        private TextBox textWindowNameRegex;
+        private Label label5;
     }
 }
