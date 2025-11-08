@@ -15,18 +15,18 @@ namespace JoyMap.Profile
             if (combiner?.ToLower() == "and")
             {
                 return () => triggerInstances
-                    .All(t => t.IsTriggered);
+                    .All(t => t.IsTriggered());
             }
             else if (combiner?.ToLower() == "or")
             {
                 return () => triggerInstances
-                    .Any(t => t.IsTriggered);
+                    .Any(t => t.IsTriggered());
             }
             else
             {
                 return ExpressionCompiler.CompileBooleanExpression(
                     combiner ?? "false",
-                    triggerInstances.Select((t, i) => KeyValuePair.Create($"T{i}", () => t.IsTriggered)).ToDictionary()
+                    triggerInstances.Select((t, i) => KeyValuePair.Create($"T{i}", t.IsTriggered)).ToDictionary()
                 );
             }
         }

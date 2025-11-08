@@ -18,6 +18,8 @@ namespace JoyMap
                     );
                 textDevice.Text = Event.Value.DeviceName;
                 textInput.Text = Event.Value.InputId.AxisName;
+                cbAutoReleaseActive.Checked = t.Trigger.AutoOffAfterMs is not null;
+                textAutoReleaseMs.Text = t.Trigger.AutoOffAfterMs?.ToStr() ?? "567.8";
                 textMin.Text = (t.Trigger.MinValue * 100).ToStr();
                 textMax.Text = (t.Trigger.MaxValue * 100).ToStr();
                 RebuildResult();
@@ -88,12 +90,15 @@ namespace JoyMap
         {
             var min = GetMin();
             var max = GetMax();
-            if (Event is not null && min is not null && max is not null)
+            var releaseTriggerAfterMs = textAutoReleaseMs.GetFloat(false);
+            if (Event is not null && min is not null && max is not null && (!cbAutoReleaseActive.Checked || releaseTriggerAfterMs is not null))
             {
-                Result = new TriggerInstance(
-                    Trigger: new(Event.Value.InputId, min.Value, max.Value),
-                    GetCurrentValue: Event.Value.GetLatestStatus
+
+                Result = TriggerInstance.Build(
+                    getCurrentValue: Event.Value.GetLatestStatus,
+                    t: new(Event.Value.InputId, min.Value, max.Value, releaseTriggerAfterMs)
                     );
+
                 btnOk.Enabled = true;
             }
             else
@@ -115,6 +120,12 @@ namespace JoyMap
 
         private void textMax_TextChanged(object sender, EventArgs e)
         {
+            RebuildResult();
+        }
+
+        private void textAutoReleaseMs_TextChanged(object sender, EventArgs e)
+        {
+            cbAutoReleaseActive.Checked = true;
             RebuildResult();
         }
     }

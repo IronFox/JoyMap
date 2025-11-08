@@ -20,7 +20,7 @@ namespace JoyMap
                     var row = triggerListView.Items.Add($"T{idx}");
                     row.SubItems.Add(t.Trigger.InputId.ControllerName);
                     row.SubItems.Add(t.Trigger.InputId.AxisName);
-                    row.SubItems.Add(t.IsTriggered ? "A" : "");
+                    row.SubItems.Add(t.IsTriggered() ? "A" : "");
                     row.Tag = t;
                     Triggers.Add((t, row));
                 }
@@ -50,7 +50,7 @@ namespace JoyMap
                 var row = triggerListView.Items.Add($"T{idx}");
                 row.SubItems.Add(t.Trigger.InputId.ControllerName);
                 row.SubItems.Add(t.Trigger.InputId.AxisName);
-                row.SubItems.Add(t.IsTriggered ? "A" : "");
+                row.SubItems.Add(t.IsTriggered() ? "A" : "");
                 row.Tag = t;
                 Triggers.Add((t, row));
                 Rebuild();
@@ -61,7 +61,7 @@ namespace JoyMap
         {
             foreach (var (trigger, row) in Triggers)
             {
-                row.SubItems[3].Text = trigger.IsTriggered ? "A" : "";
+                row.SubItems[3].Text = trigger.IsTriggered() ? "A" : "";
             }
 
         }

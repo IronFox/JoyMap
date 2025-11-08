@@ -46,6 +46,8 @@
             btnOk = new Button();
             btnCancel = new Button();
             statusUpdateTimer = new System.Windows.Forms.Timer(components);
+            textAutoReleaseMs = new TextBox();
+            cbAutoReleaseActive = new CheckBox();
             SuspendLayout();
             // 
             // textDevice
@@ -201,6 +203,26 @@
             statusUpdateTimer.Interval = 200;
             statusUpdateTimer.Tick += statusUpdateTimer_Tick;
             // 
+            // textAutoReleaseMs
+            // 
+            textAutoReleaseMs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textAutoReleaseMs.Location = new Point(240, 169);
+            textAutoReleaseMs.Name = "textAutoReleaseMs";
+            textAutoReleaseMs.Size = new Size(356, 31);
+            textAutoReleaseMs.TabIndex = 18;
+            textAutoReleaseMs.Text = "567.8";
+            textAutoReleaseMs.TextChanged += textAutoReleaseMs_TextChanged;
+            // 
+            // cbAutoReleaseActive
+            // 
+            cbAutoReleaseActive.AutoSize = true;
+            cbAutoReleaseActive.Location = new Point(10, 171);
+            cbAutoReleaseActive.Name = "cbAutoReleaseActive";
+            cbAutoReleaseActive.Size = new Size(224, 29);
+            cbAutoReleaseActive.TabIndex = 19;
+            cbAutoReleaseActive.Text = "Auto Release after (ms):";
+            cbAutoReleaseActive.UseVisualStyleBackColor = true;
+            // 
             // TriggerForm
             // 
             AcceptButton = btnOk;
@@ -208,6 +230,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new Size(608, 294);
+            Controls.Add(cbAutoReleaseActive);
+            Controls.Add(textAutoReleaseMs);
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
             Controls.Add(labelActive);
@@ -249,5 +273,7 @@
         private Button btnOk;
         private Button btnCancel;
         private System.Windows.Forms.Timer statusUpdateTimer;
+        private TextBox textAutoReleaseMs;
+        private CheckBox cbAutoReleaseActive;
     }
 }

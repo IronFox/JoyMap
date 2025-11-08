@@ -5,44 +5,71 @@ namespace JoyMap.Profile
     public readonly record struct Trigger(
         ControllerInputId InputId,
         float MinValue,
-        float MaxValue
+        float MaxValue,
+        float? AutoOffAfterMs
         );
 
 
     public record TriggerInstance(
         Trigger Trigger,
-        Func<float?> GetCurrentValue
+        Func<float?> GetCurrentValue,
+        Func<bool> IsTriggered
         )
     {
-        public float? CurrentValue
-        {
-            get
-            {
-                var v = GetCurrentValue();
-                if (v is null)
-                    return null;
-                return Trigger.InputId.AxisNegated ? -v.Value : v.Value;
-            }
-        }
+        //public float? CurrentValue
+        //{
+        //    get
+        //    {
+        //        var v = GetCurrentValue();
+        //        if (v is null)
+        //            return null;
+        //        return Trigger.InputId.AxisNegated ? -v.Value : v.Value;
+        //    }
+        //}
 
 
-        public bool IsTriggered
+        //public bool IsTriggered
+        //{
+        //    get
+        //    {
+        //        var v = CurrentValue;
+        //        if (v is null)
+        //            return false;
+        //        return v.Value >= Trigger.MinValue && v.Value <= Trigger.MaxValue;
+        //    }
+        //}
+
+        internal static TriggerInstance Build(Func<float?> getCurrentValue, Trigger t)
         {
-            get
+
+            var isTriggered = new Func<bool>(() =>
             {
-                var v = CurrentValue;
+                var v = getCurrentValue();
                 if (v is null)
                     return false;
-                return v.Value >= Trigger.MinValue && v.Value <= Trigger.MaxValue;
+                if (t.InputId.AxisNegated)
+                    v = -v.Value;
+
+                return v.Value >= t.MinValue && v.Value <= t.MaxValue;
+            });
+            if (t.AutoOffAfterMs is not null)
+            {
+                var ao = new TriggerAutoOffRelay(isTriggered, TimeSpan.FromMilliseconds(t.AutoOffAfterMs.Value));
+                isTriggered = new Func<bool>(() => ao.Poll());
             }
+
+
+            return new TriggerInstance(
+                Trigger: t,
+                GetCurrentValue: getCurrentValue,
+                IsTriggered: isTriggered
+                );
         }
 
         internal static TriggerInstance Load(InputMonitor monitor, Trigger t)
         {
-            return new TriggerInstance(
-                Trigger: t,
-                GetCurrentValue: monitor.GetFunction(t.InputId)
-                );
+            var f = monitor.GetFunction(t.InputId);
+            return Build(f, t);
         }
     }
 }
