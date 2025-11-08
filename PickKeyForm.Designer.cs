@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PickKeyForm));
             inputList = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader3 = new ColumnHeader();
@@ -99,6 +100,7 @@
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
             Controls.Add(inputList);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "PickKeyForm";
             Text = "PickKeyForm";
             KeyDown += PickKeyForm_KeyDown;

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PickWindowForm));
             windowListView = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
@@ -100,6 +101,7 @@
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
             Controls.Add(windowListView);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(822, 506);
             Name = "PickWindowForm";
             Text = "PickWindowForm";

@@ -1,6 +1,6 @@
 ﻿using JoyMap.ControllerTracking;
+using JoyMap.Util;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace JoyMap.Profile
@@ -18,12 +18,7 @@ namespace JoyMap.Profile
 
         private static Dictionary<Guid, ProfileSlot> Profiles { get; } = [];
 
-        // Shared serializer options: enums as strings, indented output.
-        private static readonly JsonSerializerOptions JsonOptions = new()
-        {
-            WriteIndented = true,
-            Converters = { new JsonStringEnumConverter() }
-        };
+
 
         public static ProfileInstance? FindAndLoadForWindow(string windowName, InputMonitor monitor)
         {
@@ -51,6 +46,7 @@ namespace JoyMap.Profile
         public static Profile Persist(WorkProfile p)
         {
             var profile = p.ToProfileInstance();
+            //return profile.Profile;
             if (Profiles.TryGetValue(p.Id, out var slot))
             {
                 slot.Profile = profile.Profile;
@@ -74,26 +70,31 @@ namespace JoyMap.Profile
             if (!File.Exists(path))
                 return;
             var json = File.ReadAllText(path);
-            var list = JsonSerializer.Deserialize<List<Profile>>(json, JsonOptions);
-            if (list is null)
-                return;
-            Profiles.Clear();
-            bool anyDropped = false;
-            foreach (var p in list)
+            try
             {
-                if (p.Events.Count == 0)
+                var list = JsonUtil.Deserialize<List<Profile>>(json);
+                Profiles.Clear();
+                bool anyDropped = false;
+                foreach (var p in list)
                 {
-                    anyDropped = true;
-                    continue;
+                    if (p.Events.Count == 0)
+                    {
+                        anyDropped = true;
+                        continue;
+                    }
+                    Profiles[p.Id] = new()
+                    {
+                        Id = p.Id,
+                        Profile = p,
+                    };
                 }
-                Profiles[p.Id] = new()
-                {
-                    Id = p.Id,
-                    Profile = p,
-                };
+                if (anyDropped)
+                    SaveAll();
             }
-            if (anyDropped)
-                SaveAll();
+            catch (JsonException)
+            {
+                // ignore
+            }
         }
 
         public static void SaveAll()
@@ -104,7 +105,7 @@ namespace JoyMap.Profile
 
             var path = Path.Combine(dir, "Profiles.json");
 
-            var json = JsonSerializer.Serialize(Profiles.Values.Select(x => x.Profile), JsonOptions);
+            var json = JsonUtil.Serialize(Profiles.Values.Select(x => x.Profile));
             File.WriteAllText(path, json);
         }
 

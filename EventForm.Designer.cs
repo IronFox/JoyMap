@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EventForm));
             label1 = new Label();
             textName = new TextBox();
             label2 = new Label();
@@ -268,6 +269,7 @@
             Controls.Add(label2);
             Controls.Add(textName);
             Controls.Add(label1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(946, 826);
             Name = "EventForm";
             Text = "Event";

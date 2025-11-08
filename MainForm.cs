@@ -1,6 +1,7 @@
 using JoyMap.ControllerTracking;
 using JoyMap.Extensions;
 using JoyMap.Profile;
+using JoyMap.Util;
 using JoyMap.Windows;
 using System.Text.RegularExpressions;
 
@@ -80,6 +81,7 @@ namespace JoyMap
             textProfileName.Enabled = true;
             btnAddPickWindow.Enabled = true;
             eventListView.ContextMenuStrip = eventContextMenu;
+            eventListView.Items.Clear();
             foreach (var ev in profile.Events)
             {
                 var row = eventListView.Items.Add(ev.Event.Name);
@@ -235,6 +237,78 @@ namespace JoyMap
                     LoadProfile(WorkProfile.Load(match));
                 }
             }
+        }
+
+        private void copyAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ActiveProfile?.Events.Select(ev => ev.Event).ToList().CopyToClipboard();
+        }
+
+        private void eventContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            copySelectedToolStripMenuItem.Enabled = deleteToolStripMenuItem.Enabled = eventListView.SelectedItems.Count > 0;
+            var copied = ClipboardUtil.GetCopiedEvents();
+            pasteOverToolStripMenuItem.Enabled = copied?.Count == eventListView.SelectedItems.Count;
+            pasteInsertToolStripMenuItem.Enabled = copied is not null;
+        }
+
+        private void copySelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var selectedEvents = eventListView.SelectedItems.ToEnumerable()
+                .Select(item => item.Tag)
+                .OfType<EventInstance>()
+                .Select(ev => ev.Event)
+                .ToList();
+            selectedEvents.CopyToClipboard();
+        }
+
+        private void pasteOverToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var copiedEvents = ClipboardUtil.GetCopiedEvents();
+            if (copiedEvents is null)
+                return;
+            if (eventListView.SelectedItems.Count != copiedEvents.Count)
+                return;
+
+            for (int i = 0; i < copiedEvents.Count; i++)
+            {
+                var item = eventListView.SelectedItems[i];
+                var ev = EventInstance.Load(InputMonitor, copiedEvents[i]);
+                item.SubItems[0].Text = ev.Event.Name;
+                item.SubItems[1].Text = string.Join(", ", ev.TriggerInstances.Select(x => x.Trigger.InputId.AxisName));
+                item.SubItems[2].Text = string.Join(", ", ev.Actions.Select(x => x.Action));
+                item.Tag = ev;
+                var idx = item.Index;
+                ActiveProfile.Events[idx] = ev;
+            }
+            Registry.Persist(ActiveProfile);
+        }
+
+        private void pasteInsertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var copiedEvents = ClipboardUtil.GetCopiedEvents();
+            if (copiedEvents is null)
+                return;
+            int insertIndex = eventListView.SelectedItems.Count > 0 ? eventListView.SelectedItems[0].Index : eventListView.Items.Count;
+            foreach (var copiedEvent in copiedEvents)
+            {
+                var ev = EventInstance.Load(InputMonitor, copiedEvent);
+                var row = eventListView.Items.Insert(insertIndex, ev.Event.Name);
+                row.Tag = ev;
+                row.SubItems.Add(string.Join(", ", ev.TriggerInstances.Select(x => x.Trigger.InputId.AxisName)));
+                row.SubItems.Add(string.Join(", ", ev.Actions.Select(x => x.Action)));
+                row.SubItems.Add("");
+                ActiveProfile.Events.Insert(insertIndex, ev);
+                insertIndex++;
+            }
+            Registry.Persist(ActiveProfile);
+
         }
     }
 }

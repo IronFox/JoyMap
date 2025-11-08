@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TriggerForm));
             textDevice = new TextBox();
             label2 = new Label();
             btnPickDeviceInput = new Button();
@@ -221,6 +222,7 @@
             Controls.Add(btnPickDeviceInput);
             Controls.Add(textDevice);
             Controls.Add(label2);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximumSize = new Size(10000000, 350);
             MinimumSize = new Size(618, 350);
             Name = "TriggerForm";

@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>joystick.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="joystick.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="SharpDX.DirectInput" Version="4.2.0" />

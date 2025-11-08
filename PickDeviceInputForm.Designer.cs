@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PickDeviceInputForm));
             btnOk = new Button();
             btnCancel = new Button();
             inputList = new ListView();
@@ -105,6 +106,7 @@
             Controls.Add(inputList);
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(800, 488);
             Name = "PickDeviceInputForm";
             Text = "PickDeviceInputForm";
