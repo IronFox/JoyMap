@@ -35,6 +35,11 @@
             quitToolStripMenuItem = new ToolStripMenuItem();
             profilesToolStripMenuItem = new ToolStripMenuItem();
             newToolStripMenuItem = new ToolStripMenuItem();
+            editToolStripMenuItem = new ToolStripMenuItem();
+            undoToolStripMenuItem = new ToolStripMenuItem();
+            redoToolStripMenuItem = new ToolStripMenuItem();
+            debugToolStripMenuItem = new ToolStripMenuItem();
+            shouldBeSuppressToolStripMenuItem = new ToolStripMenuItem();
             cbProfile = new ComboBox();
             label1 = new Label();
             label2 = new Label();
@@ -69,7 +74,7 @@
             // mainMenu
             // 
             mainMenu.ImageScalingSize = new Size(24, 24);
-            mainMenu.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, profilesToolStripMenuItem });
+            mainMenu.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, profilesToolStripMenuItem, editToolStripMenuItem, debugToolStripMenuItem });
             mainMenu.Location = new Point(0, 0);
             mainMenu.Name = "mainMenu";
             mainMenu.Size = new Size(1223, 33);
@@ -103,6 +108,44 @@
             newToolStripMenuItem.Text = "New ...";
             newToolStripMenuItem.Click += newToolStripMenuItem_Click;
             // 
+            // editToolStripMenuItem
+            // 
+            editToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem });
+            editToolStripMenuItem.Name = "editToolStripMenuItem";
+            editToolStripMenuItem.Size = new Size(58, 29);
+            editToolStripMenuItem.Text = "Edit";
+            editToolStripMenuItem.DropDownOpening += editToolStripMenuItem_DropDownOpening;
+            // 
+            // undoToolStripMenuItem
+            // 
+            undoToolStripMenuItem.Name = "undoToolStripMenuItem";
+            undoToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Z;
+            undoToolStripMenuItem.Size = new Size(219, 34);
+            undoToolStripMenuItem.Text = "Undo";
+            undoToolStripMenuItem.Click += undoToolStripMenuItem_Click;
+            // 
+            // redoToolStripMenuItem
+            // 
+            redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+            redoToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Y;
+            redoToolStripMenuItem.Size = new Size(219, 34);
+            redoToolStripMenuItem.Text = "Redo";
+            redoToolStripMenuItem.Click += redoToolStripMenuItem_Click;
+            // 
+            // debugToolStripMenuItem
+            // 
+            debugToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { shouldBeSuppressToolStripMenuItem });
+            debugToolStripMenuItem.Name = "debugToolStripMenuItem";
+            debugToolStripMenuItem.Size = new Size(82, 29);
+            debugToolStripMenuItem.Text = "Debug";
+            // 
+            // shouldBeSuppressToolStripMenuItem
+            // 
+            shouldBeSuppressToolStripMenuItem.Name = "shouldBeSuppressToolStripMenuItem";
+            shouldBeSuppressToolStripMenuItem.Size = new Size(271, 34);
+            shouldBeSuppressToolStripMenuItem.Text = "Should be suppress";
+            shouldBeSuppressToolStripMenuItem.Click += shouldBeSuppressToolStripMenuItem_Click;
+            // 
             // cbProfile
             // 
             cbProfile.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
@@ -113,6 +156,7 @@
             cbProfile.Size = new Size(1127, 33);
             cbProfile.TabIndex = 3;
             cbProfile.SelectedIndexChanged += cbProfile_SelectedIndexChanged;
+            cbProfile.KeyDown += GlobalShortcuts;
             // 
             // label1
             // 
@@ -139,6 +183,7 @@
             textProfileName.Name = "textProfileName";
             textProfileName.Size = new Size(390, 31);
             textProfileName.TabIndex = 6;
+            textProfileName.KeyDown += GlobalShortcuts;
             // 
             // label3
             // 
@@ -157,6 +202,8 @@
             textWindowRegex.Name = "textWindowRegex";
             textWindowRegex.Size = new Size(419, 31);
             textWindowRegex.TabIndex = 8;
+            textWindowRegex.TextChanged += textWindowRegex_TextChanged;
+            textWindowRegex.KeyDown += GlobalShortcuts;
             // 
             // btnAddPickWindow
             // 
@@ -169,6 +216,7 @@
             btnAddPickWindow.Text = "Pick...";
             btnAddPickWindow.UseVisualStyleBackColor = true;
             btnAddPickWindow.Click += btnAddPickWindow_Click;
+            btnAddPickWindow.KeyDown += GlobalShortcuts;
             // 
             // eventListView
             // 
@@ -183,6 +231,7 @@
             eventListView.View = View.Details;
             eventListView.SelectedIndexChanged += eventListView_SelectedIndexChanged;
             eventListView.DoubleClick += eventListView_DoubleClick;
+            eventListView.KeyDown += GlobalShortcuts;
             // 
             // columnHeader2
             // 
@@ -208,63 +257,65 @@
             eventContextMenu.ImageScalingSize = new Size(24, 24);
             eventContextMenu.Items.AddRange(new ToolStripItem[] { newToolStripMenuItem1, toolStripMenuItem2, copySelectedToolStripMenuItem, copyAllToolStripMenuItem, toolStripMenuItem1, pasteOverToolStripMenuItem, pasteInsertToolStripMenuItem, toolStripMenuItem3, deleteToolStripMenuItem });
             eventContextMenu.Name = "eventContextMenu";
-            eventContextMenu.Size = new Size(198, 214);
+            eventContextMenu.Size = new Size(260, 247);
             eventContextMenu.Opening += eventContextMenu_Opening;
             // 
             // newToolStripMenuItem1
             // 
             newToolStripMenuItem1.Name = "newToolStripMenuItem1";
-            newToolStripMenuItem1.Size = new Size(197, 32);
+            newToolStripMenuItem1.Size = new Size(259, 32);
             newToolStripMenuItem1.Text = "New ...";
             newToolStripMenuItem1.Click += newToolStripMenuItem1_Click;
             // 
             // toolStripMenuItem2
             // 
             toolStripMenuItem2.Name = "toolStripMenuItem2";
-            toolStripMenuItem2.Size = new Size(194, 6);
+            toolStripMenuItem2.Size = new Size(256, 6);
             // 
             // copySelectedToolStripMenuItem
             // 
             copySelectedToolStripMenuItem.Name = "copySelectedToolStripMenuItem";
-            copySelectedToolStripMenuItem.Size = new Size(197, 32);
+            copySelectedToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.C;
+            copySelectedToolStripMenuItem.Size = new Size(259, 32);
             copySelectedToolStripMenuItem.Text = "Copy Selected";
             copySelectedToolStripMenuItem.Click += copySelectedToolStripMenuItem_Click;
             // 
             // copyAllToolStripMenuItem
             // 
             copyAllToolStripMenuItem.Name = "copyAllToolStripMenuItem";
-            copyAllToolStripMenuItem.Size = new Size(197, 32);
+            copyAllToolStripMenuItem.Size = new Size(259, 32);
             copyAllToolStripMenuItem.Text = "Copy All";
             copyAllToolStripMenuItem.Click += copyAllToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
             toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new Size(194, 6);
+            toolStripMenuItem1.Size = new Size(256, 6);
             // 
             // pasteOverToolStripMenuItem
             // 
             pasteOverToolStripMenuItem.Name = "pasteOverToolStripMenuItem";
-            pasteOverToolStripMenuItem.Size = new Size(197, 32);
+            pasteOverToolStripMenuItem.Size = new Size(259, 32);
             pasteOverToolStripMenuItem.Text = "Paste Over";
             pasteOverToolStripMenuItem.Click += pasteOverToolStripMenuItem_Click;
             // 
             // pasteInsertToolStripMenuItem
             // 
             pasteInsertToolStripMenuItem.Name = "pasteInsertToolStripMenuItem";
-            pasteInsertToolStripMenuItem.Size = new Size(197, 32);
+            pasteInsertToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.V;
+            pasteInsertToolStripMenuItem.Size = new Size(259, 32);
             pasteInsertToolStripMenuItem.Text = "Paste Insert";
             pasteInsertToolStripMenuItem.Click += pasteInsertToolStripMenuItem_Click;
             // 
             // toolStripMenuItem3
             // 
             toolStripMenuItem3.Name = "toolStripMenuItem3";
-            toolStripMenuItem3.Size = new Size(194, 6);
+            toolStripMenuItem3.Size = new Size(256, 6);
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new Size(197, 32);
+            deleteToolStripMenuItem.Size = new Size(259, 32);
             deleteToolStripMenuItem.Text = "Delete";
             // 
             // label4
@@ -288,6 +339,7 @@
             btnUp.Text = "↑";
             btnUp.UseVisualStyleBackColor = true;
             btnUp.Click += btnUp_Click;
+            btnUp.KeyDown += GlobalShortcuts;
             // 
             // btnDown
             // 
@@ -301,6 +353,7 @@
             btnDown.Text = "↓";
             btnDown.UseVisualStyleBackColor = true;
             btnDown.Click += btnDown_Click;
+            btnDown.KeyDown += GlobalShortcuts;
             // 
             // notifyIcon1
             // 
@@ -335,6 +388,7 @@
             MinimumSize = new Size(1245, 893);
             Name = "MainForm";
             Text = "JoyMap";
+            KeyDown += GlobalShortcuts;
             mainMenu.ResumeLayout(false);
             mainMenu.PerformLayout();
             eventContextMenu.ResumeLayout(false);
@@ -376,5 +430,10 @@
         private ToolStripMenuItem pasteOverToolStripMenuItem;
         private ToolStripMenuItem pasteInsertToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem3;
+        private ToolStripMenuItem editToolStripMenuItem;
+        private ToolStripMenuItem undoToolStripMenuItem;
+        private ToolStripMenuItem redoToolStripMenuItem;
+        private ToolStripMenuItem debugToolStripMenuItem;
+        private ToolStripMenuItem shouldBeSuppressToolStripMenuItem;
     }
 }

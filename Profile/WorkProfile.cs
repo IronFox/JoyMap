@@ -1,4 +1,5 @@
-﻿using JoyMap.Windows;
+﻿using JoyMap.Undo;
+using JoyMap.Windows;
 
 namespace JoyMap.Profile
 {
@@ -9,8 +10,12 @@ namespace JoyMap.Profile
         public string WindowRegex { get; set; } = "";
         public List<EventInstance> Events { get; init; } = [];
 
+        public static bool SuppressEventProcessing { get; set; } = false;
+
         public bool Exists { get; set; }
         public bool HasChanged { get; set; }
+
+        public UndoHistory History { get; } = new();
 
         internal static WorkProfile? Load(ProfileInstance? profile)
         {
@@ -77,7 +82,7 @@ namespace JoyMap.Profile
                 while (true)
                 {
                     var focused = WindowReference.OfFocused();
-                    if (focused is not null && !focused.Value.IsChildOf(ownerHandle))
+                    if (!SuppressEventProcessing)
                     {
                         foreach (var p in processors)
                         {

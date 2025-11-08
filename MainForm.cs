@@ -1,6 +1,7 @@
 using JoyMap.ControllerTracking;
 using JoyMap.Extensions;
 using JoyMap.Profile;
+using JoyMap.Undo.Action;
 using JoyMap.Util;
 using JoyMap.Windows;
 using System.Text.RegularExpressions;
@@ -15,7 +16,7 @@ namespace JoyMap
         }
 
 
-        InputMonitor InputMonitor { get; }
+        internal InputMonitor InputMonitor { get; }
 
         public MainForm()
         {
@@ -42,13 +43,7 @@ namespace JoyMap
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
-                var row = eventListView.Items.Add(form.Result.Event.Name);
-                row.Tag = form.Result;
-                row.SubItems.Add(string.Join(", ", form.Result.TriggerInstances.Select(x => x.Trigger.InputId.AxisName)));
-                row.SubItems.Add(string.Join(", ", form.Result.Actions.Select(x => x.Action)));
-                row.SubItems.Add("");
-                ActiveProfile.Events.Add(form.Result);
-                Registry.Persist(ActiveProfile);
+                ActiveProfile.History.ExecuteAction(new AddEventInstanceAction(this, ActiveProfile, form.Result));
             }
         }
 
@@ -65,7 +60,7 @@ namespace JoyMap
             }
         }
 
-        private WorkProfile? ActiveProfile { get; set; }
+        public WorkProfile? ActiveProfile { get; private set; }
 
         private void LoadProfile(WorkProfile? profile)
         {
@@ -75,22 +70,25 @@ namespace JoyMap
             if (ActiveProfile is not null)
                 ActiveProfile.Stop();
             ActiveProfile = profile;
-            textWindowRegex.Text = profile.WindowRegex;
-            textWindowRegex.Enabled = true;
-            textProfileName.Text = profile.Name;
-            textProfileName.Enabled = true;
-            btnAddPickWindow.Enabled = true;
-            eventListView.ContextMenuStrip = eventContextMenu;
-            eventListView.Items.Clear();
-            foreach (var ev in profile.Events)
+            WithNoEvent(() =>
             {
-                var row = eventListView.Items.Add(ev.Event.Name);
-                row.Tag = ev;
-                row.SubItems.Add(string.Join(", ", ev.TriggerInstances.Select(x => x.Trigger.InputId.AxisName)));
-                row.SubItems.Add(string.Join(", ", ev.Actions.Select(x => x.Action)));
-                row.SubItems.Add("");
-            }
-            profile.StartListen(this);
+                textWindowRegex.Text = profile.WindowRegex;
+                textWindowRegex.Enabled = true;
+                textProfileName.Text = profile.Name;
+                textProfileName.Enabled = true;
+                btnAddPickWindow.Enabled = true;
+                eventListView.ContextMenuStrip = eventContextMenu;
+                eventListView.Items.Clear();
+                foreach (var ev in profile.Events)
+                {
+                    var row = eventListView.Items.Add(ev.Event.Name);
+                    row.Tag = ev;
+                    row.SubItems.Add(string.Join(", ", ev.TriggerInstances.Select(x => x.Trigger.InputId.AxisName)));
+                    row.SubItems.Add(string.Join(", ", ev.Actions.Select(x => x.Action)));
+                    row.SubItems.Add("");
+                }
+                profile.StartListen(this);
+            });
         }
 
         private void btnAddPickWindow_Click(object sender, EventArgs e)
@@ -100,13 +98,15 @@ namespace JoyMap
             using var form = new PickWindowForm();
             if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
             {
-                if (Regex.Escape(ActiveProfile.Name) == ActiveProfile.WindowRegex)
-                    ActiveProfile.Name = form.Result;
-                ActiveProfile.WindowRegex = textWindowRegex.Text = Regex.Escape(form.Result);
-                Registry.Persist(ActiveProfile);
+                textWindowRegex.Text = Regex.Escape(form.Result);
+                //ActiveProfile.History.ExecuteAction(new SetWindowRegexAction(this, ActiveProfile, form.Result));
             }
 
         }
+
+        public TextBox TextWindowRegex => textWindowRegex;
+        public TextBox TextProfileName => textProfileName;
+        public ListView EventListView => eventListView;
 
         private void Flush()
         {
@@ -139,16 +139,10 @@ namespace JoyMap
 
             if (eventListView.SelectedItems.Count == 0)
                 return;
-            var item = eventListView.SelectedItems[0];
-            var idx = item.Index;
+            var idx = eventListView.SelectedIndices[0];
             if (idx == 0)
                 return;
-            eventListView.Items.RemoveAt(idx);
-            eventListView.Items.Insert(idx - 1, item);
-            var temp = ActiveProfile.Events[idx];
-            ActiveProfile.Events.RemoveAt(idx);
-            ActiveProfile.Events.Insert(idx - 1, temp);
-            Registry.Persist(ActiveProfile);
+            ActiveProfile.History.ExecuteAction(new MoveEventInstanceUpAction(this, ActiveProfile, idx));
         }
 
         private void btnDown_Click(object sender, EventArgs e)
@@ -160,16 +154,10 @@ namespace JoyMap
             }
             if (eventListView.SelectedItems.Count == 0)
                 return;
-            var item = eventListView.SelectedItems[0];
-            var idx = item.Index;
-            if (idx >= eventListView.Items.Count - 1)
-                return;
-            eventListView.Items.RemoveAt(idx);
-            eventListView.Items.Insert(idx + 1, item);
-            var temp = ActiveProfile.Events[idx];
-            ActiveProfile.Events.RemoveAt(idx);
-            ActiveProfile.Events.Insert(idx + 1, temp);
-            Registry.Persist(ActiveProfile);
+            var idx = eventListView.SelectedIndices[0];
+
+            ActiveProfile.History.ExecuteAction(new MoveEventInstanceDownAction(this, ActiveProfile, idx));
+
         }
 
         private void cbProfile_SelectedIndexChanged(object sender, EventArgs e)
@@ -196,20 +184,27 @@ namespace JoyMap
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
-                item.SubItems[0].Text = form.Result.Event.Name;
-                item.SubItems[1].Text = string.Join(", ", form.Result.TriggerInstances.Select(x => x.Trigger.InputId.AxisName));
-                item.SubItems[2].Text = string.Join(", ", form.Result.Actions.Select(x => x.Action));
-                item.Tag = form.Result;
-                var idx = item.Index;
-                ActiveProfile.Events[idx] = form.Result;
-                Registry.Persist(ActiveProfile);
+                ActiveProfile.History.ExecuteAction(new EditEventInstanceAction(this, ActiveProfile, item.Index, ev, form.Result));
             }
 
         }
 
+        private bool shouldBeSuppressed = false;
+
         private void statusTimer_Tick(object sender, EventArgs e)
         {
-            if (ActiveProfile is null) return;
+            if (ActiveProfile is null)
+                return;
+            var lastOpenedForm = Application.OpenForms.Cast<Form>().Last();
+            WorkProfile.SuppressEventProcessing = lastOpenedForm.ContainsFocus;
+            if (!WorkProfile.SuppressEventProcessing)
+            {
+                if (shouldBeSuppressed)
+                {
+                    throw new Exception("Event processing should be suppressed at this point");
+                }
+            }
+
             foreach (ListViewItem row in eventListView.Items)
             {
                 if (row.Tag is not EventInstance ev) continue;
@@ -234,7 +229,8 @@ namespace JoyMap
 
                 if (match != null && match.Profile.Id != ActiveProfile?.Id)
                 {
-                    LoadProfile(WorkProfile.Load(match));
+                    cbProfile.SelectedIndex = cbProfile.Items.ToEnumerable().ToList().FindIndex(x => (x as ProfileSelection)?.Profile.Id == match.Profile.Id);
+                    //LoadProfile(WorkProfile.Load(match));
                 }
             }
         }
@@ -274,18 +270,8 @@ namespace JoyMap
             if (eventListView.SelectedItems.Count != copiedEvents.Count)
                 return;
 
-            for (int i = 0; i < copiedEvents.Count; i++)
-            {
-                var item = eventListView.SelectedItems[i];
-                var ev = EventInstance.Load(InputMonitor, copiedEvents[i]);
-                item.SubItems[0].Text = ev.Event.Name;
-                item.SubItems[1].Text = string.Join(", ", ev.TriggerInstances.Select(x => x.Trigger.InputId.AxisName));
-                item.SubItems[2].Text = string.Join(", ", ev.Actions.Select(x => x.Action));
-                item.Tag = ev;
-                var idx = item.Index;
-                ActiveProfile.Events[idx] = ev;
-            }
-            Registry.Persist(ActiveProfile);
+            ActiveProfile.History.ExecuteAction(new PasteOverEventInstancesAction(this, ActiveProfile, eventListView.SelectedItems.ToEnumerable().Select(item => item.Index).ToList(), copiedEvents));
+
         }
 
         private void pasteInsertToolStripMenuItem_Click(object sender, EventArgs e)
@@ -296,19 +282,113 @@ namespace JoyMap
             if (copiedEvents is null)
                 return;
             int insertIndex = eventListView.SelectedItems.Count > 0 ? eventListView.SelectedItems[0].Index : eventListView.Items.Count;
-            foreach (var copiedEvent in copiedEvents)
-            {
-                var ev = EventInstance.Load(InputMonitor, copiedEvent);
-                var row = eventListView.Items.Insert(insertIndex, ev.Event.Name);
-                row.Tag = ev;
-                row.SubItems.Add(string.Join(", ", ev.TriggerInstances.Select(x => x.Trigger.InputId.AxisName)));
-                row.SubItems.Add(string.Join(", ", ev.Actions.Select(x => x.Action)));
-                row.SubItems.Add("");
-                ActiveProfile.Events.Insert(insertIndex, ev);
-                insertIndex++;
-            }
-            Registry.Persist(ActiveProfile);
+            ActiveProfile.History.ExecuteAction(new PasteInsertEventInstancesAction(this, ActiveProfile, insertIndex, copiedEvents));
 
+        }
+
+        private void editToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+            {
+                undoToolStripMenuItem.Enabled = false;
+                redoToolStripMenuItem.Enabled = false;
+                return;
+            }
+            {
+                undoToolStripMenuItem.Enabled = ActiveProfile.History.CanUndo;
+                redoToolStripMenuItem.Enabled = ActiveProfile.History.CanRedo;
+                undoToolStripMenuItem.Text = ActiveProfile.History.NextUndoName is not null ? $"Undo {ActiveProfile.History.NextUndoName}" : "Undo";
+                redoToolStripMenuItem.Text = ActiveProfile.History.NextRedoName is not null ? $"Redo {ActiveProfile.History.NextRedoName}" : "Redo";
+            }
+        }
+
+        private bool NoEventFlag { get; set; } = false;
+
+        private void textWindowRegex_TextChanged(object sender, EventArgs e)
+        {
+            if (NoEventFlag)
+                return;
+            if (ActiveProfile is null)
+            {
+                textWindowRegex.Enabled = false;
+                return;
+            }
+
+            var lastUndo = ActiveProfile.History.NextUndoAction;
+            if (lastUndo is SetWindowRegexAction swra)
+            {
+                swra.UpdateNewValue(textWindowRegex.Text);
+            }
+            else
+            {
+                ActiveProfile.History.ExecuteAction(new SetWindowRegexAction(this, ActiveProfile, textWindowRegex.Text));
+            }
+        }
+
+        internal void WithNoEvent(Action update)
+        {
+            if (ActiveProfile is null)
+                return;
+            NoEventFlag = true;
+            try
+            {
+                update();
+            }
+            finally
+            {
+                NoEventFlag = false;
+            }
+        }
+
+        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            ActiveProfile.History.Undo();
+
+        }
+
+        private void redoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            ActiveProfile.History.Redo();
+        }
+
+        private void shouldBeSuppressToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            shouldBeSuppressed = true;
+        }
+
+        private void GlobalShortcuts(object sender, KeyEventArgs e)
+        {
+            if (e.Control && !e.Shift && e.KeyCode == Keys.Z)
+            {
+                undoToolStripMenuItem_Click(this, EventArgs.Empty);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Control && ((e.KeyCode == Keys.Y) || (e.Shift && e.KeyCode == Keys.Z)))
+            {
+                redoToolStripMenuItem_Click(this, EventArgs.Empty);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                copySelectedToolStripMenuItem_Click(this, EventArgs.Empty);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Control && e.KeyCode == Keys.V)
+            {
+                pasteInsertToolStripMenuItem_Click(this, EventArgs.Empty);
+                e.Handled = true;
+                return;
+            }
         }
     }
 }
