@@ -11,7 +11,8 @@ namespace JoyMap.Profile
         public string WindowNameRegex { get; set; } = "";
         public List<EventInstance> Events { get; init; } = [];
 
-        public static bool SuppressEventProcessing { get; set; } = false;
+        public static bool SuppressEventProcessingBecauseJoyMapIsFocused { get; set; } = false;
+        public static bool SuppressEventProcessingBecauseGameIsNotFocused { get; set; } = false;
 
         public bool Exists { get; set; }
         public bool HasChanged { get; set; }
@@ -85,7 +86,8 @@ namespace JoyMap.Profile
                 while (true)
                 {
                     var focused = WindowReference.OfFocused();
-                    if (!SuppressEventProcessing)
+                    if (!SuppressEventProcessingBecauseJoyMapIsFocused
+                        && !SuppressEventProcessingBecauseGameIsNotFocused)
                     {
                         foreach (var p in processors)
                         {

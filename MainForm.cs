@@ -26,7 +26,12 @@ namespace JoyMap
             cbProfile.Items.AddRange(Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray());
             cbProfile.SelectedIndex = 0;
             cbProfile_SelectedIndexChanged(this, EventArgs.Empty);
+#if !DEBUG
+            saveDebugOnlyToolStripMenuItem.Enabled = false;
+#endif
         }
+
+        public bool SuppressIfGameIsNotFocused { get; private set; } = true;
 
 
         protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e)
@@ -210,35 +215,17 @@ namespace JoyMap
 
         }
 
-        private bool shouldBeSuppressed = false;
-
         private void statusTimer_Tick(object sender, EventArgs e)
         {
             if (ActiveProfile is null)
                 return;
             var lastOpenedForm = Application.OpenForms.Cast<Form>().Last();
-            WorkProfile.SuppressEventProcessing = lastOpenedForm.ContainsFocus;
-            if (!WorkProfile.SuppressEventProcessing)
-            {
-                if (shouldBeSuppressed)
-                {
-                    throw new Exception("Event processing should be suppressed at this point");
-                }
-            }
+            WorkProfile.SuppressEventProcessingBecauseJoyMapIsFocused = lastOpenedForm.ContainsFocus;
 
             foreach (ListViewItem row in eventListView.Items)
             {
                 if (row.Tag is not EventInstance ev) continue;
-                bool any = false;
-                foreach (var trigger in ev.TriggerInstances)
-                {
-                    if (trigger.IsTriggered)
-                    {
-                        any = true;
-                        break;
-                    }
-                }
-                row.SubItems[3].Text = any ? "A" : "";
+                row.SubItems[3].Text = ev.IsTriggered() ? "A" : "";
             }
 
 
@@ -253,7 +240,11 @@ namespace JoyMap
                     cbProfile.SelectedIndex = cbProfile.Items.ToEnumerable().ToList().FindIndex(x => (x as ProfileSelection)?.Profile.Id == match.Profile.Id);
                     //LoadProfile(WorkProfile.Load(match));
                 }
+                WorkProfile.SuppressEventProcessingBecauseGameIsNotFocused =
+                    SuppressIfGameIsNotFocused && (match is null || !match.Is(focusedWindow));
             }
+            else
+                WorkProfile.SuppressEventProcessingBecauseGameIsNotFocused = SuppressIfGameIsNotFocused;
         }
 
         private void copyAllToolStripMenuItem_Click(object sender, EventArgs e)
@@ -403,7 +394,7 @@ namespace JoyMap
 
         private void shouldBeSuppressToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            shouldBeSuppressed = true;
+            SuppressIfGameIsNotFocused = !SuppressIfGameIsNotFocused;
         }
 
         private void GlobalShortcuts(object sender, KeyEventArgs e)
@@ -511,6 +502,21 @@ namespace JoyMap
         {
             Close();
 
+        }
+
+        private void runOnlyWhenGameIsFocusedToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null) return;
+            WorkProfile.SuppressEventProcessingBecauseJoyMapIsFocused = runOnlyWhenGameIsFocusedToolStripMenuItem.Checked;
+        }
+
+        private void saveDebugOnlyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+#if DEBUG
+            if (ActiveProfile is null)
+                return;
+            Registry.Persist(ActiveProfile, true);
+#endif
         }
     }
 }

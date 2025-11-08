@@ -12,7 +12,8 @@ namespace JoyMap.Profile
 
     public record EventInstance(
         Event Event,
-        IReadOnlyList<TriggerInstance> TriggerInstances
+        IReadOnlyList<TriggerInstance> TriggerInstances,
+        Func<bool> IsTriggered
         )
     {
         public IReadOnlyList<EventAction> Actions => Event.Actions;
@@ -24,7 +25,11 @@ namespace JoyMap.Profile
                 .ToList();
             return new EventInstance(
                 Event: e,
-                TriggerInstances: triggerInstances
+                TriggerInstances: triggerInstances,
+                IsTriggered: EventProcessor.BuildTriggerCombiner(
+                    e.TriggerCombiner,
+                    triggerInstances
+                    )
                 );
         }
 

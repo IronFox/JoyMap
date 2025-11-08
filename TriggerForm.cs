@@ -112,5 +112,10 @@ namespace JoyMap
         {
             RebuildResult();
         }
+
+        private void textMax_TextChanged(object sender, EventArgs e)
+        {
+            RebuildResult();
+        }
     }
 }

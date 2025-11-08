@@ -122,6 +122,7 @@
             textMax.Size = new Size(514, 31);
             textMax.TabIndex = 10;
             textMax.Text = "100";
+            textMax.TextChanged += textMax_TextChanged;
             // 
             // label5
             // 

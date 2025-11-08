@@ -43,12 +43,17 @@ namespace JoyMap.Profile
             return null;
         }
 
-        public static Profile Persist(WorkProfile p)
+        public static Profile Persist(WorkProfile p
+#if DEBUG
+            , bool force = false
+#endif
+            )
         {
             var profile = p.ToProfileInstance();
 #if DEBUG
-            return profile.Profile;
-#else
+            if (!force)
+                return profile.Profile;
+#endif
             if (Profiles.TryGetValue(p.Id, out var slot))
             {
                 slot.Profile = profile.Profile;
@@ -61,7 +66,6 @@ namespace JoyMap.Profile
 
             p.RestartListenIfRunning();
             return profile.Profile;
-#endif
         }
 
         public static void LoadAll()

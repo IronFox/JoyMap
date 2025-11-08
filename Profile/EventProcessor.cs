@@ -7,21 +7,26 @@
         private bool LastTriggeredState { get; set; } = false;
 
         private List<ActionProcessor> ActionProcessors { get; } = [];
-        public EventProcessor(EventInstance source)
+
+        public static Func<bool> BuildTriggerCombiner(string? combiner, IEnumerable<TriggerInstance> triggerInstances)
         {
-            Source = source;
-            if (source.Event.TriggerCombiner?.ToLower() == "and")
+            if (combiner?.ToLower() == "and")
             {
-                IsTriggered = () => Source.TriggerInstances
+                return () => triggerInstances
                     .All(t => t.IsTriggered);
             }
-            else if (source.Event.TriggerCombiner?.ToLower() == "or")
+            else if (combiner?.ToLower() == "or")
             {
-                IsTriggered = () => Source.TriggerInstances
+                return () => triggerInstances
                     .Any(t => t.IsTriggered);
             }
             else
-                IsTriggered = () => false;
+                return () => false;
+        }
+        public EventProcessor(EventInstance source)
+        {
+            Source = source;
+            IsTriggered = BuildTriggerCombiner(source.Event.TriggerCombiner, source.TriggerInstances);
 
             foreach (var action in source.Event.Actions)
             {

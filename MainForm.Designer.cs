@@ -35,6 +35,8 @@
             quitToolStripMenuItem = new ToolStripMenuItem();
             profilesToolStripMenuItem = new ToolStripMenuItem();
             newToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem5 = new ToolStripSeparator();
+            runOnlyWhenGameIsFocusedToolStripMenuItem = new ToolStripMenuItem();
             editToolStripMenuItem = new ToolStripMenuItem();
             undoToolStripMenuItem = new ToolStripMenuItem();
             redoToolStripMenuItem = new ToolStripMenuItem();
@@ -72,6 +74,8 @@
             btnDeleteCurrentProfile = new Button();
             textWindowNameRegex = new TextBox();
             label5 = new Label();
+            saveDebugOnlyToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem6 = new ToolStripSeparator();
             mainMenu.SuspendLayout();
             eventContextMenu.SuspendLayout();
             SuspendLayout();
@@ -88,7 +92,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { quitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveDebugOnlyToolStripMenuItem, toolStripMenuItem6, quitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(54, 29);
             fileToolStripMenuItem.Text = "File";
@@ -102,7 +106,7 @@
             // 
             // profilesToolStripMenuItem
             // 
-            profilesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { newToolStripMenuItem });
+            profilesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { newToolStripMenuItem, toolStripMenuItem5, runOnlyWhenGameIsFocusedToolStripMenuItem });
             profilesToolStripMenuItem.Name = "profilesToolStripMenuItem";
             profilesToolStripMenuItem.Size = new Size(86, 29);
             profilesToolStripMenuItem.Text = "Profiles";
@@ -110,9 +114,24 @@
             // newToolStripMenuItem
             // 
             newToolStripMenuItem.Name = "newToolStripMenuItem";
-            newToolStripMenuItem.Size = new Size(166, 34);
+            newToolStripMenuItem.Size = new Size(373, 34);
             newToolStripMenuItem.Text = "New ...";
             newToolStripMenuItem.Click += newToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem5
+            // 
+            toolStripMenuItem5.Name = "toolStripMenuItem5";
+            toolStripMenuItem5.Size = new Size(370, 6);
+            // 
+            // runOnlyWhenGameIsFocusedToolStripMenuItem
+            // 
+            runOnlyWhenGameIsFocusedToolStripMenuItem.Checked = true;
+            runOnlyWhenGameIsFocusedToolStripMenuItem.CheckOnClick = true;
+            runOnlyWhenGameIsFocusedToolStripMenuItem.CheckState = CheckState.Checked;
+            runOnlyWhenGameIsFocusedToolStripMenuItem.Name = "runOnlyWhenGameIsFocusedToolStripMenuItem";
+            runOnlyWhenGameIsFocusedToolStripMenuItem.Size = new Size(373, 34);
+            runOnlyWhenGameIsFocusedToolStripMenuItem.Text = "Run Only when Game is Focused";
+            runOnlyWhenGameIsFocusedToolStripMenuItem.CheckedChanged += runOnlyWhenGameIsFocusedToolStripMenuItem_CheckedChanged;
             // 
             // editToolStripMenuItem
             // 
@@ -421,6 +440,18 @@
             label5.TabIndex = 15;
             label5.Text = "Window name regex:";
             // 
+            // saveDebugOnlyToolStripMenuItem
+            // 
+            saveDebugOnlyToolStripMenuItem.Name = "saveDebugOnlyToolStripMenuItem";
+            saveDebugOnlyToolStripMenuItem.Size = new Size(270, 34);
+            saveDebugOnlyToolStripMenuItem.Text = "Save (Debug Only)";
+            saveDebugOnlyToolStripMenuItem.Click += saveDebugOnlyToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem6
+            // 
+            toolStripMenuItem6.Name = "toolStripMenuItem6";
+            toolStripMenuItem6.Size = new Size(267, 6);
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -498,5 +529,9 @@
         private Button btnDeleteCurrentProfile;
         private TextBox textWindowNameRegex;
         private Label label5;
+        private ToolStripSeparator toolStripMenuItem5;
+        private ToolStripMenuItem runOnlyWhenGameIsFocusedToolStripMenuItem;
+        private ToolStripMenuItem saveDebugOnlyToolStripMenuItem;
+        private ToolStripSeparator toolStripMenuItem6;
     }
 }

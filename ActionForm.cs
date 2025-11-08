@@ -130,5 +130,17 @@ namespace JoyMap
         {
             Rebuild();
         }
+
+        private void textSimpleReAssertFrequency_TextChanged(object sender, EventArgs e)
+        {
+            cbSimpleReAssertFrequency.Checked = true;
+            AnyInputChanged(sender, e);
+        }
+
+        private void textSimpleAutoTriggerFrequency_TextChanged(object sender, EventArgs e)
+        {
+            cbSimpleAutoTriggerFrequency.Checked = true;
+            AnyInputChanged(sender, e);
+        }
     }
 }

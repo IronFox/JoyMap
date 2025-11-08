@@ -107,7 +107,7 @@
             textSimpleAutoTriggerFrequency.Size = new Size(517, 31);
             textSimpleAutoTriggerFrequency.TabIndex = 31;
             textSimpleAutoTriggerFrequency.Text = "3.12";
-            textSimpleAutoTriggerFrequency.TextChanged += AnyInputChanged;
+            textSimpleAutoTriggerFrequency.TextChanged += textSimpleAutoTriggerFrequency_TextChanged;
             // 
             // cbSimpleAutoTriggerFrequency
             // 
@@ -128,7 +128,7 @@
             textSimpleReAssertFrequency.Size = new Size(517, 31);
             textSimpleReAssertFrequency.TabIndex = 26;
             textSimpleReAssertFrequency.Text = "5.3";
-            textSimpleReAssertFrequency.TextChanged += AnyInputChanged;
+            textSimpleReAssertFrequency.TextChanged += textSimpleReAssertFrequency_TextChanged;
             // 
             // cbSimpleReAssertFrequency
             // 

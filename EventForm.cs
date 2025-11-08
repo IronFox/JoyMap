@@ -77,14 +77,14 @@ namespace JoyMap
 
         private void deleteToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            var query = "Delete selected triggers?";
-            if (triggerListView.SelectedItems.Count == 1)
-            {
-                var item = triggerListView.SelectedItems[0];
-                var trigger = item.Tag as TriggerInstance;
-                query = "Delete selected trigger (" + trigger?.Trigger.InputId.ControllerName + " - " + trigger?.Trigger.InputId.AxisName + ")?";
-            }
-            if (MessageBox.Show(this, query, "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            //var query = "Delete selected triggers?";
+            //if (triggerListView.SelectedItems.Count == 1)
+            //{
+            //    var item = triggerListView.SelectedItems[0];
+            //    var trigger = item.Tag as TriggerInstance;
+            //    query = "Delete selected trigger (" + trigger?.Trigger.InputId.ControllerName + " - " + trigger?.Trigger.InputId.AxisName + ")?";
+            //}
+            //if (MessageBox.Show(this, query, "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 foreach (ListViewItem item in triggerListView.SelectedItems)
                 {
@@ -158,14 +158,14 @@ namespace JoyMap
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var query = "Delete selected actions?";
-            if (actionListView.SelectedItems.Count == 1)
-            {
-                var item = actionListView.SelectedItems[0];
-                var action = item.Tag as EventAction;
-                query = "Delete selected action (" + action?.Name + ")?";
-            }
-            if (MessageBox.Show(this, query, "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            //var query = "Delete selected actions?";
+            //if (actionListView.SelectedItems.Count == 1)
+            //{
+            //    var item = actionListView.SelectedItems[0];
+            //    var action = item.Tag as EventAction;
+            //    query = "Delete selected action (" + action?.Name + ")?";
+            //}
+            //if (MessageBox.Show(this, query, "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 foreach (ListViewItem item in actionListView.SelectedItems)
                 {
@@ -218,7 +218,11 @@ namespace JoyMap
                         Triggers: this.Triggers.Select(x => x.Trigger.Trigger).ToList(),
                         Actions: actions!
                     ),
-                    TriggerInstances: this.Triggers.Select(x => x.Trigger).ToList()
+                    TriggerInstances: this.Triggers.Select(x => x.Trigger).ToList(),
+                    IsTriggered: EventProcessor.BuildTriggerCombiner(
+                        triggerCombiner.Text,
+                        this.Triggers.Select(x => x.Trigger).ToList()
+                        )
                     );
                 Result = eventObj;
             }
