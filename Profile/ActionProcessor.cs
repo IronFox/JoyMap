@@ -13,6 +13,7 @@ namespace JoyMap.Profile
             var retrig = Effect.AutoTriggerFrequency ?? 0;
             ReassertDelay = reaf > 0 ? TimeSpan.FromSeconds(1f / reaf) : TimeSpan.MaxValue;
             RetriggerDelay = retrig > 0 ? TimeSpan.FromSeconds(1f / retrig) / 2 : TimeSpan.MaxValue;
+            TriggerLimit = Effect.AutoTriggerLimit ?? int.MaxValue;
         }
 
         private TimeSpan ReassertDelay { get; }
@@ -23,6 +24,8 @@ namespace JoyMap.Profile
         private DateTime Started { get; set; }
         private DateTime LastAction { get; set; }
         private DateTime LastTrigger { get; set; }
+        private int TriggerCount { get; set; }
+        private int TriggerLimit { get; }
 
         internal void SetTriggerStatus(bool triggerStatus)
         {
@@ -30,7 +33,7 @@ namespace JoyMap.Profile
             {
                 LastAction = Started = DateTime.Now;
                 LastTrigger = DateTime.MinValue;
-
+                TriggerCount = 0;
             }
             else
             {
@@ -49,7 +52,7 @@ namespace JoyMap.Profile
                 return;
 
 
-            if (Effect.AutoTriggerFrequency is null)
+            if (Effect.AutoTriggerFrequency is null || TriggerCount >= TriggerLimit)
             {
                 if (!IsDown)
                 {
@@ -66,6 +69,8 @@ namespace JoyMap.Profile
                     KeyDispatch.Change(Effect.Keys, !IsDown);
                     IsDown = !IsDown;
                     LastAction = LastTrigger = DateTime.Now;
+                    if (IsDown)
+                        TriggerCount++;
                 }
             }
 

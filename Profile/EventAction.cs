@@ -23,7 +23,8 @@ namespace JoyMap.Profile
     public record SimpleInputEffect(
         Keys Keys,
         float? ReAssertIntervalFrequency,
-        float? AutoTriggerFrequency
+        float? AutoTriggerFrequency,
+        int? AutoTriggerLimit
         )
     {
         [JsonIgnore]

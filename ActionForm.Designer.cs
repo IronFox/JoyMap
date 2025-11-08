@@ -33,6 +33,8 @@
             btnCancel = new Button();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            textSimpleAutoTriggerLimit = new TextBox();
+            cbSimpleLimitAutoTriggers = new CheckBox();
             textSimpleAutoTriggerFrequency = new TextBox();
             cbSimpleAutoTriggerFrequency = new CheckBox();
             textSimpleReAssertFrequency = new TextBox();
@@ -85,6 +87,8 @@
             // tabPage1
             // 
             tabPage1.BackColor = SystemColors.Control;
+            tabPage1.Controls.Add(textSimpleAutoTriggerLimit);
+            tabPage1.Controls.Add(cbSimpleLimitAutoTriggers);
             tabPage1.Controls.Add(textSimpleAutoTriggerFrequency);
             tabPage1.Controls.Add(cbSimpleAutoTriggerFrequency);
             tabPage1.Controls.Add(textSimpleReAssertFrequency);
@@ -98,6 +102,29 @@
             tabPage1.Size = new Size(768, 261);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Simple Trigger";
+            // 
+            // textSimpleAutoTriggerLimit
+            // 
+            textSimpleAutoTriggerLimit.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textSimpleAutoTriggerLimit.Enabled = false;
+            textSimpleAutoTriggerLimit.Location = new Point(245, 145);
+            textSimpleAutoTriggerLimit.Name = "textSimpleAutoTriggerLimit";
+            textSimpleAutoTriggerLimit.Size = new Size(517, 31);
+            textSimpleAutoTriggerLimit.TabIndex = 33;
+            textSimpleAutoTriggerLimit.Text = "3";
+            textSimpleAutoTriggerLimit.TextChanged += textAutoTriggerLimit_TextChanged;
+            // 
+            // cbSimpleLimitAutoTriggers
+            // 
+            cbSimpleLimitAutoTriggers.AutoSize = true;
+            cbSimpleLimitAutoTriggers.Enabled = false;
+            cbSimpleLimitAutoTriggers.Location = new Point(6, 147);
+            cbSimpleLimitAutoTriggers.Name = "cbSimpleLimitAutoTriggers";
+            cbSimpleLimitAutoTriggers.Size = new Size(189, 29);
+            cbSimpleLimitAutoTriggers.TabIndex = 32;
+            cbSimpleLimitAutoTriggers.Text = "Limit Auto-Triggers";
+            cbSimpleLimitAutoTriggers.UseVisualStyleBackColor = true;
+            cbSimpleLimitAutoTriggers.CheckedChanged += cbSimpleLimitAutoTriggers_CheckedChanged;
             // 
             // textSimpleAutoTriggerFrequency
             // 
@@ -118,7 +145,7 @@
             cbSimpleAutoTriggerFrequency.TabIndex = 30;
             cbSimpleAutoTriggerFrequency.Text = "Auto-Trigger Frequency:";
             cbSimpleAutoTriggerFrequency.UseVisualStyleBackColor = true;
-            cbSimpleAutoTriggerFrequency.CheckedChanged += AnyInputChanged;
+            cbSimpleAutoTriggerFrequency.CheckedChanged += cbSimpleAutoTriggerFrequency_CheckedChanged;
             // 
             // textSimpleReAssertFrequency
             // 
@@ -249,5 +276,7 @@
         private CheckBox cbSimpleAutoTriggerFrequency;
         private TextBox textSimpleReAssertFrequency;
         private CheckBox cbSimpleReAssertFrequency;
+        private TextBox textSimpleAutoTriggerLimit;
+        private CheckBox cbSimpleLimitAutoTriggers;
     }
 }

@@ -4,6 +4,15 @@ namespace JoyMap.Extensions
 {
     public static class ComponentExtensions
     {
+        public static int? GetInt(this TextBox textBox)
+        {
+            var s = textBox.Text;
+            if (int.TryParse(s, out var val))
+            {
+                return val;
+            }
+            return null;
+        }
         public static float? GetFloat(this TextBox textBox, bool isPercent)
         {
             var s = textBox.Text.Replace(',', '.');
