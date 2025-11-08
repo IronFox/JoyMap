@@ -1,4 +1,6 @@
-﻿namespace JoyMap.Profile
+﻿using JoyMap.Util;
+
+namespace JoyMap.Profile
 {
     public class EventProcessor
     {
@@ -8,7 +10,7 @@
 
         private List<ActionProcessor> ActionProcessors { get; } = [];
 
-        public static Func<bool> BuildTriggerCombiner(string? combiner, IEnumerable<TriggerInstance> triggerInstances)
+        public static Func<bool>? BuildTriggerCombiner(string? combiner, IReadOnlyList<TriggerInstance> triggerInstances)
         {
             if (combiner?.ToLower() == "and")
             {
@@ -21,12 +23,17 @@
                     .Any(t => t.IsTriggered);
             }
             else
-                return () => false;
+            {
+                return ExpressionCompiler.CompileBooleanExpression(
+                    combiner ?? "false",
+                    triggerInstances.Select((t, i) => KeyValuePair.Create($"T{i}", () => t.IsTriggered)).ToDictionary()
+                );
+            }
         }
         public EventProcessor(EventInstance source)
         {
             Source = source;
-            IsTriggered = BuildTriggerCombiner(source.Event.TriggerCombiner, source.TriggerInstances);
+            IsTriggered = BuildTriggerCombiner(source.Event.TriggerCombiner, source.TriggerInstances) ?? (() => false);
 
             foreach (var action in source.Event.Actions)
             {

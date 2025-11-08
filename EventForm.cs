@@ -11,6 +11,8 @@ namespace JoyMap
             if (instance is not null)
             {
                 textName.Text = instance.Event.Name;
+                if (!triggerCombiner.Items.Contains(instance.Event.TriggerCombiner))
+                    triggerCombiner.Items.Add(instance.Event.TriggerCombiner);
                 triggerCombiner.Text = instance.Event.TriggerCombiner;
                 foreach (var t in instance.TriggerInstances)
                 {
@@ -211,6 +213,14 @@ namespace JoyMap
                 var actions = actionListView.Items.ToEnumerable()
                         .Select(x => x.Tag as EventAction!)
                         .Where(x => x is not null).ToList();
+                var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, this.Triggers.Select(x => x.Trigger).ToList());
+                if (tCombiner is null)
+                {
+                    btnOk.Enabled = false;
+                    Result = null;
+                    return;
+                }
+
                 var eventObj = new EventInstance(
                     Event: new(
                         TriggerCombiner: triggerCombiner.Text,
@@ -219,10 +229,7 @@ namespace JoyMap
                         Actions: actions!
                     ),
                     TriggerInstances: this.Triggers.Select(x => x.Trigger).ToList(),
-                    IsTriggered: EventProcessor.BuildTriggerCombiner(
-                        triggerCombiner.Text,
-                        this.Triggers.Select(x => x.Trigger).ToList()
-                        )
+                    IsTriggered: tCombiner
                     );
                 Result = eventObj;
             }

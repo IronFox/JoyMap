@@ -29,7 +29,7 @@ namespace JoyMap.Profile
                 IsTriggered: EventProcessor.BuildTriggerCombiner(
                     e.TriggerCombiner,
                     triggerInstances
-                    )
+                    ) ?? (() => false)
                 );
         }
 
