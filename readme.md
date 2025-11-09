@@ -56,7 +56,7 @@ Note that any changes made here will take effect only when pressing the "Update 
 
 **_Triggers_**
 
-The trigger section is primarily a list of possible joystick inputs (buttons or axes), plus a combiner that tells how to combine multiple axes.
+The trigger section is primarily a list of possible triggers (joystick buttons or axes), plus a combiner that tells the system how to combine multiple triggers.
 The columns show the automatically determined label, the device (Joystick), axis/button name, and status.
 As with the event list, the status column shows nothing if the trigger is considered inactive, otherwise a single A.
 To add a new trigger open the context menu and select "Pick/Add ...". Likewise, existing ones can be edited or deleted.
