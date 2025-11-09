@@ -1,4 +1,9 @@
+
 # JoyMap
+
+## Assets used
+This application uses a free icon from:
+<a href="https://www.flaticon.com/free-icon/joystick_12585353?term=joystick&page=1&position=15&origin=tag&related_id=12585353" title="Joystick free icon">Joystick free icon - Flaticon</a>
 
 ## Introduction
 
