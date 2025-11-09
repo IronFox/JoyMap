@@ -1,3 +1,5 @@
+using JoyMap.Profile;
+
 namespace JoyMap
 {
     internal static class Program
@@ -17,6 +19,7 @@ namespace JoyMap
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             Application.Run(new MainForm());
+            Registry.Destroy();
         }
     }
 }

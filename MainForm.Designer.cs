@@ -43,6 +43,8 @@
             editToolStripMenuItem = new ToolStripMenuItem();
             undoToolStripMenuItem = new ToolStripMenuItem();
             redoToolStripMenuItem = new ToolStripMenuItem();
+            helpToolStripMenuItem = new ToolStripMenuItem();
+            aboutToolStripMenuItem = new ToolStripMenuItem();
             cbProfile = new ComboBox();
             label1 = new Label();
             label2 = new Label();
@@ -78,8 +80,6 @@
             btnDeleteCurrentProfile = new Button();
             textWindowNameRegex = new TextBox();
             label5 = new Label();
-            helpToolStripMenuItem = new ToolStripMenuItem();
-            aboutToolStripMenuItem = new ToolStripMenuItem();
             mainMenu.SuspendLayout();
             eventContextMenu.SuspendLayout();
             SuspendLayout();
@@ -180,6 +180,20 @@
             redoToolStripMenuItem.Text = "Redo";
             redoToolStripMenuItem.Click += redoToolStripMenuItem_Click;
             // 
+            // helpToolStripMenuItem
+            // 
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { aboutToolStripMenuItem });
+            helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            helpToolStripMenuItem.Size = new Size(65, 29);
+            helpToolStripMenuItem.Text = "Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            aboutToolStripMenuItem.Size = new Size(270, 34);
+            aboutToolStripMenuItem.Text = "About ...";
+            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
+            // 
             // cbProfile
             // 
             cbProfile.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
@@ -218,6 +232,7 @@
             textProfileName.Name = "textProfileName";
             textProfileName.Size = new Size(1012, 31);
             textProfileName.TabIndex = 6;
+            textProfileName.TextChanged += textProfileName_TextChanged;
             textProfileName.KeyDown += GlobalShortcuts;
             // 
             // label3
@@ -469,20 +484,6 @@
             label5.Size = new Size(179, 25);
             label5.TabIndex = 15;
             label5.Text = "Window name regex:";
-            // 
-            // helpToolStripMenuItem
-            // 
-            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { aboutToolStripMenuItem });
-            helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            helpToolStripMenuItem.Size = new Size(65, 29);
-            helpToolStripMenuItem.Text = "Help";
-            // 
-            // aboutToolStripMenuItem
-            // 
-            aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(270, 34);
-            aboutToolStripMenuItem.Text = "About ...";
-            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
             // MainForm
             // 

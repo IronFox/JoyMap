@@ -14,6 +14,7 @@ namespace JoyMap.Profile
             public required Profile Profile { get; set; }
             public ProfileInstance? Loaded { get; set; }
             public ProcessRegex? ProcessNameRegex { get; set; }
+            public WorkProfile? WorkProfile { get; set; }
         }
 
         private static Dictionary<Guid, ProfileSlot> Profiles { get; } = [];
@@ -43,28 +44,29 @@ namespace JoyMap.Profile
             return null;
         }
 
-        public static Profile Persist(WorkProfile p
+        public static Profile Persist(WorkProfile p, MainForm mainForm
 #if DEBUG
             , bool force = false
 #endif
             )
         {
             var profile = p.ToProfileInstance();
-#if DEBUG
-            if (!force)
-                return profile.Profile;
-#endif
             if (Profiles.TryGetValue(p.Id, out var slot))
             {
                 slot.Profile = profile.Profile;
                 slot.Loaded = profile;
+                slot.WorkProfile = p;
                 slot.ProcessNameRegex = profile.ProcessNameRegex;
             }
             else
                 Profiles.Add(p.Id, new() { Id = p.Id, Profile = profile.Profile, Loaded = profile });
-            SaveAll();
 
-            p.RestartListenIfRunning();
+#if DEBUG
+            if (force)
+#endif
+                SaveAll();
+            if (ProfileExecution.Stop(p))
+                ProfileExecution.Start(p, mainForm);
             return profile.Profile;
         }
 
@@ -135,6 +137,36 @@ namespace JoyMap.Profile
         {
             Profiles.Remove(profileId);
             SaveAll();
+        }
+
+        public static void Destroy()
+        {
+            ProfileExecution.Stop();
+        }
+
+        internal static WorkProfile? ToWorkProfile(ProfileInstance? profile)
+        {
+            if (profile is null)
+                return null;
+            Profiles.TryGetValue(profile.Profile.Id, out var slot);
+            if (slot?.WorkProfile is not null)
+                return slot.WorkProfile;
+
+
+            var workProfile = new WorkProfile
+            {
+                Id = profile.Profile.Id,
+                Name = profile.Profile.Name,
+                ProcessNameRegex = profile.Profile.ProcessNameRegex ?? "",
+                WindowNameRegex = profile.Profile.WindowNameRegex ?? "",
+                Events = [.. profile.EventInstances]
+            };
+            if (slot is not null)
+                slot.WorkProfile = workProfile;
+            else
+                Profiles[workProfile.Id] = new() { Id = workProfile.Id, Profile = profile.Profile, Loaded = profile, WorkProfile = workProfile };
+
+            return workProfile;
         }
     }
 }

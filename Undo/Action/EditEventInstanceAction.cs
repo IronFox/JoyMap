@@ -28,7 +28,7 @@ namespace JoyMap.Undo.Action
             row.SubItems[1].Text = string.Join(", ", NewInstance.TriggerInstances.Select(x => x.Trigger.InputId.AxisName));
             row.SubItems[2].Text = string.Join(", ", NewInstance.Actions.Select(x => x.Action));
             row.Tag = NewInstance;
-            Registry.Persist(TargetProfile);
+            Registry.Persist(TargetProfile, Form);
         }
 
         public void Undo()
@@ -42,7 +42,7 @@ namespace JoyMap.Undo.Action
             row.SubItems[1].Text = string.Join(", ", OldInstance.TriggerInstances.Select(x => x.Trigger.InputId.AxisName));
             row.SubItems[2].Text = string.Join(", ", OldInstance.Actions.Select(x => x.Action));
             row.Tag = OldInstance;
-            Registry.Persist(TargetProfile);
+            Registry.Persist(TargetProfile, Form);
 
         }
     }

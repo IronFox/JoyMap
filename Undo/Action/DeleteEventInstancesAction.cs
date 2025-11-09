@@ -32,7 +32,7 @@ namespace JoyMap.Undo.Action
                 Form.EventListView.Items.RemoveAt(idx);
             }
             DeletedEvents.Reverse();
-            Registry.Persist(TargetProfile);
+            Registry.Persist(TargetProfile, Form);
         }
 
         public void Undo()
@@ -48,7 +48,7 @@ namespace JoyMap.Undo.Action
                 row.SubItems.Add("");
                 TargetProfile.Events.Insert(Index, EventInstance);
             }
-            Registry.Persist(TargetProfile);
+            Registry.Persist(TargetProfile, Form);
             DeletedEvents.Clear();
         }
     }

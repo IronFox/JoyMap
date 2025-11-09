@@ -27,7 +27,7 @@ namespace JoyMap.Undo.Action
                     Form.EventListView.Items.RemoveAt(oldRowIndex);
                     Form.EventListView.Items.Insert(oldRowIndex + 1, row);
                 }
-                Registry.Persist(TargetProfile);
+                Registry.Persist(TargetProfile, Form);
             }
             finally
             {
@@ -53,7 +53,7 @@ namespace JoyMap.Undo.Action
                     Form.EventListView.Items.RemoveAt(oldRowIndex + 1);
                     Form.EventListView.Items.Insert(oldRowIndex, row);
                 }
-                Registry.Persist(TargetProfile);
+                Registry.Persist(TargetProfile, Form);
             }
             finally
             {

@@ -26,7 +26,7 @@ namespace JoyMap.Undo.Action
             row.SubItems.Add(string.Join(", ", NewInstance.Actions.Select(x => x.Action)));
             row.SubItems.Add("");
             TargetProfile.Events.Add(NewInstance);
-            Registry.Persist(TargetProfile);
+            Registry.Persist(TargetProfile, Form);
         }
 
         public void Undo()
@@ -35,7 +35,7 @@ namespace JoyMap.Undo.Action
                 return;
             TargetProfile.Events.Remove(NewInstance);
             Form.EventListView.Items.Remove(OnUndoRemovedItem);
-            Registry.Persist(TargetProfile);
+            Registry.Persist(TargetProfile, Form);
             OnUndoRemovedItem = null;
         }
     }

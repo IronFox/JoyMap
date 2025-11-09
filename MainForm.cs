@@ -18,14 +18,34 @@ namespace JoyMap
 
         internal InputMonitor InputMonitor { get; }
 
+
+        public void RefreshProfileList()
+        {
+            var selectedProfileId = ActiveProfile?.Id;
+            var allProfiles = Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray();
+            cbProfile.Items.Clear();
+            cbProfile.Items.AddRange(allProfiles);
+            var previousIndexInNewList = allProfiles.IndexOf(x => x.Profile.Id == selectedProfileId);
+            if (previousIndexInNewList < 0)
+            {
+                if (cbProfile.Items.Count > 0)
+                {
+                    cbProfile.SelectedIndex = 0;
+                    cbProfile_SelectedIndexChanged(this, EventArgs.Empty);
+                }
+                return;
+            }
+
+            cbProfile.SelectedIndex = previousIndexInNewList;
+            cbProfile_SelectedIndexChanged(this, EventArgs.Empty);
+        }
+
         public MainForm()
         {
             InitializeComponent();
             InputMonitor = new InputMonitor(Handle);
             Registry.LoadAll();
-            cbProfile.Items.AddRange(Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray());
-            cbProfile.SelectedIndex = 0;
-            cbProfile_SelectedIndexChanged(this, EventArgs.Empty);
+            RefreshProfileList();
 #if !DEBUG
             saveDebugOnlyToolStripMenuItem.Enabled = false;
 #endif
@@ -54,10 +74,8 @@ namespace JoyMap
 
         private void CreateProfile(WorkProfile p)
         {
-            Registry.Persist(p);
-            cbProfile.Items.Clear();
-            cbProfile.Items.AddRange(Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray());
-            cbProfile.SelectedIndex = cbProfile.Items.ToEnumerable().ToList().FindIndex(x => (x as ProfileSelection)?.Profile.Id == p.Id);
+            Registry.Persist(p, this);
+            RefreshProfileList();
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -93,11 +111,10 @@ namespace JoyMap
 
         private void LoadProfile(WorkProfile? profile)
         {
+            ProfileExecution.Stop();
 
-            if (profile is null || profile.Id == ActiveProfile?.Id)
+            if (profile is null || profile == ActiveProfile)
                 return;
-            if (ActiveProfile is not null)
-                ActiveProfile.Stop();
             ActiveProfile = profile;
             WithNoEvent(() =>
             {
@@ -119,7 +136,7 @@ namespace JoyMap
                     row.SubItems.Add(string.Join(", ", ev.Actions.Select(x => x.Action)));
                     row.SubItems.Add("");
                 }
-                profile.StartListen(this);
+                //ProfileExecution.Start(profile, this);
             });
         }
 
@@ -157,7 +174,7 @@ namespace JoyMap
         private void Flush()
         {
             if (ActiveProfile is not null)
-                ActiveProfile.Stop();
+                ProfileExecution.Stop();
             ActiveProfile = null;
             textProcessNameRegex.Text = "";
             textProcessNameRegex.Enabled = false;
@@ -204,10 +221,19 @@ namespace JoyMap
 
         private void cbProfile_SelectedIndexChanged(object sender, EventArgs e)
         {
+            var selected = cbProfile.SelectedItem as ProfileSelection;
+            if (selected is null)
+            {
+                Flush();
+                return;
+            }
+            if (selected.Profile.Id == ActiveProfile?.Id)
+                return;
+
             var profile = Registry.Instantiate(InputMonitor, (cbProfile.SelectedItem as ProfileSelection)?.Profile);
             if (profile is not null)
             {
-                LoadProfile(WorkProfile.Load(profile));
+                LoadProfile(Registry.ToWorkProfile(profile));
             }
             else
                 Flush();
@@ -236,9 +262,9 @@ namespace JoyMap
             if (ActiveProfile is null)
                 return;
             var lastOpenedForm = Application.OpenForms.Cast<Form>().Last();
-            WorkProfile.SuppressEventProcessingBecauseJoyMapIsFocused = lastOpenedForm.ContainsFocus;
+            JoyMapIsFocused = lastOpenedForm.ContainsFocus;
 
-            if (WorkProfile.SuppressEventProcessingBecauseJoyMapIsFocused)
+            if (JoyMapIsFocused)
             {
                 foreach (ListViewItem row in eventListView.Items)
                 {
@@ -254,16 +280,23 @@ namespace JoyMap
 
                 var match = Registry.FindAndLoadForWindow(focusedWindow, InputMonitor);
 
-                if (match != null && match.Profile.Id != ActiveProfile?.Id)
+                if (match != null && match.Profile.Id != ActiveProfile.Id)
                 {
                     cbProfile.SelectedIndex = cbProfile.Items.ToEnumerable().ToList().FindIndex(x => (x as ProfileSelection)?.Profile.Id == match.Profile.Id);
                     //LoadProfile(WorkProfile.Load(match));
                 }
-                WorkProfile.SuppressEventProcessingBecauseGameIsNotFocused =
+                GameNotFocused =
                     SuppressIfGameIsNotFocused && (match is null || !match.Is(focusedWindow));
             }
             else
-                WorkProfile.SuppressEventProcessingBecauseGameIsNotFocused = SuppressIfGameIsNotFocused;
+                GameNotFocused = SuppressIfGameIsNotFocused;
+
+            if (!JoyMapIsFocused && !GameNotFocused)
+            {
+                ProfileExecution.Start(ActiveProfile, this);
+            }
+            else
+                ProfileExecution.Stop();
         }
 
         private void copyAllToolStripMenuItem_Click(object sender, EventArgs e)
@@ -338,6 +371,8 @@ namespace JoyMap
         }
 
         private bool NoEventFlag { get; set; } = false;
+        public bool JoyMapIsFocused { get; private set; }
+        public bool GameNotFocused { get; private set; }
 
         private void textWindowRegex_TextChanged(object sender, EventArgs e)
         {
@@ -509,10 +544,7 @@ namespace JoyMap
                 var profileId = ActiveProfile.Id;
                 Flush();
                 Registry.DeleteProfile(profileId);
-                cbProfile.Items.Clear();
-                cbProfile.Items.AddRange(Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray());
-                if (cbProfile.Items.Count > 0)
-                    cbProfile.SelectedIndex = 0;
+                RefreshProfileList();
             }
 
         }
@@ -535,7 +567,7 @@ namespace JoyMap
 #if DEBUG
             if (ActiveProfile is null)
                 return;
-            Registry.Persist(ActiveProfile, true);
+            Registry.Persist(ActiveProfile, this, true);
 #endif
         }
 
@@ -548,6 +580,27 @@ namespace JoyMap
         {
             using var form = new AboutForm();
             form.ShowDialog(this);
+        }
+
+        private void textProfileName_TextChanged(object sender, EventArgs e)
+        {
+            if (NoEventFlag)
+                return;
+            if (ActiveProfile is null)
+            {
+                textProfileName.Enabled = false;
+                return;
+            }
+
+            var lastUndo = ActiveProfile.History.NextUndoAction;
+            if (lastUndo is SetProfileNameAction swra)
+            {
+                swra.UpdateNewValue(textProfileName.Text);
+            }
+            else
+            {
+                ActiveProfile.History.ExecuteAction(new SetProfileNameAction(this, ActiveProfile, textProfileName));
+            }
         }
     }
 }
