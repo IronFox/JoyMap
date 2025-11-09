@@ -33,7 +33,7 @@ namespace JoyMap.Undo.Action
                 item.Tag = ev;
                 TargetProfile.Events[idx] = ev;
             }
-            Registry.Persist(TargetProfile, Form);
+            Registry.Persist(TargetProfile);
         }
 
         public void Undo()
@@ -49,7 +49,7 @@ namespace JoyMap.Undo.Action
                 item.Tag = ev;
                 TargetProfile.Events[idx] = ev;
             }
-            Registry.Persist(TargetProfile, Form);
+            Registry.Persist(TargetProfile);
         }
     }
 }

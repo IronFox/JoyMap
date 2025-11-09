@@ -10,6 +10,7 @@ namespace JoyMap
             InitializeComponent();
             if (instance is not null)
             {
+                Suspended = instance.IsSuspended;
                 textName.Text = instance.Event.Name;
                 if (!triggerCombiner.Items.Contains(instance.Event.TriggerCombiner))
                     triggerCombiner.Items.Add(instance.Event.TriggerCombiner);
@@ -34,6 +35,8 @@ namespace JoyMap
                 Rebuild();
             }
         }
+
+        private bool Suspended { get; set; } = false;
 
         private List<(TriggerInstance Trigger, ListViewItem Row)> Triggers { get; } = [];
 
@@ -231,7 +234,10 @@ namespace JoyMap
                     ),
                     TriggerInstances: this.Triggers.Select(x => x.Trigger).ToList(),
                     IsTriggered: tCombiner
-                    );
+                    )
+                {
+                    IsSuspended = Suspended
+                };
                 Result = eventObj;
             }
             else

@@ -44,7 +44,7 @@ namespace JoyMap.Profile
             return null;
         }
 
-        public static Profile Persist(WorkProfile p, MainForm mainForm
+        public static Profile Persist(WorkProfile p
 #if DEBUG
             , bool force = false
 #endif
@@ -66,7 +66,7 @@ namespace JoyMap.Profile
 #endif
                 SaveAll();
             if (ProfileExecution.Stop(p))
-                ProfileExecution.Start(p, mainForm);
+                ProfileExecution.Start(p);
             return profile.Profile;
         }
 

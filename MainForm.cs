@@ -74,7 +74,7 @@ namespace JoyMap
 
         private void CreateProfile(WorkProfile p)
         {
-            Registry.Persist(p, this);
+            Registry.Persist(p);
             RefreshProfileList();
         }
 
@@ -269,7 +269,7 @@ namespace JoyMap
                 foreach (ListViewItem row in eventListView.Items)
                 {
                     if (row.Tag is not EventInstance ev) continue;
-                    row.SubItems[3].Text = ev.IsTriggered() ? "A" : "";
+                    row.SubItems[3].Text = ev.IsSuspended ? "Suspended" : ev.IsTriggered() ? "A" : "";
                 }
             }
 
@@ -293,7 +293,7 @@ namespace JoyMap
 
             if (!JoyMapIsFocused && !GameNotFocused)
             {
-                ProfileExecution.Start(ActiveProfile, this);
+                ProfileExecution.Start(ActiveProfile);
             }
             else
                 ProfileExecution.Stop();
@@ -567,7 +567,7 @@ namespace JoyMap
 #if DEBUG
             if (ActiveProfile is null)
                 return;
-            Registry.Persist(ActiveProfile, this, true);
+            Registry.Persist(ActiveProfile, true);
 #endif
         }
 
@@ -601,6 +601,17 @@ namespace JoyMap
             {
                 ActiveProfile.History.ExecuteAction(new SetProfileNameAction(this, ActiveProfile, textProfileName));
             }
+        }
+
+        private void suspendSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var selectedIndexes = eventListView.SelectedIndices;
+            if (selectedIndexes.Count == 0)
+                return;
+            ActiveProfile.History.ExecuteAction(new ToggleSuspendEventInstancesAction(this, ActiveProfile, selectedIndexes.ToArray()));
+
         }
     }
 }

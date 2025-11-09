@@ -33,7 +33,7 @@ namespace JoyMap.Undo.Action
                 TextProcessNameRegex.Text = TargetProfile.ProcessNameRegex;
                 TextWindowNameRegex.Text = TargetProfile.WindowNameRegex;
             });
-            Registry.Persist(TargetProfile, Form);
+            Registry.Persist(TargetProfile);
         }
     }
 }

@@ -98,7 +98,7 @@ namespace JoyMap.Windows
             uint flags = nowDown ? 0u : Win32.KEYEVENTF_KEYUP;
 
             // Set extended bit for PageUp/PageDown (and aliases Prior/Next)
-            if (keys == Keys.PageUp || keys == Keys.PageDown || keys == Keys.Prior || keys == Keys.Next)
+            if (keys == Keys.PageUp || keys == Keys.PageDown || keys == Keys.Prior || keys == Keys.Next || keys == Keys.Home)
             {
                 flags |= Win32.KEYEVENTF_EXTENDEDKEY;
             }

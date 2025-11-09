@@ -16,6 +16,7 @@ namespace JoyMap.Profile
         Func<bool> IsTriggered
         )
     {
+        public bool IsSuspended { get; set; }
         public IReadOnlyList<EventAction> Actions => Event.Actions;
 
         internal static EventInstance Load(InputMonitor monitor, Event e)
@@ -33,8 +34,10 @@ namespace JoyMap.Profile
                 );
         }
 
-        public EventProcessor ToProcessor()
+        public EventProcessor? ToProcessor()
         {
+            if (IsSuspended)
+                return null;
             return new EventProcessor(this);
         }
 

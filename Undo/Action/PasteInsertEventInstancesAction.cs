@@ -35,7 +35,7 @@ namespace JoyMap.Undo.Action
                 TargetProfile.Events.Insert(InsertIndex + i, ev);
                 CreatedRows.Add(row);
             }
-            Registry.Persist(TargetProfile, Form);
+            Registry.Persist(TargetProfile);
         }
 
         public void Undo()
@@ -48,7 +48,7 @@ namespace JoyMap.Undo.Action
                 TargetProfile.Events.RemoveAt(InsertIndex + i);
                 Form.EventListView.Items.Remove(row);
             }
-            Registry.Persist(TargetProfile, Form);
+            Registry.Persist(TargetProfile);
             CreatedRows.Clear();
         }
     }

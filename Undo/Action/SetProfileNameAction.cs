@@ -13,7 +13,7 @@ namespace JoyMap.Undo.Action
         {
             TargetProfile.Name = name;
             Form.WithNoEvent(() => TextBox.Text = name);
-            Registry.Persist(TargetProfile, Form);
+            Registry.Persist(TargetProfile);
             Form.RefreshProfileList();
         }
     }

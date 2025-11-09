@@ -21,7 +21,7 @@ namespace JoyMap.Undo.Action
         {
             TargetProfile.ProcessNameRegex = windowRegex;
             Form.WithNoEvent(() => TextBox.Text = windowRegex);
-            Registry.Persist(TargetProfile, Form);
+            Registry.Persist(TargetProfile);
         }
     }
 }

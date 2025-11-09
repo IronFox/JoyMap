@@ -5,14 +5,14 @@ namespace JoyMap.Profile
     internal class ProfileExecution : IDisposable, IAsyncDisposable
     {
         private static ProfileExecution? Active { get; set; }
-        public static void Start(IProfileInstance profileInstance, Form owner)
+        public static void Start(IProfileInstance profileInstance)
         {
             if (Active?.Events == profileInstance.EventInstances)
             {
                 return;
             }
             Active?.Dispose();
-            Active = new ProfileExecution(profileInstance, owner);
+            Active = new ProfileExecution(profileInstance);
         }
 
         public static bool Stop(IProfileInstance profileInstance)
@@ -32,16 +32,16 @@ namespace JoyMap.Profile
             Active = null;
         }
 
-        public ProfileExecution(IProfileInstance profileInstance, Form owner)
+        public ProfileExecution(IProfileInstance profileInstance)
         {
             Events = profileInstance.EventInstances;
+            Console.WriteLine($"Starting ProfileExecution with {Events.Count} events.");
+
 
             ListenCancel = new CancellationTokenSource();
-            ListenOwner = owner;
             var cancel = ListenCancel.Token;
-            var processors = Events.Select(ev => ev.ToProcessor()).ToList();
-            var handle = owner.Handle;
-            Task.Run(() => ListenLoop(processors, handle, cancel), cancel);
+            var processors = Events.Select(ev => ev.ToProcessor()).OfType<EventProcessor>().ToList();
+            Task.Run(() => ListenLoop(processors, cancel), cancel);
         }
 
 
@@ -49,11 +49,10 @@ namespace JoyMap.Profile
 
 
         private CancellationTokenSource ListenCancel { get; } = new();
-        private Form ListenOwner { get; }
 
         private TaskCompletionSource DisposeCompletion { get; } = new();
 
-        private async Task ListenLoop(List<EventProcessor> processors, IntPtr ownerHandle, CancellationToken cancel)
+        private async Task ListenLoop(List<EventProcessor> processors, CancellationToken cancel)
         {
             try
             {
@@ -79,9 +78,16 @@ namespace JoyMap.Profile
             {
                 // Log exception
                 Console.WriteLine($"ListenLoop Exception: {ex}");
+                throw;
             }
             finally
             {
+                Console.WriteLine($"ProfileExecution ListenLoop ending.");
+                foreach (var processor in processors)
+                {
+                    processor.Stop();
+                }
+
                 DisposeCompletion.SetResult();
             }
         }
