@@ -55,13 +55,13 @@ namespace JoyMap
             if (Event is not null)
             {
                 var state = Event.Value.GetLatestStatus();
+                labelStatus.Text = PickDeviceInputForm.Status2Str(state, Event.Value.InputId.AxisNegated);
+
                 if (Event.Value.InputId.AxisNegated && state is not null)
                 {
                     state = -state;
-                    labelStatus.Text = PickDeviceInputForm.Status2Str(state) + " (flipped)";
                 }
-                else
-                    labelStatus.Text = PickDeviceInputForm.Status2Str(state);
+
                 var min = GetMin();
                 var max = GetMax();
                 if (min is not null && max is not null)

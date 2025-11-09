@@ -94,13 +94,15 @@ namespace JoyMap.ControllerTracking
 
     internal readonly record struct EventKey(
         Guid DeviceInstanceId,
-        InputAxis Which
+        InputAxis Which,
+        bool AxisNegated
         )
     {
         public EventKey(DeviceEvent ev)
         : this(
               DeviceInstanceId: ev.InputId.ControllerId.InstanceGuid,
-              Which: ev.InputId.Axis)
+              Which: ev.InputId.Axis,
+              AxisNegated: ev.InputId.AxisNegated)
         { }
     }
 
@@ -130,11 +132,12 @@ namespace JoyMap.ControllerTracking
             {
                 var ev = new EventKey(
                     DeviceInstanceId: state.Id,
-                    Which: change.Which);
+                    Which: change.Which,
+                    AxisNegated: change.Status < 0);
 
                 foreach (var recorder in Active.Keys)
                 {
-                    var nv = new EventValue(new(devId, state.ControllerName, change.Which, change.Status < 0), change.Status, () => state.Get(change.Which));
+                    var nv = new EventValue(new(devId, state.ControllerName, change.Which, ev.AxisNegated), change.Status, () => state.Get(change.Which));
                     recorder.Events.AddOrUpdate(ev, nv, (_, _) => nv);
                 }
             }

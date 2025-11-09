@@ -33,7 +33,7 @@ namespace JoyMap
 
         private void updateDeviceListTimer_Tick(object sender, EventArgs e)
         {
-            Dictionary<EventKey, float> status = new();
+            Dictionary<EventKey, DeviceEvent> status = new();
             foreach (var ev in EventRecorder.GetAll())
             {
                 var key = new EventKey(ev);
@@ -41,10 +41,11 @@ namespace JoyMap
                 {
                     var row = inputList.Items.Add(ev.DeviceName);
                     row.SubItems.Add(ev.InputId.Axis.ToString());
-                    row.SubItems.Add(Status2Str(ev.Status));
+                    row.SubItems.Add(Status2Str(ev.GetLatestStatus(), ev.InputId.AxisNegated));
+                    row.SubItems.Add(StatusOf(ev.InputId));
                     row.Tag = ev;
                 }
-                status.Add(key, ev.Status);
+                status.Add(key, ev);
             }
 
             foreach (ListViewItem item in inputList.Items)
@@ -54,7 +55,8 @@ namespace JoyMap
                     var key = new EventKey(record);
                     if (status.TryGetValue(key, out var stat))
                     {
-                        item.SubItems[2].Text = Status2Str(stat);
+                        item.SubItems[2].Text = Status2Str(stat.GetLatestStatus(), stat.InputId.AxisNegated);
+                        item.SubItems[3].Text = StatusOf(record.InputId);
                         continue;
                     }
                     else
@@ -71,12 +73,19 @@ namespace JoyMap
 
         }
 
+        private string StatusOf(ControllerInputId inputId)
+        {
+            return inputId.AxisSigned ? inputId.AxisNegated ? "Negative" : "Positive" : "Button";
+        }
+
         public DeviceEvent? Result { get; private set; } = null;
 
-        public static string Status2Str(float? status)
+        public static string Status2Str(float? status, bool negated)
         {
             if (status is null)
                 return "N/A";
+            if (negated)
+                status = -status.Value;
             return Math.Round(status.Value * 100, 2).ToStr() + " %";
         }
 

@@ -208,7 +208,7 @@
             textAutoReleaseMs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textAutoReleaseMs.Location = new Point(240, 169);
             textAutoReleaseMs.Name = "textAutoReleaseMs";
-            textAutoReleaseMs.Size = new Size(356, 31);
+            textAutoReleaseMs.Size = new Size(354, 31);
             textAutoReleaseMs.TabIndex = 18;
             textAutoReleaseMs.Text = "567.8";
             textAutoReleaseMs.TextChanged += textAutoReleaseMs_TextChanged;
