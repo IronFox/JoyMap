@@ -75,6 +75,7 @@ namespace JoyMap
         private void triggerMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             deleteToolStripMenuItem1.Enabled = triggerListView.SelectedItems.Count > 0;
+            editSelectedToolStripMenuItem.Enabled = triggerListView.SelectedItems.Count == 1;
         }
 
         private void deleteToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -155,7 +156,7 @@ namespace JoyMap
         private void actionMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             deleteToolStripMenuItem.Enabled = actionListView.SelectedItems.Count > 0;
-
+            editSelectedToolStripMenuItem1.Enabled = actionListView.SelectedItems.Count == 1;
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -242,6 +243,16 @@ namespace JoyMap
         private void AnyChanged(object sender, EventArgs e)
         {
             Rebuild();
+        }
+
+        private void editSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            triggerListView_DoubleClick(sender, e);
+        }
+
+        private void editSelectedToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            actionListView_DoubleClick(sender, e);
         }
     }
 }

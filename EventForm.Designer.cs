@@ -40,6 +40,9 @@
             columnHeader3 = new ColumnHeader();
             triggerMenu = new ContextMenuStrip(components);
             pickAddToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem1 = new ToolStripSeparator();
+            editSelectedToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem2 = new ToolStripSeparator();
             deleteToolStripMenuItem1 = new ToolStripMenuItem();
             label3 = new Label();
             actionListView = new ListView();
@@ -48,6 +51,9 @@
             columnHeader7 = new ColumnHeader();
             actionMenu = new ContextMenuStrip(components);
             addToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem3 = new ToolStripSeparator();
+            editSelectedToolStripMenuItem1 = new ToolStripMenuItem();
+            toolStripMenuItem4 = new ToolStripSeparator();
             deleteToolStripMenuItem = new ToolStripMenuItem();
             btnCancel = new Button();
             btnOk = new Button();
@@ -112,7 +118,7 @@
             // columnHeader2
             // 
             columnHeader2.Text = "Input";
-            columnHeader2.Width = 120;
+            columnHeader2.Width = 200;
             // 
             // columnHeader3
             // 
@@ -121,22 +127,39 @@
             // triggerMenu
             // 
             triggerMenu.ImageScalingSize = new Size(24, 24);
-            triggerMenu.Items.AddRange(new ToolStripItem[] { pickAddToolStripMenuItem, deleteToolStripMenuItem1 });
+            triggerMenu.Items.AddRange(new ToolStripItem[] { pickAddToolStripMenuItem, toolStripMenuItem1, editSelectedToolStripMenuItem, toolStripMenuItem2, deleteToolStripMenuItem1 });
             triggerMenu.Name = "triggerMenu";
-            triggerMenu.Size = new Size(174, 68);
+            triggerMenu.Size = new Size(312, 112);
             triggerMenu.Opening += triggerMenu_Opening;
             // 
             // pickAddToolStripMenuItem
             // 
             pickAddToolStripMenuItem.Name = "pickAddToolStripMenuItem";
-            pickAddToolStripMenuItem.Size = new Size(173, 32);
+            pickAddToolStripMenuItem.Size = new Size(311, 32);
             pickAddToolStripMenuItem.Text = "Pick/Add ...";
             pickAddToolStripMenuItem.Click += pickAddToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(308, 6);
+            // 
+            // editSelectedToolStripMenuItem
+            // 
+            editSelectedToolStripMenuItem.Name = "editSelectedToolStripMenuItem";
+            editSelectedToolStripMenuItem.Size = new Size(311, 32);
+            editSelectedToolStripMenuItem.Text = "Edit Selected (double click) ...";
+            editSelectedToolStripMenuItem.Click += editSelectedToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem2
+            // 
+            toolStripMenuItem2.Name = "toolStripMenuItem2";
+            toolStripMenuItem2.Size = new Size(308, 6);
             // 
             // deleteToolStripMenuItem1
             // 
             deleteToolStripMenuItem1.Name = "deleteToolStripMenuItem1";
-            deleteToolStripMenuItem1.Size = new Size(173, 32);
+            deleteToolStripMenuItem1.Size = new Size(311, 32);
             deleteToolStripMenuItem1.Text = "Delete";
             deleteToolStripMenuItem1.Click += deleteToolStripMenuItem1_Click;
             // 
@@ -181,22 +204,39 @@
             // actionMenu
             // 
             actionMenu.ImageScalingSize = new Size(24, 24);
-            actionMenu.Items.AddRange(new ToolStripItem[] { addToolStripMenuItem, deleteToolStripMenuItem });
+            actionMenu.Items.AddRange(new ToolStripItem[] { addToolStripMenuItem, toolStripMenuItem3, editSelectedToolStripMenuItem1, toolStripMenuItem4, deleteToolStripMenuItem });
             actionMenu.Name = "actionMenu";
-            actionMenu.Size = new Size(136, 68);
+            actionMenu.Size = new Size(312, 145);
             actionMenu.Opening += actionMenu_Opening;
             // 
             // addToolStripMenuItem
             // 
             addToolStripMenuItem.Name = "addToolStripMenuItem";
-            addToolStripMenuItem.Size = new Size(135, 32);
+            addToolStripMenuItem.Size = new Size(311, 32);
             addToolStripMenuItem.Text = "Add ...";
             addToolStripMenuItem.Click += addToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem3
+            // 
+            toolStripMenuItem3.Name = "toolStripMenuItem3";
+            toolStripMenuItem3.Size = new Size(308, 6);
+            // 
+            // editSelectedToolStripMenuItem1
+            // 
+            editSelectedToolStripMenuItem1.Name = "editSelectedToolStripMenuItem1";
+            editSelectedToolStripMenuItem1.Size = new Size(311, 32);
+            editSelectedToolStripMenuItem1.Text = "Edit Selected (double click) ...";
+            editSelectedToolStripMenuItem1.Click += editSelectedToolStripMenuItem1_Click;
+            // 
+            // toolStripMenuItem4
+            // 
+            toolStripMenuItem4.Name = "toolStripMenuItem4";
+            toolStripMenuItem4.Size = new Size(308, 6);
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new Size(135, 32);
+            deleteToolStripMenuItem.Size = new Size(311, 32);
             deleteToolStripMenuItem.Text = "Delete";
             deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
             // 
@@ -305,5 +345,11 @@
         private ToolStripMenuItem deleteToolStripMenuItem1;
         private System.Windows.Forms.Timer statusUpdateTimer;
         private ColumnHeader columnHeader7;
+        private ToolStripSeparator toolStripMenuItem1;
+        private ToolStripMenuItem editSelectedToolStripMenuItem;
+        private ToolStripSeparator toolStripMenuItem2;
+        private ToolStripSeparator toolStripMenuItem3;
+        private ToolStripMenuItem editSelectedToolStripMenuItem1;
+        private ToolStripSeparator toolStripMenuItem4;
     }
 }

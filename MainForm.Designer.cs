@@ -289,7 +289,7 @@
             eventContextMenu.ImageScalingSize = new Size(24, 24);
             eventContextMenu.Items.AddRange(new ToolStripItem[] { newToolStripMenuItem1, toolStripMenuItem4, selectAllToolStripMenuItem, moveSelectedDownToolStripMenuItem, moveSelectedUpToolStripMenuItem, toolStripMenuItem2, editSelectedToolStripMenuItem, copySelectedToolStripMenuItem, copyAllToolStripMenuItem, toolStripMenuItem1, pasteOverToolStripMenuItem, pasteInsertToolStripMenuItem, toolStripMenuItem3, deleteToolStripMenuItem });
             eventContextMenu.Name = "eventContextMenu";
-            eventContextMenu.Size = new Size(351, 348);
+            eventContextMenu.Size = new Size(351, 381);
             eventContextMenu.Opening += eventContextMenu_Opening;
             // 
             // newToolStripMenuItem1
@@ -337,7 +337,7 @@
             // 
             editSelectedToolStripMenuItem.Name = "editSelectedToolStripMenuItem";
             editSelectedToolStripMenuItem.Size = new Size(350, 32);
-            editSelectedToolStripMenuItem.Text = "Edit Selected (double click)";
+            editSelectedToolStripMenuItem.Text = "Edit Selected (double click) ...";
             editSelectedToolStripMenuItem.Click += editSelectedToolStripMenuItem_Click;
             // 
             // copySelectedToolStripMenuItem
