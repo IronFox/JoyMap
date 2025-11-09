@@ -52,7 +52,7 @@ and a single 'A' if it currently is and would execute if the target game window 
 #### Event Dialog
 Editing an existing or creating a new event will open a dialog to do so.
 The dialog features a name input in the top section, a trigger section, and an action section.
-Note that any chances made here will take effect only when pressing the "Update / Create" button. This dialog does not have an undo feature.
+Note that any changes made here will take effect only when pressing the "Update / Create" button. This dialog does not have an undo feature.
 
 **_Triggers_**
 
