@@ -75,6 +75,7 @@ namespace JoyMap
         private void CreateProfile(WorkProfile p)
         {
             Registry.Persist(p);
+            LoadProfile(p);
             RefreshProfileList();
         }
 
