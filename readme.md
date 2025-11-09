@@ -40,6 +40,9 @@ An event is a combination of triggers and actions. If the trigger combination is
 #### Event List
 Most of the main window is one huge list of events. Right click the list, chose 'New ...' to create a new event.
 The buttons and context menu also allow you to change the order, select, edit, copy, paste, and delete events.
+Note that the order of events does not matter.
+It is only a way to structure the list according to personal preferences.
+
 The list shows four columns: 'Name' is the customizable name of the respective event,
 'Triggers' an abbreviation of what causes the event to trigger,
 and 'Actions' an abbreviation of what it does.
