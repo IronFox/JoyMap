@@ -52,6 +52,14 @@ namespace JoyMap
             }
         }
 
+        private void CreateProfile(WorkProfile p)
+        {
+            Registry.Persist(p);
+            cbProfile.Items.Clear();
+            cbProfile.Items.AddRange(Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray());
+            cbProfile.SelectedIndex = cbProfile.Items.ToEnumerable().ToList().FindIndex(x => (x as ProfileSelection)?.Profile.Id == p.Id);
+        }
+
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using var form = new PickWindowForm();
@@ -66,11 +74,19 @@ namespace JoyMap
                     ProcessNameRegex = Regex.Escape(procName),
                     WindowNameRegex = Regex.Escape(form.Result!.WindowTitle)
                 };
-                Registry.Persist(p);
-                cbProfile.Items.Clear();
-                cbProfile.Items.AddRange(Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray());
-                cbProfile.SelectedIndex = cbProfile.Items.ToEnumerable().ToList().FindIndex(x => (x as ProfileSelection)?.Profile.Id == p.Id);
+                CreateProfile(p);
             }
+        }
+
+
+        private void newEmptyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CreateProfile(new WorkProfile
+            {
+                Name = "New Profile",
+                ProcessNameRegex = "",
+                WindowNameRegex = ""
+            });
         }
 
         public WorkProfile? ActiveProfile { get; private set; }
@@ -264,6 +280,7 @@ namespace JoyMap
             moveSelectedUpToolStripMenuItem.Enabled = btnUp.Enabled;
             moveSelectedDownToolStripMenuItem.Enabled = btnDown.Enabled;
             selectAllToolStripMenuItem.Enabled = eventListView.Items.Count > 0;
+            editSelectedToolStripMenuItem.Enabled = eventListView.SelectedItems.Count == 1;
         }
 
         private void copySelectedToolStripMenuItem_Click(object sender, EventArgs e)
@@ -521,5 +538,11 @@ namespace JoyMap
             Registry.Persist(ActiveProfile, true);
 #endif
         }
+
+        private void editSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            eventListView_DoubleClick(this, EventArgs.Empty);
+        }
+
     }
 }

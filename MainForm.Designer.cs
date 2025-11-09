@@ -32,9 +32,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             mainMenu = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
+            saveDebugOnlyToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem6 = new ToolStripSeparator();
             quitToolStripMenuItem = new ToolStripMenuItem();
             profilesToolStripMenuItem = new ToolStripMenuItem();
             newToolStripMenuItem = new ToolStripMenuItem();
+            newEmptyToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem5 = new ToolStripSeparator();
             runOnlyWhenGameIsFocusedToolStripMenuItem = new ToolStripMenuItem();
             editToolStripMenuItem = new ToolStripMenuItem();
@@ -59,6 +62,7 @@
             moveSelectedDownToolStripMenuItem = new ToolStripMenuItem();
             moveSelectedUpToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem2 = new ToolStripSeparator();
+            editSelectedToolStripMenuItem = new ToolStripMenuItem();
             copySelectedToolStripMenuItem = new ToolStripMenuItem();
             copyAllToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripSeparator();
@@ -74,8 +78,6 @@
             btnDeleteCurrentProfile = new Button();
             textWindowNameRegex = new TextBox();
             label5 = new Label();
-            saveDebugOnlyToolStripMenuItem = new ToolStripMenuItem();
-            toolStripMenuItem6 = new ToolStripSeparator();
             mainMenu.SuspendLayout();
             eventContextMenu.SuspendLayout();
             SuspendLayout();
@@ -97,16 +99,28 @@
             fileToolStripMenuItem.Size = new Size(54, 29);
             fileToolStripMenuItem.Text = "File";
             // 
+            // saveDebugOnlyToolStripMenuItem
+            // 
+            saveDebugOnlyToolStripMenuItem.Name = "saveDebugOnlyToolStripMenuItem";
+            saveDebugOnlyToolStripMenuItem.Size = new Size(262, 34);
+            saveDebugOnlyToolStripMenuItem.Text = "Save (Debug Only)";
+            saveDebugOnlyToolStripMenuItem.Click += saveDebugOnlyToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem6
+            // 
+            toolStripMenuItem6.Name = "toolStripMenuItem6";
+            toolStripMenuItem6.Size = new Size(259, 6);
+            // 
             // quitToolStripMenuItem
             // 
             quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            quitToolStripMenuItem.Size = new Size(270, 34);
+            quitToolStripMenuItem.Size = new Size(262, 34);
             quitToolStripMenuItem.Text = "Quit";
             quitToolStripMenuItem.Click += quitToolStripMenuItem_Click;
             // 
             // profilesToolStripMenuItem
             // 
-            profilesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { newToolStripMenuItem, toolStripMenuItem5, runOnlyWhenGameIsFocusedToolStripMenuItem });
+            profilesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { newToolStripMenuItem, newEmptyToolStripMenuItem, toolStripMenuItem5, runOnlyWhenGameIsFocusedToolStripMenuItem });
             profilesToolStripMenuItem.Name = "profilesToolStripMenuItem";
             profilesToolStripMenuItem.Size = new Size(86, 29);
             profilesToolStripMenuItem.Text = "Profiles";
@@ -115,8 +129,15 @@
             // 
             newToolStripMenuItem.Name = "newToolStripMenuItem";
             newToolStripMenuItem.Size = new Size(373, 34);
-            newToolStripMenuItem.Text = "New ...";
+            newToolStripMenuItem.Text = "New from Window ...";
             newToolStripMenuItem.Click += newToolStripMenuItem_Click;
+            // 
+            // newEmptyToolStripMenuItem
+            // 
+            newEmptyToolStripMenuItem.Name = "newEmptyToolStripMenuItem";
+            newEmptyToolStripMenuItem.Size = new Size(373, 34);
+            newEmptyToolStripMenuItem.Text = "New Empty";
+            newEmptyToolStripMenuItem.Click += newEmptyToolStripMenuItem_Click;
             // 
             // toolStripMenuItem5
             // 
@@ -266,9 +287,9 @@
             // eventContextMenu
             // 
             eventContextMenu.ImageScalingSize = new Size(24, 24);
-            eventContextMenu.Items.AddRange(new ToolStripItem[] { newToolStripMenuItem1, toolStripMenuItem4, selectAllToolStripMenuItem, moveSelectedDownToolStripMenuItem, moveSelectedUpToolStripMenuItem, toolStripMenuItem2, copySelectedToolStripMenuItem, copyAllToolStripMenuItem, toolStripMenuItem1, pasteOverToolStripMenuItem, pasteInsertToolStripMenuItem, toolStripMenuItem3, deleteToolStripMenuItem });
+            eventContextMenu.Items.AddRange(new ToolStripItem[] { newToolStripMenuItem1, toolStripMenuItem4, selectAllToolStripMenuItem, moveSelectedDownToolStripMenuItem, moveSelectedUpToolStripMenuItem, toolStripMenuItem2, editSelectedToolStripMenuItem, copySelectedToolStripMenuItem, copyAllToolStripMenuItem, toolStripMenuItem1, pasteOverToolStripMenuItem, pasteInsertToolStripMenuItem, toolStripMenuItem3, deleteToolStripMenuItem });
             eventContextMenu.Name = "eventContextMenu";
-            eventContextMenu.Size = new Size(351, 316);
+            eventContextMenu.Size = new Size(351, 348);
             eventContextMenu.Opening += eventContextMenu_Opening;
             // 
             // newToolStripMenuItem1
@@ -311,6 +332,13 @@
             // 
             toolStripMenuItem2.Name = "toolStripMenuItem2";
             toolStripMenuItem2.Size = new Size(347, 6);
+            // 
+            // editSelectedToolStripMenuItem
+            // 
+            editSelectedToolStripMenuItem.Name = "editSelectedToolStripMenuItem";
+            editSelectedToolStripMenuItem.Size = new Size(350, 32);
+            editSelectedToolStripMenuItem.Text = "Edit Selected (double click)";
+            editSelectedToolStripMenuItem.Click += editSelectedToolStripMenuItem_Click;
             // 
             // copySelectedToolStripMenuItem
             // 
@@ -440,18 +468,6 @@
             label5.TabIndex = 15;
             label5.Text = "Window name regex:";
             // 
-            // saveDebugOnlyToolStripMenuItem
-            // 
-            saveDebugOnlyToolStripMenuItem.Name = "saveDebugOnlyToolStripMenuItem";
-            saveDebugOnlyToolStripMenuItem.Size = new Size(270, 34);
-            saveDebugOnlyToolStripMenuItem.Text = "Save (Debug Only)";
-            saveDebugOnlyToolStripMenuItem.Click += saveDebugOnlyToolStripMenuItem_Click;
-            // 
-            // toolStripMenuItem6
-            // 
-            toolStripMenuItem6.Name = "toolStripMenuItem6";
-            toolStripMenuItem6.Size = new Size(267, 6);
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -533,5 +549,7 @@
         private ToolStripMenuItem runOnlyWhenGameIsFocusedToolStripMenuItem;
         private ToolStripMenuItem saveDebugOnlyToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem6;
+        private ToolStripMenuItem editSelectedToolStripMenuItem;
+        private ToolStripMenuItem newEmptyToolStripMenuItem;
     }
 }
