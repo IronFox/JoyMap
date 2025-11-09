@@ -1,10 +1,6 @@
 
 # JoyMap
 
-## Assets used
-This application uses a free icon from:
-<a href="https://www.flaticon.com/free-icon/joystick_12585353?term=joystick&page=1&position=15&origin=tag&related_id=12585353" title="Joystick free icon">Joystick free icon - Flaticon</a>
-
 ## Introduction
 
 JoyMap is a Joystick to Keyboard mapping program, somewhat akin to JoyToKey, however more powerful in most aspects.
@@ -29,9 +25,24 @@ A profile has a name and is associated with one or more games.
 To create a new profile, start the game, then use the main menu (Profiles -> New from Window...) to pick its window and create a new profile.
 Alternatively you can create a new empty profile (Profiles -> New Empty). It will have pre-filled profile, process, and window names, which can now be freely edited.
 Process and window names are regular expressions.
-If empty, they will always match but at least one (process or window name) must be set correctly or the profile will never activate.
+Apart from editing, the "Pick ..." button allows selecting a new process/window name combo.
+Empty regex's will always match, but at least one (process or window name) must be set correctly or the profile will never activate.
 The "Profile: ..." drop down in the top section of the window allows selecting any created profile.
 Focusing a game window that matches a registered process or window name will automatically switch to that profile.
+
+The "Delete" button can be used to delete a profile.
+Alternatively, profiles are automatically removed if they are restored from file without events.
+Removal of a profile can currently not be undone.
+
+### Save and Load
+
+If the application is compiled and runs in its release configuration, all changes to profiles are immediately written to file.
+Otherwise, you can test modifications without changing the file, and the main menu File -> Save (...) entry will save everything.
+
+When starting, the program will attempt to restore its profile/event configuration from file.
+
+This file is currently stored in
+   [My Documents]\JoyMap\Profiles.json
 
 ### Events
 An event is a combination of triggers and actions. If the trigger combination is considered active, the actions are executed while the target game window is focused
@@ -91,3 +102,9 @@ Currently, only one key/mouse event may be issued, either exactly while the trig
 Initial delay is the time in milliseconds, until this action starts. The key or mouse button can be selected and changed via the "Pick ..." button.
 It may also automatically name the action if it was not previously manually changed.
 If the "Auto Trigger Frequency" checkbox is checked, the chosen key/button will virtually be pressed and released at that frequency (pressed times per second). The auto-triggering can further be limited by checking "Limit Auto-Triggers". If set, only that many times, the key/button will be pressed. The last time, it will be held until they trigger combination becomes inactive.
+
+
+
+## Assets used
+This application uses a free icon from:
+<a href="https://www.flaticon.com/free-icon/joystick_12585353?term=joystick&page=1&position=15&origin=tag&related_id=12585353" title="Joystick free icon">Joystick free icon - Flaticon</a>
