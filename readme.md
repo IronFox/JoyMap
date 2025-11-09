@@ -44,8 +44,8 @@ Note that the order of events does not matter.
 It is only a way to structure the list according to personal preferences.
 
 The list shows four columns: 'Name' is the customizable name of the respective event,
-'Triggers' an abbreviation of what causes the event to trigger,
-and 'Actions' an abbreviation of what it does.
+'Triggers' an abbreviation of what causes the event to activate,
+and 'Actions' an abbreviation of what it does while active.
 The 'Active' column is empty if the event is currently not active according to its trigger configuration, 
 and a single 'A' if it currently is and would execute if the target game window was focused
 
