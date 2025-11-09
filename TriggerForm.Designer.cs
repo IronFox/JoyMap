@@ -222,6 +222,7 @@
             cbAutoReleaseActive.TabIndex = 19;
             cbAutoReleaseActive.Text = "Auto Release after (ms):";
             cbAutoReleaseActive.UseVisualStyleBackColor = true;
+            cbAutoReleaseActive.CheckedChanged += cbAutoReleaseActive_CheckedChanged;
             // 
             // TriggerForm
             // 

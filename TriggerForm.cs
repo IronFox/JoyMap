@@ -91,6 +91,8 @@ namespace JoyMap
             var min = GetMin();
             var max = GetMax();
             var releaseTriggerAfterMs = textAutoReleaseMs.GetFloat(false);
+            if (!cbAutoReleaseActive.Checked)
+                releaseTriggerAfterMs = null;
             if (Event is not null && min is not null && max is not null && (!cbAutoReleaseActive.Checked || releaseTriggerAfterMs is not null))
             {
 
@@ -126,6 +128,11 @@ namespace JoyMap
         private void textAutoReleaseMs_TextChanged(object sender, EventArgs e)
         {
             cbAutoReleaseActive.Checked = true;
+            RebuildResult();
+        }
+
+        private void cbAutoReleaseActive_CheckedChanged(object sender, EventArgs e)
+        {
             RebuildResult();
         }
     }
