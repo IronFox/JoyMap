@@ -24,9 +24,14 @@ So if the instance GUID changes, it will default to any other instance of the sa
 
 ## Full Manual
 ### Profiles
-The main construct that defines what the program does is a profile. A profile has a name and is associated with one or more games. To create a new profile, start the game, then use the main menu (Profiles -> New from Window...) to pick its window and create a new profile. Alternatively you can create a new empty profile (Profiles -> New Empty). It will have pre-filled profile, process, and window names, which can now be freely edited.
-Process and window names are regular expressions. If empty, they will always match but at least one (process or window name) must be set correctly or the profile will never activate.
-The Profile: ... combo box in the top section of the window allows selecting any created profile. Focusing a game window that matches a registered process or window name will automatically switch to that profile.
+The main construct that defines what the program does is a profile.
+A profile has a name and is associated with one or more games.
+To create a new profile, start the game, then use the main menu (Profiles -> New from Window...) to pick its window and create a new profile.
+Alternatively you can create a new empty profile (Profiles -> New Empty). It will have pre-filled profile, process, and window names, which can now be freely edited.
+Process and window names are regular expressions.
+If empty, they will always match but at least one (process or window name) must be set correctly or the profile will never activate.
+The "Profile: ..." drop down in the top section of the window allows selecting any created profile.
+Focusing a game window that matches a registered process or window name will automatically switch to that profile.
 
 ### Events
 An event is a combination of triggers and actions. If the trigger combination is considered active, the actions are executed.
@@ -36,7 +41,8 @@ The buttons and context menu also allow you to change the order, select, edit, c
 The list shows four columns: 'Name' is the customizable name of the respective event,
 'Triggers' an abbreviation of what causes the event to trigger,
 and 'Actions' an abbreviation of what it does.
-The 'Active' column is empty if the event is currently not active according to its trigger configuration, and a single 'A' if it currently is and would execute if the target game window was focused
+The 'Active' column is empty if the event is currently not active according to its trigger configuration, 
+and a single 'A' if it currently is and would execute if the target game window was focused
 
 #### Event Dialog
 Editing an existing or creating a new event will open a dialog to do so.
@@ -44,17 +50,20 @@ The dialog features a name input in the top section, a trigger section, and an a
 Note that any chances made here will take effect only when pressing the "Update / Create" button. This dialog does not have an undo feature.
 
 **_Triggers_**
+
 The trigger section is primarily a list of possible joystick inputs (buttons or axes), plus a combiner that tells how to combine multiple axes.
 The columns show the automatically determined label, the device (Joystick), axis/button name, and status.
 As with the event list, the status column shows nothing if the trigger is considered inactive, otherwise a single A.
 To add a new trigger open the context menu and select "Pick/Add ...". Likewise, existing ones can be edited or deleted.
 
 **_Combiners_**
+
 The combiner input is both a drop-down and a text input. By default, it supports **And** and **Or**, which respectively activate if **_all_** or **_at least one_** trigger is currently active.
 Alternatively, it supports complex expressions where triggers are referenced by their label (T0, T1, T2, ...) and can be combined using ||/or, &&/and, !/not, and ().
 E.g. "(T0 and T1 and T2) or not T3", which is identical to writing "(T0 && T1 && T2) || !T3".
 
 **_Actions_**
+
 The bottom half of the event dialog is composed of a list of independent actions to perform when the trigger combination is determined as active.
 As with the trigger list, you can add, edit, or remove actions with the context menu.
 
