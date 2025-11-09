@@ -362,3 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Properties/AssemblyInfo.Version.cs
+/repack/JoyMap
+/repack/release.zip
