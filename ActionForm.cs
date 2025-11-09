@@ -17,11 +17,6 @@ namespace JoyMap
                 {
                     SimpleKey = effect.SimpleInputEffect.Keys;
                     textSimpleKey.Text = PickKeyForm.KeysToString(SimpleKey);
-                    if (effect.SimpleInputEffect.ReAssertIntervalFrequency is not null)
-                    {
-                        cbSimpleReAssertFrequency.Checked = true;
-                        textSimpleReAssertFrequency.Text = effect.SimpleInputEffect.ReAssertIntervalFrequency.Value.ToStr();
-                    }
                     if (effect.SimpleInputEffect.AutoTriggerFrequency is not null)
                     {
                         cbSimpleAutoTriggerFrequency.Checked = true;
@@ -64,7 +59,6 @@ namespace JoyMap
 
 
             var delay = textDelay.GetFloat(false);
-            var assertFrequency = textSimpleReAssertFrequency.GetFloat(false);
             var triggerFrequency = textSimpleAutoTriggerFrequency.GetFloat(false);
             var autoTriggerLimit = textSimpleAutoTriggerLimit.GetInt();
             if (!cbSimpleAutoTriggerFrequency.Checked)
@@ -72,14 +66,6 @@ namespace JoyMap
                 triggerFrequency = null;
             }
             else if (triggerFrequency is null || triggerFrequency.Value <= 0)
-            {
-                return;
-            }
-            if (!cbSimpleReAssertFrequency.Checked)
-            {
-                assertFrequency = null;
-            }
-            else if (assertFrequency is null || assertFrequency.Value <= 0)
             {
                 return;
             }
@@ -113,7 +99,6 @@ namespace JoyMap
                 SimpleInputEffect: new SimpleInputEffect
                 (
                     Keys: SimpleKey,
-                    ReAssertIntervalFrequency: assertFrequency,
                     AutoTriggerFrequency: triggerFrequency,
                     AutoTriggerLimit: autoTriggerLimit
                 )
@@ -140,12 +125,6 @@ namespace JoyMap
         private void AnyInputChanged(object sender, EventArgs e)
         {
             Rebuild();
-        }
-
-        private void textSimpleReAssertFrequency_TextChanged(object sender, EventArgs e)
-        {
-            cbSimpleReAssertFrequency.Checked = true;
-            AnyInputChanged(sender, e);
         }
 
         private void textSimpleAutoTriggerFrequency_TextChanged(object sender, EventArgs e)

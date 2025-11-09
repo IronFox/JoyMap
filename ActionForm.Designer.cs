@@ -37,8 +37,6 @@
             cbSimpleLimitAutoTriggers = new CheckBox();
             textSimpleAutoTriggerFrequency = new TextBox();
             cbSimpleAutoTriggerFrequency = new CheckBox();
-            textSimpleReAssertFrequency = new TextBox();
-            cbSimpleReAssertFrequency = new CheckBox();
             btnSimplePickKey = new Button();
             textSimpleKey = new TextBox();
             label3 = new Label();
@@ -91,8 +89,6 @@
             tabPage1.Controls.Add(cbSimpleLimitAutoTriggers);
             tabPage1.Controls.Add(textSimpleAutoTriggerFrequency);
             tabPage1.Controls.Add(cbSimpleAutoTriggerFrequency);
-            tabPage1.Controls.Add(textSimpleReAssertFrequency);
-            tabPage1.Controls.Add(cbSimpleReAssertFrequency);
             tabPage1.Controls.Add(btnSimplePickKey);
             tabPage1.Controls.Add(textSimpleKey);
             tabPage1.Controls.Add(label3);
@@ -146,27 +142,6 @@
             cbSimpleAutoTriggerFrequency.Text = "Auto-Trigger Frequency:";
             cbSimpleAutoTriggerFrequency.UseVisualStyleBackColor = true;
             cbSimpleAutoTriggerFrequency.CheckedChanged += cbSimpleAutoTriggerFrequency_CheckedChanged;
-            // 
-            // textSimpleReAssertFrequency
-            // 
-            textSimpleReAssertFrequency.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textSimpleReAssertFrequency.Location = new Point(245, 51);
-            textSimpleReAssertFrequency.Name = "textSimpleReAssertFrequency";
-            textSimpleReAssertFrequency.Size = new Size(517, 31);
-            textSimpleReAssertFrequency.TabIndex = 26;
-            textSimpleReAssertFrequency.Text = "5.3";
-            textSimpleReAssertFrequency.TextChanged += textSimpleReAssertFrequency_TextChanged;
-            // 
-            // cbSimpleReAssertFrequency
-            // 
-            cbSimpleReAssertFrequency.AutoSize = true;
-            cbSimpleReAssertFrequency.Location = new Point(6, 53);
-            cbSimpleReAssertFrequency.Name = "cbSimpleReAssertFrequency";
-            cbSimpleReAssertFrequency.Size = new Size(203, 29);
-            cbSimpleReAssertFrequency.TabIndex = 29;
-            cbSimpleReAssertFrequency.Text = "Re-Assert Frequency:";
-            cbSimpleReAssertFrequency.UseVisualStyleBackColor = true;
-            cbSimpleReAssertFrequency.CheckedChanged += AnyInputChanged;
             // 
             // btnSimplePickKey
             // 
@@ -274,8 +249,6 @@
         private Label label2;
         private TextBox textSimpleAutoTriggerFrequency;
         private CheckBox cbSimpleAutoTriggerFrequency;
-        private TextBox textSimpleReAssertFrequency;
-        private CheckBox cbSimpleReAssertFrequency;
         private TextBox textSimpleAutoTriggerLimit;
         private CheckBox cbSimpleLimitAutoTriggers;
     }

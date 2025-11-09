@@ -22,7 +22,6 @@ namespace JoyMap.Profile
 
     public record SimpleInputEffect(
         Keys Keys,
-        float? ReAssertIntervalFrequency,
         float? AutoTriggerFrequency,
         int? AutoTriggerLimit
         )

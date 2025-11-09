@@ -9,14 +9,13 @@ namespace JoyMap.Profile
         {
             Source = source;
             Effect = source.SimpleInputEffect ?? throw new InvalidOperationException("Unknown Effect");
-            var reaf = Effect.ReAssertIntervalFrequency ?? 0;
+
             var retrig = Effect.AutoTriggerFrequency ?? 0;
-            ReassertDelay = reaf > 0 ? TimeSpan.FromSeconds(1f / reaf) : TimeSpan.MaxValue;
             RetriggerDelay = retrig > 0 ? TimeSpan.FromSeconds(1f / retrig) / 2 : TimeSpan.MaxValue;
             TriggerLimit = Effect.AutoTriggerLimit ?? int.MaxValue;
         }
 
-        private TimeSpan ReassertDelay { get; }
+        private TimeSpan ReassertDelay { get; } = TimeSpan.FromSeconds(0.1f);
         private TimeSpan RetriggerDelay { get; }
         public EventAction Source { get; }
         public SimpleInputEffect Effect { get; }
