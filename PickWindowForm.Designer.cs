@@ -33,10 +33,10 @@
             windowListView = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
+            columnHeader3 = new ColumnHeader();
             btnOk = new Button();
             btnCancel = new Button();
             updateWindowListTimer = new System.Windows.Forms.Timer(components);
-            columnHeader3 = new ColumnHeader();
             SuspendLayout();
             // 
             // windowListView
@@ -62,6 +62,11 @@
             // 
             columnHeader2.Text = "Window Size";
             columnHeader2.Width = 200;
+            // 
+            // columnHeader3
+            // 
+            columnHeader3.Text = "Process Name";
+            columnHeader3.Width = 200;
             // 
             // btnOk
             // 
@@ -92,11 +97,6 @@
             updateWindowListTimer.Interval = 500;
             updateWindowListTimer.Tick += updateWindowListTimer_Tick;
             // 
-            // columnHeader3
-            // 
-            columnHeader3.Text = "Process Name";
-            columnHeader3.Width = 200;
-            // 
             // PickWindowForm
             // 
             AcceptButton = btnOk;
@@ -110,7 +110,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(822, 506);
             Name = "PickWindowForm";
-            Text = "PickWindowForm";
+            Text = "Pick Window/Process";
             ResumeLayout(false);
         }
 

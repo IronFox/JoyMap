@@ -116,7 +116,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(800, 488);
             Name = "PickDeviceInputForm";
-            Text = "PickDeviceInputForm";
+            Text = "Pick Axis";
             Load += PickDeviceInputForm_Load;
             ResumeLayout(false);
         }

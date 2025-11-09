@@ -102,7 +102,7 @@
             Controls.Add(inputList);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "PickKeyForm";
-            Text = "PickKeyForm";
+            Text = "Pick Key";
             KeyDown += PickKeyForm_KeyDown;
             KeyUp += PickKeyForm_KeyUp;
             MouseDown += PickKeyForm_MouseDown;

@@ -251,7 +251,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(822, 506);
             Name = "ActionForm";
-            Text = "ActionForm";
+            Text = "w";
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();
