@@ -110,5 +110,14 @@ namespace JoyMap
                 btnOk.Enabled = false;
             }
         }
+
+        private void inputList_DoubleClick(object sender, EventArgs e)
+        {
+            if (btnOk.Enabled)
+            {
+                DialogResult = DialogResult.OK;
+                Close();
+            }
+        }
     }
 }

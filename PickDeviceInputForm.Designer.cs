@@ -36,8 +36,8 @@
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
             columnHeader3 = new ColumnHeader();
-            updateDeviceListTimer = new System.Windows.Forms.Timer(components);
             columnHeader4 = new ColumnHeader();
+            updateDeviceListTimer = new System.Windows.Forms.Timer(components);
             SuspendLayout();
             // 
             // btnOk
@@ -75,6 +75,7 @@
             inputList.UseCompatibleStateImageBehavior = false;
             inputList.View = View.Details;
             inputList.SelectedIndexChanged += inputList_SelectedIndexChanged;
+            inputList.DoubleClick += inputList_DoubleClick;
             // 
             // columnHeader1
             // 
@@ -91,16 +92,16 @@
             columnHeader3.Text = "Status";
             columnHeader3.Width = 120;
             // 
+            // columnHeader4
+            // 
+            columnHeader4.Text = "Direction";
+            columnHeader4.Width = 120;
+            // 
             // updateDeviceListTimer
             // 
             updateDeviceListTimer.Enabled = true;
             updateDeviceListTimer.Interval = 200;
             updateDeviceListTimer.Tick += updateDeviceListTimer_Tick;
-            // 
-            // columnHeader4
-            // 
-            columnHeader4.Text = "Direction";
-            columnHeader4.Width = 120;
             // 
             // PickDeviceInputForm
             // 
