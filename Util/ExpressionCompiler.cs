@@ -18,6 +18,10 @@
         {
             if (string.IsNullOrWhiteSpace(expression))
                 return null;
+            if (expression.StartsWith('"') && expression.EndsWith('"') && expression.Length >= 2)
+                expression = expression[1..^1];
+            if (string.IsNullOrWhiteSpace(expression))
+                return null;
 
             try
             {
