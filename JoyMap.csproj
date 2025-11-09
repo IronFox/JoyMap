@@ -7,7 +7,49 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>joystick.ico</ApplicationIcon>
+    <!-- Disable auto assembly attribute generation so we can emit our own with the computed version -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <BuildNumberFile>$(MSBuildProjectDirectory)\Version\buildnumber.txt</BuildNumberFile>
+  </PropertyGroup>
+
+  <Target Name="UpdateBuildNumber" BeforeTargets="Compile"
+          Condition="'$(Configuration)'=='Release'">
+    <MakeDir Directories="$(MSBuildProjectDirectory)\Version" />
+    <ItemGroup>
+      <_DefaultLine Include="0" Condition="!Exists('$(BuildNumberFile)')" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(BuildNumberFile)" Lines="@(_DefaultLine)"
+                      Overwrite="true" Condition="!Exists('$(BuildNumberFile)')" />
+    <ReadLinesFromFile File="$(BuildNumberFile)">
+      <Output TaskParameter="Lines" ItemName="_BNLines"/>
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <CurrentBuildNumber>@(_BNLines)</CurrentBuildNumber>
+      <NewBuildNumber>$([MSBuild]::Add($(CurrentBuildNumber),1))</NewBuildNumber>
+      <ComputedAssemblyVersion>1.0.$(NewBuildNumber).0</ComputedAssemblyVersion>
+      <ComputedInformationalVersion>1.0.$(NewBuildNumber)</ComputedInformationalVersion>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(BuildNumberFile)" Lines="$(NewBuildNumber)" Overwrite="true" />
+
+    <!-- Emit/overwrite a version assembly info file -->
+    <ItemGroup>
+      <_VersionFileLines Include="using System.Reflection%3B" />
+      <_VersionFileLines Include="using System.Runtime.Versioning%3B" />
+      <_VersionFileLines Include="[assembly: AssemblyVersion(&quot;$(ComputedAssemblyVersion)&quot;)]" />
+      <_VersionFileLines Include="[assembly: AssemblyFileVersion(&quot;$(ComputedAssemblyVersion)&quot;)]" />
+      <_VersionFileLines Include="[assembly: AssemblyInformationalVersion(&quot;$(ComputedInformationalVersion)&quot;)]" />
+      <_VersionFileLines Include="[assembly: SupportedOSPlatform(&quot;windows&quot;)]" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)\Properties\AssemblyInfo.Version.cs"
+                      Overwrite="true"
+                      Lines="@(_VersionFileLines)" />
+    <ItemGroup>
+      <Compile Include="$(MSBuildProjectDirectory)\Properties\AssemblyInfo.Version.cs" />
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
     <Content Include="joystick.ico" />
@@ -16,21 +58,6 @@
   <ItemGroup>
     <PackageReference Include="SharpDX.DirectInput" Version="4.2.0" />
     <PackageReference Include="SharpDX.XInput" Version="4.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

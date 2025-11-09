@@ -544,5 +544,10 @@ namespace JoyMap
             eventListView_DoubleClick(this, EventArgs.Empty);
         }
 
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using var form = new AboutForm();
+            form.ShowDialog(this);
+        }
     }
 }

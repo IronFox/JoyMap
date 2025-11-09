@@ -78,6 +78,8 @@
             btnDeleteCurrentProfile = new Button();
             textWindowNameRegex = new TextBox();
             label5 = new Label();
+            helpToolStripMenuItem = new ToolStripMenuItem();
+            aboutToolStripMenuItem = new ToolStripMenuItem();
             mainMenu.SuspendLayout();
             eventContextMenu.SuspendLayout();
             SuspendLayout();
@@ -85,7 +87,7 @@
             // mainMenu
             // 
             mainMenu.ImageScalingSize = new Size(24, 24);
-            mainMenu.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, profilesToolStripMenuItem, editToolStripMenuItem });
+            mainMenu.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, profilesToolStripMenuItem, editToolStripMenuItem, helpToolStripMenuItem });
             mainMenu.Location = new Point(0, 0);
             mainMenu.Name = "mainMenu";
             mainMenu.Size = new Size(1223, 33);
@@ -245,7 +247,7 @@
             btnAddPickWindow.Name = "btnAddPickWindow";
             btnAddPickWindow.Size = new Size(112, 34);
             btnAddPickWindow.TabIndex = 9;
-            btnAddPickWindow.Text = "Pick...";
+            btnAddPickWindow.Text = "Pick ...";
             btnAddPickWindow.UseVisualStyleBackColor = true;
             btnAddPickWindow.Click += btnAddPickWindow_Click;
             btnAddPickWindow.KeyDown += GlobalShortcuts;
@@ -289,7 +291,7 @@
             eventContextMenu.ImageScalingSize = new Size(24, 24);
             eventContextMenu.Items.AddRange(new ToolStripItem[] { newToolStripMenuItem1, toolStripMenuItem4, selectAllToolStripMenuItem, moveSelectedDownToolStripMenuItem, moveSelectedUpToolStripMenuItem, toolStripMenuItem2, editSelectedToolStripMenuItem, copySelectedToolStripMenuItem, copyAllToolStripMenuItem, toolStripMenuItem1, pasteOverToolStripMenuItem, pasteInsertToolStripMenuItem, toolStripMenuItem3, deleteToolStripMenuItem });
             eventContextMenu.Name = "eventContextMenu";
-            eventContextMenu.Size = new Size(351, 381);
+            eventContextMenu.Size = new Size(351, 348);
             eventContextMenu.Opening += eventContextMenu_Opening;
             // 
             // newToolStripMenuItem1
@@ -468,6 +470,20 @@
             label5.TabIndex = 15;
             label5.Text = "Window name regex:";
             // 
+            // helpToolStripMenuItem
+            // 
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { aboutToolStripMenuItem });
+            helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            helpToolStripMenuItem.Size = new Size(65, 29);
+            helpToolStripMenuItem.Text = "Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            aboutToolStripMenuItem.Size = new Size(270, 34);
+            aboutToolStripMenuItem.Text = "About ...";
+            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -551,5 +567,7 @@
         private ToolStripSeparator toolStripMenuItem6;
         private ToolStripMenuItem editSelectedToolStripMenuItem;
         private ToolStripMenuItem newEmptyToolStripMenuItem;
+        private ToolStripMenuItem helpToolStripMenuItem;
+        private ToolStripMenuItem aboutToolStripMenuItem;
     }
 }
