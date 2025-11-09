@@ -7,7 +7,7 @@ This application uses a free icon from:
 
 ## Introduction
 
-JoyMap is a Joystick to Keyboard mappin program, somewhat akin to JoyToKey, however more powerful in most aspects.
+JoyMap is a Joystick to Keyboard mapping program, somewhat akin to JoyToKey, however more powerful in most aspects.
 
 Key differences
 
