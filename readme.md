@@ -33,7 +33,11 @@ An event is a combination of triggers and actions. If the trigger combination is
 #### Event List
 Most of the main window is one huge list of events. Right click the list, chose 'New ...' to create a new event.
 The buttons and context menu also allow you to change the order, select, edit, copy, paste, and delete events.
-The list shows four columns: Name is the customizable name of the respective event, Triggers an abbreviation of what causes the event to trigger, and Actions an abbreviation of what it does. The Active column is empty if the trigger is currently not active and a single A if it currently is.
+The list shows four columns: 'Name' is the customizable name of the respective event,
+'Triggers' an abbreviation of what causes the event to trigger,
+and 'Actions' an abbreviation of what it does.
+The 'Active' column is empty if the event is currently not active according to its trigger configuration, and a single 'A' if it currently is and would execute if the target game window was focused
+
 #### Event Dialog
 Editing an existing or creating a new event will open a dialog to do so.
 The dialog features a name input in the top section, a trigger section, and an action section.
