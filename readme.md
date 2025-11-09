@@ -34,7 +34,9 @@ The "Profile: ..." drop down in the top section of the window allows selecting a
 Focusing a game window that matches a registered process or window name will automatically switch to that profile.
 
 ### Events
-An event is a combination of triggers and actions. If the trigger combination is considered active, the actions are executed.
+An event is a combination of triggers and actions. If the trigger combination is considered active, the actions are executed while the target game window is focused
+(or any non JoyMap window if Profiles->"Run Only when Game is Focused" is disabled).
+
 #### Event List
 Most of the main window is one huge list of events. Right click the list, chose 'New ...' to create a new event.
 The buttons and context menu also allow you to change the order, select, edit, copy, paste, and delete events.
