@@ -67,11 +67,11 @@
 
         private void PickKeyForm_KeyDown(object sender, KeyEventArgs e)
         {
-            RelayKey(e.KeyData, true);
+            RelayKey(e.KeyData, true, singleKey: true);
         }
 
 
-        private void RelayKey(Keys k, bool isPressed)
+        private void RelayKey(Keys k, bool isPressed, bool singleKey = false)
         {
             if ((k & Keys.Control) != 0)
             {
@@ -107,6 +107,12 @@
 
             Status[k] = isPressed;
             UpdateList();
+            if (singleKey)
+            {
+                Result = k;
+                DialogResult = DialogResult.OK;
+                Close();
+            }
         }
 
         private void PickKeyForm_MouseDown(object sender, MouseEventArgs e)
@@ -126,6 +132,10 @@
                 Status[mouseKey] = true;
             }
             UpdateList();
+            Result = mouseKey;
+            DialogResult = DialogResult.OK;
+            Close();
+
         }
 
         public Keys Result { get; private set; } = Keys.None;
