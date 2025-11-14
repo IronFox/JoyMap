@@ -6,7 +6,8 @@ namespace JoyMap.Profile
         ControllerInputId InputId,
         float MinValue,
         float MaxValue,
-        float? AutoOffAfterMs
+        float? AutoOffAfterMs,
+        float? DelayReleaseMs
         );
 
 
@@ -56,6 +57,11 @@ namespace JoyMap.Profile
             {
                 var ao = new TriggerAutoOffRelay(isTriggered, TimeSpan.FromMilliseconds(t.AutoOffAfterMs.Value));
                 isTriggered = new Func<bool>(() => ao.Poll());
+            }
+            if (t.DelayReleaseMs is not null)
+            {
+                var dr = new TriggerDelayReleaseRelay(isTriggered, TimeSpan.FromMilliseconds(t.DelayReleaseMs.Value));
+                isTriggered = new Func<bool>(() => dr.Poll());
             }
 
 

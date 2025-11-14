@@ -48,6 +48,8 @@
             statusUpdateTimer = new System.Windows.Forms.Timer(components);
             textAutoReleaseMs = new TextBox();
             cbAutoReleaseActive = new CheckBox();
+            cbDelayRelease = new CheckBox();
+            textDelayReleaseMs = new TextBox();
             SuspendLayout();
             // 
             // textDevice
@@ -137,8 +139,9 @@
             // 
             // label6
             // 
+            label6.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label6.AutoSize = true;
-            label6.Location = new Point(10, 206);
+            label6.Location = new Point(10, 251);
             label6.Name = "label6";
             label6.Size = new Size(74, 25);
             label6.TabIndex = 11;
@@ -146,8 +149,9 @@
             // 
             // labelStatus
             // 
+            labelStatus.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             labelStatus.AutoSize = true;
-            labelStatus.Location = new Point(160, 206);
+            labelStatus.Location = new Point(160, 251);
             labelStatus.Name = "labelStatus";
             labelStatus.Size = new Size(61, 25);
             labelStatus.TabIndex = 12;
@@ -155,9 +159,9 @@
             // 
             // label8
             // 
-            label8.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label8.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label8.AutoSize = true;
-            label8.Location = new Point(332, 206);
+            label8.Location = new Point(332, 251);
             label8.Name = "label8";
             label8.Size = new Size(161, 25);
             label8.TabIndex = 13;
@@ -165,9 +169,9 @@
             // 
             // labelActive
             // 
-            labelActive.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            labelActive.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             labelActive.AutoSize = true;
-            labelActive.Location = new Point(556, 206);
+            labelActive.Location = new Point(556, 251);
             labelActive.Name = "labelActive";
             labelActive.Size = new Size(37, 25);
             labelActive.TabIndex = 14;
@@ -178,7 +182,7 @@
             btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnOk.DialogResult = DialogResult.OK;
             btnOk.Enabled = false;
-            btnOk.Location = new Point(26, 248);
+            btnOk.Location = new Point(26, 293);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(282, 34);
             btnOk.TabIndex = 16;
@@ -190,7 +194,7 @@
             // 
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(314, 248);
+            btnCancel.Location = new Point(314, 293);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(282, 34);
             btnCancel.TabIndex = 15;
@@ -224,13 +228,36 @@
             cbAutoReleaseActive.UseVisualStyleBackColor = true;
             cbAutoReleaseActive.CheckedChanged += cbAutoReleaseActive_CheckedChanged;
             // 
+            // cbDelayRelease
+            // 
+            cbDelayRelease.AutoSize = true;
+            cbDelayRelease.Location = new Point(10, 208);
+            cbDelayRelease.Name = "cbDelayRelease";
+            cbDelayRelease.Size = new Size(216, 29);
+            cbDelayRelease.TabIndex = 21;
+            cbDelayRelease.Text = "Delay Release for (ms):";
+            cbDelayRelease.UseVisualStyleBackColor = true;
+            cbDelayRelease.CheckedChanged += cbDelayRelease_CheckedChanged;
+            // 
+            // textDelayReleaseMs
+            // 
+            textDelayReleaseMs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textDelayReleaseMs.Location = new Point(240, 206);
+            textDelayReleaseMs.Name = "textDelayReleaseMs";
+            textDelayReleaseMs.Size = new Size(354, 31);
+            textDelayReleaseMs.TabIndex = 20;
+            textDelayReleaseMs.Text = "567.8";
+            textDelayReleaseMs.TextChanged += textDelayReleaseMs_TextChanged;
+            // 
             // TriggerForm
             // 
             AcceptButton = btnOk;
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
-            ClientSize = new Size(608, 294);
+            ClientSize = new Size(608, 339);
+            Controls.Add(cbDelayRelease);
+            Controls.Add(textDelayReleaseMs);
             Controls.Add(cbAutoReleaseActive);
             Controls.Add(textAutoReleaseMs);
             Controls.Add(btnOk);
@@ -249,8 +276,7 @@
             Controls.Add(textDevice);
             Controls.Add(label2);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MaximumSize = new Size(10000000, 350);
-            MinimumSize = new Size(618, 350);
+            MinimumSize = new Size(630, 395);
             Name = "TriggerForm";
             Text = "Trigger";
             ResumeLayout(false);
@@ -276,5 +302,7 @@
         private System.Windows.Forms.Timer statusUpdateTimer;
         private TextBox textAutoReleaseMs;
         private CheckBox cbAutoReleaseActive;
+        private CheckBox cbDelayRelease;
+        private TextBox textDelayReleaseMs;
     }
 }

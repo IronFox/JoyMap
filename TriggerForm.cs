@@ -11,6 +11,7 @@ namespace JoyMap
             InitializeComponent();
             if (t is not null)
             {
+                SuspendEvents = true;
                 Event = new DeviceEvent(
                     InputId: t.Trigger.InputId,
                     Status: t.GetCurrentValue() ?? 0,
@@ -18,15 +19,18 @@ namespace JoyMap
                     );
                 textDevice.Text = Event.Value.DeviceName;
                 textInput.Text = Event.Value.InputId.AxisName;
+                cbDelayRelease.Checked = t.Trigger.DelayReleaseMs is not null;
+                textDelayReleaseMs.Text = t.Trigger.DelayReleaseMs?.ToStr() ?? "567.8";
                 cbAutoReleaseActive.Checked = t.Trigger.AutoOffAfterMs is not null;
                 textAutoReleaseMs.Text = t.Trigger.AutoOffAfterMs?.ToStr() ?? "567.8";
                 textMin.Text = (t.Trigger.MinValue * 100).ToStr();
                 textMax.Text = (t.Trigger.MaxValue * 100).ToStr();
+                SuspendEvents = false;
                 RebuildResult();
 
             }
         }
-
+        private bool SuspendEvents { get; set; }
         private DeviceEvent? Event { get; set; }
 
 
@@ -88,17 +92,28 @@ namespace JoyMap
 
         private void RebuildResult()
         {
+            if (SuspendEvents)
+                return;
             var min = GetMin();
             var max = GetMax();
             var releaseTriggerAfterMs = textAutoReleaseMs.GetFloat(false);
             if (!cbAutoReleaseActive.Checked)
                 releaseTriggerAfterMs = null;
+            var delayReleaseMs = textDelayReleaseMs.GetFloat(false);
+            if (!cbDelayRelease.Checked)
+                delayReleaseMs = null;
             if (Event is not null && min is not null && max is not null && (!cbAutoReleaseActive.Checked || releaseTriggerAfterMs is not null))
             {
 
                 Result = TriggerInstance.Build(
                     getCurrentValue: Event.Value.GetLatestStatus,
-                    t: new(Event.Value.InputId, min.Value, max.Value, releaseTriggerAfterMs)
+                    t: new(
+                        Event.Value.InputId,
+                        min.Value,
+                        max.Value,
+                        AutoOffAfterMs: releaseTriggerAfterMs,
+                        DelayReleaseMs: delayReleaseMs
+                        )
                     );
 
                 btnOk.Enabled = true;
@@ -127,11 +142,26 @@ namespace JoyMap
 
         private void textAutoReleaseMs_TextChanged(object sender, EventArgs e)
         {
+            if (SuspendEvents)
+                return;
             cbAutoReleaseActive.Checked = true;
             RebuildResult();
         }
 
         private void cbAutoReleaseActive_CheckedChanged(object sender, EventArgs e)
+        {
+            RebuildResult();
+        }
+
+        private void textDelayReleaseMs_TextChanged(object sender, EventArgs e)
+        {
+            if (SuspendEvents)
+                return;
+            cbDelayRelease.Checked = true;
+            RebuildResult();
+        }
+
+        private void cbDelayRelease_CheckedChanged(object sender, EventArgs e)
         {
             RebuildResult();
         }
