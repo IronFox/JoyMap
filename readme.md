@@ -89,7 +89,9 @@ The top two rows show the device (Joystick) and input (axis/button). To change t
 The Min% and Max% inputs will defining the minimum and maximum threshold for the current axis percentage.
 For buttons, the axis percentage is 0% if not pressed and 100% if pressed.
 To invert activation, set min/max to something like 0%/50%.
+
 The option "Auto Release after (ms):" option allows forcing the trigger result to off if it has been active for that many milliseconds. Once the device axis is moved out of the min/max range, then in again, this timer will reset.
+
 The option "Delay Release by (ms):" allows to extend the active time after the device axis was moved out of the min/max range. If both "Auto Release after (ms)" and "Delay Release by (ms)" are set, the delay will effectively extend the auto release timer.
 Like other dialogs, this dialog's inputs will take effect only when pressing "Update / Create".
 
@@ -103,7 +105,9 @@ Currently, only one key/mouse event may be issued, either exactly while the trig
 Initial delay is the time in milliseconds, until this action starts. The key or mouse button can be selected and changed via the "Pick ..." button.
 It may also automatically name the action if it was not previously manually changed.
 If the "Auto Trigger Frequency" checkbox is checked, the chosen key/button will virtually be pressed and released at that frequency (pressed times per second).
+
 The auto-triggering can be delayed by checking "Delay Start (ms):". Doing so will hold the simulated key press until the delay has passed, then switch to autofire.
+
 The auto-triggering can further be limited by checking "Limit Auto-Triggers". If set, only that many times, the key/button will be pressed. The last time, it will be held until they trigger combination becomes inactive.
  
 
