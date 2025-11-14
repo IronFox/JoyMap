@@ -90,9 +90,9 @@ The Min% and Max% inputs will defining the minimum and maximum threshold for the
 For buttons, the axis percentage is 0% if not pressed and 100% if pressed.
 To invert activation, set min/max to something like 0%/50%.
 
-The option "Auto Release after (ms):" option allows forcing the trigger result to off if it has been active for that many milliseconds. Once the device axis is moved out of the min/max range, then in again, this timer will reset.
+The option "Auto Release after (ms):" allows forcing the trigger result to off if it has been active for that many milliseconds. Once the device axis is moved out of the min/max range, then in again, this timer will reset.
 
-The option "Delay Release by (ms):" allows to extend the active time after the device axis was moved out of the min/max range. If both "Auto Release after (ms)" and "Delay Release by (ms)" are set, the delay will effectively extend the auto release timer.
+The option "Delay Release by (ms):" enables to extend the active time after the device axis was moved out of the min/max range. If both "Auto Release after (ms)" and "Delay Release by (ms)" are set, the delay will effectively extend the auto release timer.
 Like other dialogs, this dialog's inputs will take effect only when pressing "Update / Create".
 
 #### Pick Axis Dialog
