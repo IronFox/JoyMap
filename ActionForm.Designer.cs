@@ -33,8 +33,10 @@
             btnCancel = new Button();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            textSimpleAutoTriggerDelayedStartMs = new TextBox();
+            cbSimpleAutoTriggerDelayedStart = new CheckBox();
             textSimpleAutoTriggerLimit = new TextBox();
-            cbSimpleLimitAutoTriggers = new CheckBox();
+            cbSimpleAutoTriggerLimit = new CheckBox();
             textSimpleAutoTriggerFrequency = new TextBox();
             cbSimpleAutoTriggerFrequency = new CheckBox();
             btnSimplePickKey = new Button();
@@ -85,8 +87,10 @@
             // tabPage1
             // 
             tabPage1.BackColor = SystemColors.Control;
+            tabPage1.Controls.Add(textSimpleAutoTriggerDelayedStartMs);
+            tabPage1.Controls.Add(cbSimpleAutoTriggerDelayedStart);
             tabPage1.Controls.Add(textSimpleAutoTriggerLimit);
-            tabPage1.Controls.Add(cbSimpleLimitAutoTriggers);
+            tabPage1.Controls.Add(cbSimpleAutoTriggerLimit);
             tabPage1.Controls.Add(textSimpleAutoTriggerFrequency);
             tabPage1.Controls.Add(cbSimpleAutoTriggerFrequency);
             tabPage1.Controls.Add(btnSimplePickKey);
@@ -99,33 +103,56 @@
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Simple Trigger";
             // 
+            // textSimpleAutoTriggerDelayedStartMs
+            // 
+            textSimpleAutoTriggerDelayedStartMs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textSimpleAutoTriggerDelayedStartMs.Enabled = false;
+            textSimpleAutoTriggerDelayedStartMs.Location = new Point(245, 81);
+            textSimpleAutoTriggerDelayedStartMs.Name = "textSimpleAutoTriggerDelayedStartMs";
+            textSimpleAutoTriggerDelayedStartMs.Size = new Size(517, 31);
+            textSimpleAutoTriggerDelayedStartMs.TabIndex = 35;
+            textSimpleAutoTriggerDelayedStartMs.Text = "512.345";
+            textSimpleAutoTriggerDelayedStartMs.TextChanged += textSimpleAutoTriggerDelayedStartMs_TextChanged;
+            // 
+            // cbSimpleAutoTriggerDelayedStart
+            // 
+            cbSimpleAutoTriggerDelayedStart.AutoSize = true;
+            cbSimpleAutoTriggerDelayedStart.Enabled = false;
+            cbSimpleAutoTriggerDelayedStart.Location = new Point(6, 83);
+            cbSimpleAutoTriggerDelayedStart.Name = "cbSimpleAutoTriggerDelayedStart";
+            cbSimpleAutoTriggerDelayedStart.Size = new Size(166, 29);
+            cbSimpleAutoTriggerDelayedStart.TabIndex = 34;
+            cbSimpleAutoTriggerDelayedStart.Text = "Delay Start (ms):";
+            cbSimpleAutoTriggerDelayedStart.UseVisualStyleBackColor = true;
+            cbSimpleAutoTriggerDelayedStart.CheckedChanged += cbSimpleAutoTriggerDelayedStart_CheckedChanged;
+            // 
             // textSimpleAutoTriggerLimit
             // 
             textSimpleAutoTriggerLimit.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textSimpleAutoTriggerLimit.Enabled = false;
-            textSimpleAutoTriggerLimit.Location = new Point(245, 145);
+            textSimpleAutoTriggerLimit.Location = new Point(245, 118);
             textSimpleAutoTriggerLimit.Name = "textSimpleAutoTriggerLimit";
             textSimpleAutoTriggerLimit.Size = new Size(517, 31);
             textSimpleAutoTriggerLimit.TabIndex = 33;
             textSimpleAutoTriggerLimit.Text = "3";
             textSimpleAutoTriggerLimit.TextChanged += textAutoTriggerLimit_TextChanged;
             // 
-            // cbSimpleLimitAutoTriggers
+            // cbSimpleAutoTriggerLimit
             // 
-            cbSimpleLimitAutoTriggers.AutoSize = true;
-            cbSimpleLimitAutoTriggers.Enabled = false;
-            cbSimpleLimitAutoTriggers.Location = new Point(6, 147);
-            cbSimpleLimitAutoTriggers.Name = "cbSimpleLimitAutoTriggers";
-            cbSimpleLimitAutoTriggers.Size = new Size(189, 29);
-            cbSimpleLimitAutoTriggers.TabIndex = 32;
-            cbSimpleLimitAutoTriggers.Text = "Limit Auto-Triggers";
-            cbSimpleLimitAutoTriggers.UseVisualStyleBackColor = true;
-            cbSimpleLimitAutoTriggers.CheckedChanged += cbSimpleLimitAutoTriggers_CheckedChanged;
+            cbSimpleAutoTriggerLimit.AutoSize = true;
+            cbSimpleAutoTriggerLimit.Enabled = false;
+            cbSimpleAutoTriggerLimit.Location = new Point(6, 120);
+            cbSimpleAutoTriggerLimit.Name = "cbSimpleAutoTriggerLimit";
+            cbSimpleAutoTriggerLimit.Size = new Size(193, 29);
+            cbSimpleAutoTriggerLimit.TabIndex = 32;
+            cbSimpleAutoTriggerLimit.Text = "Limit Auto-Triggers:";
+            cbSimpleAutoTriggerLimit.UseVisualStyleBackColor = true;
+            cbSimpleAutoTriggerLimit.CheckedChanged += cbSimpleAutoTriggerLimit_CheckedChanged;
             // 
             // textSimpleAutoTriggerFrequency
             // 
             textSimpleAutoTriggerFrequency.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textSimpleAutoTriggerFrequency.Location = new Point(245, 97);
+            textSimpleAutoTriggerFrequency.Location = new Point(245, 44);
             textSimpleAutoTriggerFrequency.Name = "textSimpleAutoTriggerFrequency";
             textSimpleAutoTriggerFrequency.Size = new Size(517, 31);
             textSimpleAutoTriggerFrequency.TabIndex = 31;
@@ -135,7 +162,7 @@
             // cbSimpleAutoTriggerFrequency
             // 
             cbSimpleAutoTriggerFrequency.AutoSize = true;
-            cbSimpleAutoTriggerFrequency.Location = new Point(6, 99);
+            cbSimpleAutoTriggerFrequency.Location = new Point(6, 46);
             cbSimpleAutoTriggerFrequency.Name = "cbSimpleAutoTriggerFrequency";
             cbSimpleAutoTriggerFrequency.Size = new Size(228, 29);
             cbSimpleAutoTriggerFrequency.TabIndex = 30;
@@ -250,6 +277,8 @@
         private TextBox textSimpleAutoTriggerFrequency;
         private CheckBox cbSimpleAutoTriggerFrequency;
         private TextBox textSimpleAutoTriggerLimit;
-        private CheckBox cbSimpleLimitAutoTriggers;
+        private CheckBox cbSimpleAutoTriggerLimit;
+        private TextBox textSimpleAutoTriggerDelayedStartMs;
+        private CheckBox cbSimpleAutoTriggerDelayedStart;
     }
 }

@@ -13,10 +13,14 @@ namespace JoyMap.Profile
             var retrig = Effect.AutoTriggerFrequency ?? 0;
             RetriggerDelay = retrig > 0 ? TimeSpan.FromSeconds(1f / retrig) / 2 : TimeSpan.MaxValue;
             TriggerLimit = Effect.AutoTriggerLimit ?? int.MaxValue;
+            AutoTriggerDelay = Effect.AutoTriggerDelayMs is not null
+                ? TimeSpan.FromMilliseconds(Effect.AutoTriggerDelayMs.Value)
+                : TimeSpan.Zero;
         }
 
         private TimeSpan ReassertDelay { get; } = TimeSpan.FromSeconds(0.1f);
         private TimeSpan RetriggerDelay { get; }
+        private TimeSpan AutoTriggerDelay { get; }
         public EventAction Source { get; }
         public SimpleInputEffect Effect { get; }
         private bool IsDown { get; set; } = false;
@@ -51,7 +55,7 @@ namespace JoyMap.Profile
                 return;
 
 
-            if (Effect.AutoTriggerFrequency is null || TriggerCount >= TriggerLimit)
+            if (Effect.AutoTriggerFrequency is null || TriggerCount >= TriggerLimit || elapsed < AutoTriggerDelay)
             {
                 if (!IsDown)
                 {
