@@ -1,14 +1,15 @@
 ﻿
+using JoyMap.Profile.Processing;
 using JoyMap.Windows;
 
 namespace JoyMap.Profile
 {
-    internal class ActionProcessor
+    internal class SimpleActionProcessor : IActionProcessor
     {
-        public ActionProcessor(EventAction source)
+        public SimpleActionProcessor(EventAction source, SimpleInputEffect effect)
         {
             Source = source;
-            Effect = source.SimpleInputEffect ?? throw new InvalidOperationException("Unknown Effect");
+            Effect = effect;
 
             var retrig = Effect.AutoTriggerFrequency ?? 0;
             RetriggerDelay = retrig > 0 ? TimeSpan.FromSeconds(1f / retrig) / 2 : TimeSpan.MaxValue;
@@ -30,7 +31,7 @@ namespace JoyMap.Profile
         private int TriggerCount { get; set; }
         private int TriggerLimit { get; }
 
-        internal void SetTriggerStatus(bool triggerStatus)
+        public void SetTriggerStatus(bool triggerStatus)
         {
             if (triggerStatus)
             {
@@ -48,7 +49,10 @@ namespace JoyMap.Profile
             }
         }
 
-        internal void UpdateTriggered()
+        public void UpdateNonTriggered()
+        { }
+
+        public void UpdateTriggered()
         {
             var elapsed = DateTime.Now - Started;
             if (elapsed < TimeSpan.FromMilliseconds(Source.DelayMs))

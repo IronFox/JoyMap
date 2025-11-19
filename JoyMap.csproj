@@ -15,16 +15,14 @@
     <BuildNumberFile>$(MSBuildProjectDirectory)\Version\buildnumber.txt</BuildNumberFile>
   </PropertyGroup>
 
-  <Target Name="UpdateBuildNumber" BeforeTargets="Compile"
-          Condition="'$(Configuration)'=='Release'">
+  <Target Name="UpdateBuildNumber" BeforeTargets="Compile" Condition="'$(Configuration)'=='Release'">
     <MakeDir Directories="$(MSBuildProjectDirectory)\Version" />
     <ItemGroup>
       <_DefaultLine Include="0" Condition="!Exists('$(BuildNumberFile)')" />
     </ItemGroup>
-    <WriteLinesToFile File="$(BuildNumberFile)" Lines="@(_DefaultLine)"
-                      Overwrite="true" Condition="!Exists('$(BuildNumberFile)')" />
+    <WriteLinesToFile File="$(BuildNumberFile)" Lines="@(_DefaultLine)" Overwrite="true" Condition="!Exists('$(BuildNumberFile)')" />
     <ReadLinesFromFile File="$(BuildNumberFile)">
-      <Output TaskParameter="Lines" ItemName="_BNLines"/>
+      <Output TaskParameter="Lines" ItemName="_BNLines" />
     </ReadLinesFromFile>
     <PropertyGroup>
       <CurrentBuildNumber>@(_BNLines)</CurrentBuildNumber>
@@ -43,9 +41,7 @@
       <_VersionFileLines Include="[assembly: AssemblyInformationalVersion(&quot;$(ComputedInformationalVersion)&quot;)]" />
       <_VersionFileLines Include="[assembly: SupportedOSPlatform(&quot;windows&quot;)]" />
     </ItemGroup>
-    <WriteLinesToFile File="$(MSBuildProjectDirectory)\Properties\AssemblyInfo.Version.cs"
-                      Overwrite="true"
-                      Lines="@(_VersionFileLines)" />
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)\Properties\AssemblyInfo.Version.cs" Overwrite="true" Lines="@(_VersionFileLines)" />
     <ItemGroup>
       <Compile Include="$(MSBuildProjectDirectory)\Properties\AssemblyInfo.Version.cs" />
     </ItemGroup>

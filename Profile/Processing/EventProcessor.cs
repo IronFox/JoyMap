@@ -1,4 +1,5 @@
-﻿using JoyMap.Util;
+﻿using JoyMap.Profile.Processing;
+using JoyMap.Util;
 
 namespace JoyMap.Profile
 {
@@ -8,7 +9,7 @@ namespace JoyMap.Profile
         private Func<bool> IsTriggered { get; }
         private bool LastTriggeredState { get; set; } = false;
 
-        private List<ActionProcessor> ActionProcessors { get; } = [];
+        private List<IActionProcessor> ActionProcessors { get; } = [];
 
         public static Func<bool>? BuildTriggerCombiner(string? combiner, IReadOnlyList<TriggerInstance> triggerInstances)
         {
@@ -37,8 +38,10 @@ namespace JoyMap.Profile
 
             foreach (var action in source.Event.Actions)
             {
-                var processor = new ActionProcessor(action);
-                ActionProcessors.Add(processor);
+                if (action.SimpleInputEffect is not null)
+                    ActionProcessors.Add(new SimpleActionProcessor(action, action.SimpleInputEffect));
+                else if (action.ChangeTriggeredInputEffect is not null)
+                    ActionProcessors.Add(new TriggeredActionProcessor(action, action.ChangeTriggeredInputEffect));
             }
 
         }
@@ -62,15 +65,21 @@ namespace JoyMap.Profile
                     {
                         processor.UpdateTriggered();
                     }
+                else
+                    foreach (var processor in ActionProcessors)
+                    {
+                        processor.UpdateNonTriggered();
+                    }
             }
         }
 
         public void Stop()
         {
-            foreach (var processor in ActionProcessors)
-            {
-                processor.SetTriggerStatus(false);
-            }
+            if (LastTriggeredState)
+                foreach (var processor in ActionProcessors)
+                {
+                    processor.SetTriggerStatus(false);
+                }
 
         }
     }

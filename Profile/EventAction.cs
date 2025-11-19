@@ -6,17 +6,24 @@ namespace JoyMap.Profile
     public record EventAction(
         string Name,
         float DelayMs,
-        SimpleInputEffect? SimpleInputEffect
+        SimpleInputEffect? SimpleInputEffect = null,
+        ChangeTriggerInputEffect? ChangeTriggeredInputEffect = null
+
         )
     {
         [JsonIgnore]
         public string TypeName => SimpleInputEffect is not null
             ? "Simple"
-            : "empty";
+            : ChangeTriggeredInputEffect is not null
+                ? "Change Triggered"
+                : "empty";
+
         [JsonIgnore]
         public string Action => SimpleInputEffect is not null
             ? SimpleInputEffect.Action
-            : "No Action";
+            : ChangeTriggeredInputEffect is not null
+                ? ChangeTriggeredInputEffect.Action
+                : "No Action";
     }
 
 
@@ -30,5 +37,14 @@ namespace JoyMap.Profile
         [JsonIgnore]
         public string Action =>
                 $"Key: {PickKeyForm.KeysToString(Keys)}{(AutoTriggerFrequency is not null ? $", f={AutoTriggerFrequency.Value.ToStr()}" : "")}";
+    }
+
+    public record ChangeTriggerInputEffect(
+        Keys Keys
+        )
+    {
+        [JsonIgnore]
+        public string Action =>
+                $"Change Triggered: {PickKeyForm.KeysToString(Keys)}";
     }
 }

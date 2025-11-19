@@ -55,30 +55,12 @@ namespace JoyMap.Windows
             bool isMouse = (keys >= Keys.LButton && keys <= Keys.XButton2);
             if (isMouse)
             {
-                //if (reassert)
-                //{
-                //    Win32.INPUT[] inputs = [
-                //        MouseEvent(keys, !nowDown),
-                //        MouseEvent(keys, nowDown)
-                //        ];
-                //    Win32.SendInput(2, inputs, Win32.INPUT.Size);
-                //}
-                //else
                 {
                     Win32.INPUT[] inputs = [MouseEvent(keys, nowDown)];
                     Win32.SendInput(1, inputs, Win32.INPUT.Size);
                 }
                 return;
             }
-            //if (reassert)
-            //{
-            //    Win32.INPUT[] kInputs = [
-            //        KeyEvent(keys, !nowDown),
-            //        KeyEvent(keys, nowDown)
-            //        ];
-            //    Win32.SendInput(2, kInputs, Win32.INPUT.Size);
-            //}
-            //else
             {
                 Win32.INPUT[] kInputs = [
                     KeyEvent(keys, nowDown)
@@ -147,6 +129,38 @@ namespace JoyMap.Windows
             rs.U.mi.dwExtraInfo = Win32.GetMessageExtraInfo();
             return rs;
         }
+
+        internal static void DownUp(Keys keys)
+        {
+            int idx = (int)keys;
+            if (idx >= keyStates.Length)
+                return;
+
+            bool isDown = keyStates[idx] > 0;
+            if (isDown)
+                return;
+
+            bool isMouse = (keys >= Keys.LButton && keys <= Keys.XButton2);
+            if (isMouse)
+            {
+                {
+                    Win32.INPUT[] inputs = [MouseEvent(keys, true), MouseEvent(keys, false)];
+                    Win32.SendInput(2, inputs, Win32.INPUT.Size);
+                }
+                return;
+            }
+            {
+                Win32.INPUT[] kInputs = [
+                    KeyEvent(keys, true),
+                    KeyEvent(keys, false)
+                    ];
+                Win32.SendInput(2, kInputs, Win32.INPUT.Size);
+            }
+
+
+
+        }
+
 
         internal static void Down(Keys keys, bool reassert = false)
             => Change(keys, true, reassert: reassert);
