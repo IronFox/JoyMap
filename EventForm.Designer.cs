@@ -32,12 +32,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EventForm));
             label1 = new Label();
             textName = new TextBox();
-            label2 = new Label();
-            triggerListView = new ListView();
-            columnHeader6 = new ColumnHeader();
-            columnHeader1 = new ColumnHeader();
-            columnHeader2 = new ColumnHeader();
-            columnHeader3 = new ColumnHeader();
             triggerMenu = new ContextMenuStrip(components);
             pickAddToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripSeparator();
@@ -45,10 +39,6 @@
             toolStripMenuItem2 = new ToolStripSeparator();
             deleteToolStripMenuItem1 = new ToolStripMenuItem();
             label3 = new Label();
-            actionListView = new ListView();
-            columnHeader4 = new ColumnHeader();
-            columnHeader5 = new ColumnHeader();
-            columnHeader7 = new ColumnHeader();
             actionMenu = new ContextMenuStrip(components);
             addToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem3 = new ToolStripSeparator();
@@ -57,11 +47,26 @@
             deleteToolStripMenuItem = new ToolStripMenuItem();
             btnCancel = new Button();
             btnOk = new Button();
+            statusUpdateTimer = new System.Windows.Forms.Timer(components);
+            splitContainer1 = new SplitContainer();
             label4 = new Label();
             triggerCombiner = new ComboBox();
-            statusUpdateTimer = new System.Windows.Forms.Timer(components);
+            triggerListView = new ListView();
+            columnHeader6 = new ColumnHeader();
+            columnHeader1 = new ColumnHeader();
+            columnHeader2 = new ColumnHeader();
+            columnHeader3 = new ColumnHeader();
+            label2 = new Label();
+            actionListView = new ListView();
+            columnHeader4 = new ColumnHeader();
+            columnHeader5 = new ColumnHeader();
+            columnHeader7 = new ColumnHeader();
             triggerMenu.SuspendLayout();
             actionMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -81,48 +86,6 @@
             textName.Size = new Size(831, 31);
             textName.TabIndex = 1;
             textName.TextChanged += AnyChanged;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(12, 75);
-            label2.Name = "label2";
-            label2.Size = new Size(74, 25);
-            label2.TabIndex = 2;
-            label2.Text = "Triggers";
-            // 
-            // triggerListView
-            // 
-            triggerListView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            triggerListView.Columns.AddRange(new ColumnHeader[] { columnHeader6, columnHeader1, columnHeader2, columnHeader3 });
-            triggerListView.ContextMenuStrip = triggerMenu;
-            triggerListView.FullRowSelect = true;
-            triggerListView.Location = new Point(12, 103);
-            triggerListView.Name = "triggerListView";
-            triggerListView.Size = new Size(900, 265);
-            triggerListView.TabIndex = 3;
-            triggerListView.UseCompatibleStateImageBehavior = false;
-            triggerListView.View = View.Details;
-            triggerListView.DoubleClick += triggerListView_DoubleClick;
-            // 
-            // columnHeader6
-            // 
-            columnHeader6.Text = "Label";
-            columnHeader6.Width = 100;
-            // 
-            // columnHeader1
-            // 
-            columnHeader1.Text = "Device";
-            columnHeader1.Width = 200;
-            // 
-            // columnHeader2
-            // 
-            columnHeader2.Text = "Input";
-            columnHeader2.Width = 200;
-            // 
-            // columnHeader3
-            // 
-            columnHeader3.Text = "Status";
             // 
             // triggerMenu
             // 
@@ -172,41 +135,12 @@
             label3.TabIndex = 4;
             label3.Text = "Actions";
             // 
-            // actionListView
-            // 
-            actionListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            actionListView.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader5, columnHeader7 });
-            actionListView.ContextMenuStrip = actionMenu;
-            actionListView.FullRowSelect = true;
-            actionListView.Location = new Point(12, 422);
-            actionListView.Name = "actionListView";
-            actionListView.Size = new Size(900, 296);
-            actionListView.TabIndex = 5;
-            actionListView.UseCompatibleStateImageBehavior = false;
-            actionListView.View = View.Details;
-            actionListView.DoubleClick += actionListView_DoubleClick;
-            // 
-            // columnHeader4
-            // 
-            columnHeader4.Text = "Name";
-            columnHeader4.Width = 200;
-            // 
-            // columnHeader5
-            // 
-            columnHeader5.Text = "Type";
-            columnHeader5.Width = 100;
-            // 
-            // columnHeader7
-            // 
-            columnHeader7.Text = "Action";
-            columnHeader7.Width = 200;
-            // 
             // actionMenu
             // 
             actionMenu.ImageScalingSize = new Size(24, 24);
             actionMenu.Items.AddRange(new ToolStripItem[] { addToolStripMenuItem, toolStripMenuItem3, editSelectedToolStripMenuItem1, toolStripMenuItem4, deleteToolStripMenuItem });
             actionMenu.Name = "actionMenu";
-            actionMenu.Size = new Size(312, 145);
+            actionMenu.Size = new Size(312, 112);
             actionMenu.Opening += actionMenu_Opening;
             // 
             // addToolStripMenuItem
@@ -263,34 +197,126 @@
             btnOk.Text = "Update / Create";
             btnOk.UseVisualStyleBackColor = true;
             // 
-            // label4
-            // 
-            label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label4.AutoSize = true;
-            label4.Location = new Point(556, 67);
-            label4.Name = "label4";
-            label4.Size = new Size(94, 25);
-            label4.TabIndex = 8;
-            label4.Text = "Combiner:";
-            // 
-            // triggerCombiner
-            // 
-            triggerCombiner.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            triggerCombiner.FormattingEnabled = true;
-            triggerCombiner.Items.AddRange(new object[] { "Or", "And" });
-            triggerCombiner.Location = new Point(656, 64);
-            triggerCombiner.Name = "triggerCombiner";
-            triggerCombiner.Size = new Size(256, 33);
-            triggerCombiner.TabIndex = 9;
-            triggerCombiner.Text = "Or";
-            triggerCombiner.SelectedIndexChanged += AnyChanged;
-            triggerCombiner.TextChanged += AnyChanged;
-            // 
             // statusUpdateTimer
             // 
             statusUpdateTimer.Enabled = true;
             statusUpdateTimer.Interval = 200;
             statusUpdateTimer.Tick += statusUpdateTimer_Tick;
+            // 
+            // splitContainer1
+            // 
+            splitContainer1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            splitContainer1.Location = new Point(12, 49);
+            splitContainer1.Name = "splitContainer1";
+            splitContainer1.Orientation = Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(label4);
+            splitContainer1.Panel1.Controls.Add(triggerCombiner);
+            splitContainer1.Panel1.Controls.Add(triggerListView);
+            splitContainer1.Panel1.Controls.Add(label2);
+            splitContainer1.Panel1MinSize = 75;
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.Controls.Add(actionListView);
+            splitContainer1.Panel2MinSize = 75;
+            splitContainer1.Size = new Size(900, 669);
+            splitContainer1.SplitterDistance = 297;
+            splitContainer1.TabIndex = 10;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(262, 10);
+            label4.Name = "label4";
+            label4.Size = new Size(94, 25);
+            label4.TabIndex = 13;
+            label4.Text = "Combiner:";
+            // 
+            // triggerCombiner
+            // 
+            triggerCombiner.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            triggerCombiner.FormattingEnabled = true;
+            triggerCombiner.Items.AddRange(new object[] { "Or", "And" });
+            triggerCombiner.Location = new Point(362, 7);
+            triggerCombiner.Name = "triggerCombiner";
+            triggerCombiner.Size = new Size(535, 33);
+            triggerCombiner.TabIndex = 12;
+            triggerCombiner.Text = "Or";
+            triggerCombiner.TextChanged += AnyChanged;
+            // 
+            // triggerListView
+            // 
+            triggerListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            triggerListView.Columns.AddRange(new ColumnHeader[] { columnHeader6, columnHeader1, columnHeader2, columnHeader3 });
+            triggerListView.ContextMenuStrip = triggerMenu;
+            triggerListView.FullRowSelect = true;
+            triggerListView.Location = new Point(3, 46);
+            triggerListView.Name = "triggerListView";
+            triggerListView.Size = new Size(894, 248);
+            triggerListView.TabIndex = 11;
+            triggerListView.UseCompatibleStateImageBehavior = false;
+            triggerListView.View = View.Details;
+            triggerListView.DoubleClick += triggerListView_DoubleClick;
+            // 
+            // columnHeader6
+            // 
+            columnHeader6.Text = "Label";
+            columnHeader6.Width = 100;
+            // 
+            // columnHeader1
+            // 
+            columnHeader1.Text = "Device";
+            columnHeader1.Width = 200;
+            // 
+            // columnHeader2
+            // 
+            columnHeader2.Text = "Input";
+            columnHeader2.Width = 200;
+            // 
+            // columnHeader3
+            // 
+            columnHeader3.Text = "Status";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(3, 18);
+            label2.Name = "label2";
+            label2.Size = new Size(74, 25);
+            label2.TabIndex = 10;
+            label2.Text = "Triggers";
+            // 
+            // actionListView
+            // 
+            actionListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            actionListView.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader5, columnHeader7 });
+            actionListView.ContextMenuStrip = actionMenu;
+            actionListView.FullRowSelect = true;
+            actionListView.Location = new Point(3, 3);
+            actionListView.Name = "actionListView";
+            actionListView.Size = new Size(894, 362);
+            actionListView.TabIndex = 6;
+            actionListView.UseCompatibleStateImageBehavior = false;
+            actionListView.View = View.Details;
+            actionListView.DoubleClick += actionListView_DoubleClick;
+            // 
+            // columnHeader4
+            // 
+            columnHeader4.Text = "Name";
+            columnHeader4.Width = 200;
+            // 
+            // columnHeader5
+            // 
+            columnHeader5.Text = "Type";
+            columnHeader5.Width = 100;
+            // 
+            // columnHeader7
+            // 
+            columnHeader7.Text = "Action";
+            columnHeader7.Width = 200;
             // 
             // EventForm
             // 
@@ -299,14 +325,10 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new Size(924, 770);
-            Controls.Add(triggerCombiner);
-            Controls.Add(label4);
+            Controls.Add(splitContainer1);
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
-            Controls.Add(actionListView);
             Controls.Add(label3);
-            Controls.Add(triggerListView);
-            Controls.Add(label2);
             Controls.Add(textName);
             Controls.Add(label1);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -315,6 +337,11 @@
             Text = "Event";
             triggerMenu.ResumeLayout(false);
             actionMenu.ResumeLayout(false);
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel1.PerformLayout();
+            splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -323,20 +350,9 @@
 
         private Label label1;
         private TextBox textName;
-        private Label label2;
-        private ListView triggerListView;
         private Label label3;
-        private ListView actionListView;
         private Button btnCancel;
         private Button btnOk;
-        private ColumnHeader columnHeader1;
-        private ColumnHeader columnHeader2;
-        private ColumnHeader columnHeader3;
-        private ColumnHeader columnHeader4;
-        private ColumnHeader columnHeader5;
-        private Label label4;
-        private ComboBox triggerCombiner;
-        private ColumnHeader columnHeader6;
         private ContextMenuStrip triggerMenu;
         private ContextMenuStrip actionMenu;
         private ToolStripMenuItem addToolStripMenuItem;
@@ -344,12 +360,24 @@
         private ToolStripMenuItem pickAddToolStripMenuItem;
         private ToolStripMenuItem deleteToolStripMenuItem1;
         private System.Windows.Forms.Timer statusUpdateTimer;
-        private ColumnHeader columnHeader7;
         private ToolStripSeparator toolStripMenuItem1;
         private ToolStripMenuItem editSelectedToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem2;
         private ToolStripSeparator toolStripMenuItem3;
         private ToolStripMenuItem editSelectedToolStripMenuItem1;
         private ToolStripSeparator toolStripMenuItem4;
+        private SplitContainer splitContainer1;
+        private Label label4;
+        private ComboBox triggerCombiner;
+        private ListView triggerListView;
+        private ColumnHeader columnHeader6;
+        private ColumnHeader columnHeader1;
+        private ColumnHeader columnHeader2;
+        private ColumnHeader columnHeader3;
+        private Label label2;
+        private ListView actionListView;
+        private ColumnHeader columnHeader4;
+        private ColumnHeader columnHeader5;
+        private ColumnHeader columnHeader7;
     }
 }
