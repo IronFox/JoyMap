@@ -35,6 +35,9 @@
         {
             return k switch
             {
+                Keys.Oemcomma => ",",
+                Keys.Oemplus => "+",
+                Keys.OemPeriod => ".",
                 Keys.Oem1 => ";",
                 Keys.Oem2 => "/",
                 Keys.Oem3 => "`",
