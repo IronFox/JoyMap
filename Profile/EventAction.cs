@@ -15,7 +15,7 @@ namespace JoyMap.Profile
         public string TypeName => SimpleInputEffect is not null
             ? "Simple"
             : ChangeTriggeredInputEffect is not null
-                ? "Change Triggered"
+                ? "OnChange"
                 : "empty";
 
         [JsonIgnore]
@@ -45,6 +45,6 @@ namespace JoyMap.Profile
     {
         [JsonIgnore]
         public string Action =>
-                $"Change Triggered: {PickKeyForm.KeysToString(Keys)}";
+                $"On Change: {PickKeyForm.KeysToString(Keys)}";
     }
 }

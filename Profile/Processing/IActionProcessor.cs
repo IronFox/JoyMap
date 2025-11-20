@@ -1,6 +1,6 @@
 ﻿namespace JoyMap.Profile.Processing
 {
-    internal interface IActionProcessor
+    internal interface IActionProcessor : IDisposable
     {
         /// <summary>
         /// Change notifier when the trigger status changes

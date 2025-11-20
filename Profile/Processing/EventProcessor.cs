@@ -3,7 +3,7 @@ using JoyMap.Util;
 
 namespace JoyMap.Profile
 {
-    public class EventProcessor
+    public class EventProcessor : IDisposable
     {
         private EventInstance Source { get; }
         private Func<bool> IsTriggered { get; }
@@ -73,13 +73,17 @@ namespace JoyMap.Profile
             }
         }
 
-        public void Stop()
+        public void Dispose()
         {
             if (LastTriggeredState)
                 foreach (var processor in ActionProcessors)
                 {
                     processor.SetTriggerStatus(false);
                 }
+            foreach (var processor in ActionProcessors)
+            {
+                processor.Dispose();
+            }
 
         }
     }

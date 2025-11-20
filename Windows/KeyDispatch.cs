@@ -162,11 +162,153 @@ namespace JoyMap.Windows
         }
 
 
-        internal static void Down(Keys keys, bool reassert = false)
-            => Change(keys, true, reassert: reassert);
+        internal static KeyHandle Press(Keys keys)
+            => new(keys);
 
-        internal static void Up(Keys keys, bool reassert = false)
-            => Change(keys, false, reassert: reassert);
+        internal static void Reassert(Keys keys)
+            => Change(keys, true, reassert: true);
+
+        //internal static void Up(Keys keys, bool reassert = false)
+        //    => Change(keys, false, reassert: reassert);
+    }
+
+    /// <summary>
+    /// Represents a handle for managing the pressed and released state of one or more keys or buttons, providing timing
+    /// and state information as well as control over their simulated input state.
+    /// </summary>
+    /// <remarks>A KeyHandle instance tracks the state and timing of the specified keys, allowing callers to
+    /// programmatically press, release, or reassert the key state. The handle updates timing properties such as when
+    /// the key was last pressed, released, or acted upon. Disposing the handle automatically releases the keys if they
+    /// are pressed. This class is not thread-safe; callers should ensure thread safety if accessed from multiple
+    /// threads.</remarks>
+    public class KeyHandle : IDisposable
+    {
+        /// <summary>
+        /// Initializes a new instance of the KeyHandle class for the specified key, optionally setting its initial
+        /// pressed state.
+        /// </summary>
+        /// <param name="keys">The key to associate with this handle.</param>
+        /// <param name="startPressed">true to set the key as pressed upon creation; otherwise, false. The default is true.</param>
+        public KeyHandle(Keys keys, bool startPressed = true)
+        {
+            Keys = keys;
+            if (startPressed)
+                Press();
+        }
+        /// <summary>
+        /// Gets the key or button to be emitted to the WinApi when this handle is pressed or released.
+        /// </summary>
+        public Keys Keys { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the key/button is currently pressed.
+        /// </summary>
+        public bool IsPressed { get; private set; }
+        /// <summary>
+        /// Gets the date and time when the button was last pressed.
+        /// DateTime.MinValue if never pressed.
+        /// </summary>
+        public DateTime LastPressedAt { get; private set; }
+        /// <summary>
+        /// Gets the date and time when the item was released.
+        /// DateTime.MinValue if never released.
+        /// </summary>
+        public DateTime LastReleasedAt { get; private set; }
+
+        /// <summary>
+        /// Gets the date and time when the key or button was last pressed or released. Does not account for reasserts.
+        /// DateTime.MinValue if never changed.
+        /// </summary>
+        public DateTime LastChangeAt { get; private set; }
+        /// <summary>
+        /// Gets the date and time when the most recent action occurred.
+        /// An action is either a press, a release, or a reassert.
+        /// DateTime.MinValue if no actions have occurred.
+        /// </summary>
+        public DateTime LastActionAt { get; private set; }
+        /// <summary>
+        /// Gets the amount of time that has elapsed since the key/button was last pressed.
+        /// </summary>
+        public TimeSpan TimeSincePressed => DateTime.UtcNow - LastPressedAt;
+        /// <summary>
+        /// Gets the amount of time that has elapsed since the key/button was released.
+        /// </summary>
+        public TimeSpan TimeSinceReleased => DateTime.UtcNow - LastReleasedAt;
+        /// <summary>
+        /// Gets the amount of time that has elapsed since the last recorded action.
+        /// An action is either a press, a release, or a reassert.
+        /// </summary>
+        public TimeSpan TimeSinceLastAction => DateTime.UtcNow - LastActionAt;
+
+        /// <summary>
+        /// Gets the amount of time that has elapsed since the last time this key/button was pressed or released.
+        /// </summary>
+        public TimeSpan TimeSinceLastChange => DateTime.UtcNow - LastChangeAt;
+
+        public void Dispose()
+        {
+            Release();
+        }
+
+
+        /// <summary>
+        /// Reapplies the current key state, ensuring that the key press or release is re-sent to the underlying system.
+        /// </summary>
+        /// <remarks>Use this method to explicitly reassert the key state when it may have been lost or
+        /// needs to be refreshed. This can be useful in scenarios where external factors may have interfered with the
+        /// expected key state.</remarks>
+        public void Reassert()
+        {
+            KeyDispatch.Change(Keys, IsPressed, reassert: true);
+            LastActionAt = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Releases the key or button if they are currently pressed.
+        /// </summary>
+        /// <remarks>If the key/button is not currently pressed, this method performs no action and returns
+        /// false. The release action updates the relevant state and timestamps.</remarks>
+        /// <returns>true if the key or button was pressed before and has now been released; otherwise, false.</returns>
+        public bool Release()
+        {
+            if (IsPressed)
+            {
+                KeyDispatch.Change(Keys, false, reassert: false);
+                IsPressed = false;
+                LastChangeAt = LastActionAt = LastReleasedAt = DateTime.UtcNow;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Attempts to press the key or button associated with this instance.
+        /// </summary>
+        /// <remarks>If the key or button is already pressed, this method does nothing and returns false.
+        /// The method updates the press state and timestamps only when a press action occurs.</remarks>
+        /// <returns>true if the key or button was not already pressed and is now pressed; otherwise, false.</returns>
+        public bool Press()
+        {
+            if (!IsPressed)
+            {
+                KeyDispatch.Change(Keys, true, reassert: false);
+                IsPressed = true;
+                LastChangeAt = LastActionAt = LastPressedAt = DateTime.UtcNow;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Toggles the current pressed state. If the object is pressed, it is released; otherwise, it is pressed.
+        /// </summary>
+        internal void Toggle()
+        {
+            if (IsPressed)
+                Release();
+            else
+                Press();
+        }
     }
 
     internal static class Win32

@@ -68,10 +68,6 @@ namespace JoyMap.Profile
             }
             catch (OperationCanceledException)
             {
-                foreach (var processor in processors)
-                {
-                    processor.Stop();
-                }
                 throw;
             }
             catch (Exception ex)
@@ -85,7 +81,7 @@ namespace JoyMap.Profile
                 Console.WriteLine($"ProfileExecution ListenLoop ending.");
                 foreach (var processor in processors)
                 {
-                    processor.Stop();
+                    processor.Dispose();
                 }
 
                 DisposeCompletion.SetResult();

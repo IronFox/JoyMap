@@ -8,76 +8,68 @@ namespace JoyMap.Profile.Processing
         {
             Action = action;
             ChangeTriggeredInputEffect = changeTriggeredInputEffect;
+            Key = new KeyHandle(changeTriggeredInputEffect.Keys, false);
         }
 
         private readonly TimeSpan HoldDelay = TimeSpan.FromMilliseconds(100);
         public EventAction Action { get; }
         public ChangeTriggerInputEffect ChangeTriggeredInputEffect { get; }
-        private bool downEmitted;
+        public KeyHandle Key { get; }
+
+        private bool haveStarted;
 
         private DateTime started;
-        private DateTime? initialPressed, initialReleased, finalPressed, finalReleased;
-        private void Emit()
+
+        public void Dispose()
         {
-            KeyDispatch.DownUp(ChangeTriggeredInputEffect.Keys);
-            //KeyDispatch.Up(ChangeTriggeredInputEffect.Keys);
+            Key.Dispose();
         }
 
         public void SetTriggerStatus(bool triggerStatus)
         {
             if (!triggerStatus)
             {
-                if (downEmitted)
+                if (haveStarted)
                 {
-                    KeyDispatch.Down(ChangeTriggeredInputEffect.Keys);
-                    finalPressed = DateTime.UtcNow;
+                    Key.Press();
                 }
             }
             else
             {
-                downEmitted = false;
+                Key.Release();
                 started = DateTime.UtcNow;
-                finalPressed = null;
-                finalReleased = null;
-                initialPressed = null;
-                initialReleased = null;
-
+                haveStarted = false;
             }
-
-
         }
 
         public void UpdateTriggered()
         {
-            if (!downEmitted)
+            if (!haveStarted)
             {
                 var elapsed = DateTime.UtcNow - started;
                 if (elapsed.TotalMilliseconds >= Action.DelayMs)
                 {
-                    KeyDispatch.Down(ChangeTriggeredInputEffect.Keys);
-                    initialPressed = DateTime.UtcNow;
-                    downEmitted = true;
+                    Key.Press();
+                    haveStarted = true;
                 }
             }
-            else if (initialPressed.HasValue && !initialReleased.HasValue)
+            else if (Key.IsPressed)
             {
-                var elapsed = DateTime.UtcNow - initialPressed.Value;
+                var elapsed = Key.TimeSincePressed;
                 if (elapsed >= HoldDelay)
                 {
-                    KeyDispatch.Up(ChangeTriggeredInputEffect.Keys);
-                    initialReleased = DateTime.UtcNow;
+                    Key.Release();
                 }
             }
         }
         public void UpdateNonTriggered()
         {
-            if (downEmitted && finalPressed.HasValue && !finalReleased.HasValue)
+            if (Key.IsPressed)
             {
-                var elapsed = DateTime.UtcNow - finalPressed.Value;
+                var elapsed = Key.TimeSincePressed;
                 if (elapsed >= HoldDelay)
                 {
-                    KeyDispatch.Up(ChangeTriggeredInputEffect.Keys);
-                    finalReleased = DateTime.UtcNow;
+                    Key.Release();
                 }
             }
         }
