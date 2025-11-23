@@ -92,7 +92,6 @@
             // 
             // tpSimple
             // 
-            tpSimple.BackColor = SystemColors.Control;
             tpSimple.Controls.Add(textSimpleAutoTriggerDelayedStartMs);
             tpSimple.Controls.Add(cbSimpleAutoTriggerDelayedStart);
             tpSimple.Controls.Add(textSimpleAutoTriggerLimit);
@@ -207,7 +206,6 @@
             // 
             // tpTrigger
             // 
-            tpTrigger.BackColor = SystemColors.Control;
             tpTrigger.Controls.Add(btnChangeTriggerKeySelect);
             tpTrigger.Controls.Add(textTriggerKey);
             tpTrigger.Controls.Add(label4);
