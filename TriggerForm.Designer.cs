@@ -324,6 +324,7 @@
             textDitherFrequency.Size = new Size(445, 31);
             textDitherFrequency.TabIndex = 16;
             textDitherFrequency.Text = "10.0";
+            textDitherFrequency.TextChanged += AnyChanged;
             // 
             // label1
             // 
@@ -342,6 +343,7 @@
             textRampStart.Size = new Size(445, 31);
             textRampStart.TabIndex = 12;
             textRampStart.Text = "20";
+            textRampStart.TextChanged += AnyChanged;
             // 
             // label7
             // 
@@ -360,6 +362,7 @@
             textRampMax.Size = new Size(445, 31);
             textRampMax.TabIndex = 14;
             textRampMax.Text = "80";
+            textRampMax.TextChanged += AnyChanged;
             // 
             // TriggerForm
             // 

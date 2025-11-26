@@ -219,5 +219,11 @@ namespace JoyMap
         {
             RebuildResult();
         }
+
+        private void AnyChanged(object sender, EventArgs e)
+        {
+            RebuildResult();
+
+        }
     }
 }
