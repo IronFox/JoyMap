@@ -31,7 +31,7 @@
 
             // Normalize value to [0,1] range and compare with iteration progress
             var normalizedValue = (value - rampStart) / (rampMax - rampStart);
-            return iterationProgress > normalizedValue;
+            return iterationProgress < normalizedValue;
         }
     }
 }
