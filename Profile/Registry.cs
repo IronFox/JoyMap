@@ -64,7 +64,7 @@ namespace JoyMap.Profile
 #if DEBUG
             if (force)
 #endif
-                SaveAll();
+            SaveAll();
             if (ProfileExecution.Stop(p))
                 ProfileExecution.Start(p);
             return profile.Profile;
@@ -84,7 +84,7 @@ namespace JoyMap.Profile
                 var list = JsonUtil.Deserialize<List<Profile>>(json);
                 Profiles.Clear();
                 bool anyDropped = false;
-                foreach (var p in list.Select(x => x.FixImport()))
+                foreach (var p in list)
                 {
                     if (p.Events.Count == 0)
                     {

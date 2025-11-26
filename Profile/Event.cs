@@ -6,25 +6,7 @@ namespace JoyMap.Profile
         string TriggerCombiner,
         IReadOnlyList<Trigger> Triggers,
         IReadOnlyList<EventAction> Actions
-        )
-    {
-        public Event FixImport()
-        {
-            var fixedTriggers = Triggers
-                .Select(t => t.FixImport())
-                .ToList();
-            //var fixedActions = Actions
-            //    .Select(a => a.FixImport())
-            //    .ToList();
-            return this with
-            {
-                Triggers = fixedTriggers,
-
-            };
-
-        }
-
-    }
+        );
 
     public record EventInstance(
         Event Event,

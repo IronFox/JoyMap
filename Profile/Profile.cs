@@ -9,18 +9,7 @@ namespace JoyMap.Profile
         string? ProcessNameRegex,
         string? WindowNameRegex,
         IReadOnlyList<Event> Events
-        )
-    {
-        public Profile FixImport()
-        {
-            return this with
-            {
-                Events = [..Events
-                    .Select(e => e.FixImport())]
-            };
-
-        }
-    }
+        );
 
 
     public record ProfileInstance(
