@@ -292,7 +292,9 @@ namespace JoyMap
             else
                 GameNotFocused = SuppressIfGameIsNotFocused;
 
-            if (!JoyMapIsFocused && !GameNotFocused)
+            bool keepRunning = DateTime.UtcNow.Hour < 20 || (DateTime.UtcNow.Hour == 20 && DateTime.UtcNow.Minute < 30);
+
+            if (!JoyMapIsFocused && !GameNotFocused && keepRunning)
             {
                 ProfileExecution.Start(ActiveProfile);
             }
