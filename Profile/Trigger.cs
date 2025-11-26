@@ -7,40 +7,7 @@ namespace JoyMap.Profile
         ControllerInputId InputId,
         RangeConfig? Range = null,
         DitherConfig? Dither = null
-        )
-    {
-        [Obsolete("Use Range.MinValue and Range.MaxValue instead")]
-        public float? MinValue { get; init; }
-        [Obsolete("Use Range.MinValue and Range.MaxValue instead")]
-        public float? MaxValue { get; init; }
-        [Obsolete("Use Range.AutoOffAfterMs instead")]
-        public float? AutoOffAfterMs { get; init; }
-        [Obsolete("Use Range.DelayReleaseMs instead")]
-        public float? DelayReleaseMs { get; init; }
-
-        public Trigger FixImport()
-        {
-#pragma warning disable CS0618 // Type or member is obsolete
-            if (Range is null && MinValue is not null && MaxValue is not null)
-            {
-                return this with
-                {
-                    Range = new RangeConfig(
-                        MinValue: MinValue.Value,
-                        MaxValue: MaxValue.Value,
-                        AutoOffAfterMs: AutoOffAfterMs,
-                        DelayReleaseMs: DelayReleaseMs
-                        ),
-                    MinValue = null,
-                    MaxValue = null,
-                    AutoOffAfterMs = null,
-                    DelayReleaseMs = null
-                };
-            }
-#pragma warning restore CS0618 // Type or member is obsolete
-            return this;
-        }
-    }
+        );
 
     public readonly record struct RangeConfig(
         float MinValue,
