@@ -19,12 +19,24 @@ namespace JoyMap
                     );
                 textDevice.Text = Event.Value.DeviceName;
                 textInput.Text = Event.Value.InputId.AxisName;
-                cbDelayRelease.Checked = t.Trigger.DelayReleaseMs is not null;
-                textDelayReleaseMs.Text = t.Trigger.DelayReleaseMs?.ToStr() ?? "567.8";
-                cbAutoReleaseActive.Checked = t.Trigger.AutoOffAfterMs is not null;
-                textAutoReleaseMs.Text = t.Trigger.AutoOffAfterMs?.ToStr() ?? "567.8";
-                textMin.Text = (t.Trigger.MinValue * 100).ToStr();
-                textMax.Text = (t.Trigger.MaxValue * 100).ToStr();
+                if (t.Trigger.Range is not null)
+                {
+                    cbDelayRelease.Checked = t.Trigger.Range.Value.DelayReleaseMs is not null;
+                    textDelayReleaseMs.Text = t.Trigger.Range.Value.DelayReleaseMs?.ToStr() ?? "567.8";
+                    cbAutoReleaseActive.Checked = t.Trigger.Range.Value.AutoOffAfterMs is not null;
+                    textAutoReleaseMs.Text = t.Trigger.Range.Value.AutoOffAfterMs?.ToStr() ?? "567.8";
+                    textMin.Text = (t.Trigger.Range.Value.MinValue * 100).ToStr();
+                    textMax.Text = (t.Trigger.Range.Value.MaxValue * 100).ToStr();
+                    tabs.SelectedTab = tabRange;
+                }
+                else if (t.Trigger.Dither is not null)
+                {
+                    textRampStart.Text = (t.Trigger.Dither.Value.RampStart * 100).ToStr();
+                    textRampMax.Text = (t.Trigger.Dither.Value.RampMax * 100).ToStr();
+                    textDitherFrequency.Text = t.Trigger.Dither.Value.Frequency.ToStr();
+                    tabs.SelectedTab = tabDither;
+                }
+
                 SuspendEvents = false;
                 RebuildResult();
 
@@ -94,29 +106,66 @@ namespace JoyMap
         {
             if (SuspendEvents)
                 return;
-            var min = GetMin();
-            var max = GetMax();
-            var releaseTriggerAfterMs = textAutoReleaseMs.GetFloat(false);
-            if (!cbAutoReleaseActive.Checked)
-                releaseTriggerAfterMs = null;
-            var delayReleaseMs = textDelayReleaseMs.GetFloat(false);
-            if (!cbDelayRelease.Checked)
-                delayReleaseMs = null;
-            if (Event is not null && min is not null && max is not null && (!cbAutoReleaseActive.Checked || releaseTriggerAfterMs is not null))
+            if (Event is not null)
             {
+                if (tabs.SelectedTab == tabDither)
+                {
+                    var rampStart = textRampStart.GetFloat(true);
+                    var rampMax = textRampMax.GetFloat(true);
+                    var frequency = textDitherFrequency.GetFloat(false);
+                    if (rampStart is not null && rampMax is not null && frequency is not null)
+                    {
+                        Result = TriggerInstance.Build(
+                        getCurrentValue: Event.Value.GetLatestStatus,
+                        t: new(
+                            Event.Value.InputId,
+                            Dither: new(
+                                RampStart: rampStart.Value,
+                                RampMax: rampMax.Value,
+                                Frequency: frequency.Value
+                                )
+                            )
+                        );
+                        btnOk.Enabled = true;
+                    }
+                    else
+                        btnOk.Enabled = false;
 
-                Result = TriggerInstance.Build(
-                    getCurrentValue: Event.Value.GetLatestStatus,
-                    t: new(
-                        Event.Value.InputId,
-                        min.Value,
-                        max.Value,
-                        AutoOffAfterMs: releaseTriggerAfterMs,
-                        DelayReleaseMs: delayReleaseMs
-                        )
-                    );
+                    return;
+                }
+                else if (tabs.SelectedTab == tabRange)
+                {
+                    var min = GetMin();
+                    var max = GetMax();
+                    var releaseTriggerAfterMs = textAutoReleaseMs.GetFloat(false);
+                    if (!cbAutoReleaseActive.Checked)
+                        releaseTriggerAfterMs = null;
+                    var delayReleaseMs = textDelayReleaseMs.GetFloat(false);
+                    if (!cbDelayRelease.Checked)
+                        delayReleaseMs = null;
+                    if (min is not null && max is not null && (!cbAutoReleaseActive.Checked || releaseTriggerAfterMs is not null))
+                    {
+                        Result = TriggerInstance.Build(
+                            getCurrentValue: Event.Value.GetLatestStatus,
+                            t: new(
+                                Event.Value.InputId,
+                                    Range: new(
+                                        min.Value,
+                                        max.Value,
+                                        AutoOffAfterMs: releaseTriggerAfterMs,
+                                        DelayReleaseMs: delayReleaseMs
+                                    )
+                                )
+                            );
+                        btnOk.Enabled = true;
+                    }
+                    else
+                        btnOk.Enabled = false;
+                }
+                else
+                    btnOk.Enabled = false;
 
-                btnOk.Enabled = true;
+
             }
             else
             {
@@ -162,6 +211,11 @@ namespace JoyMap
         }
 
         private void cbDelayRelease_CheckedChanged(object sender, EventArgs e)
+        {
+            RebuildResult();
+        }
+
+        private void tabs_SelectedIndexChanged(object sender, EventArgs e)
         {
             RebuildResult();
         }

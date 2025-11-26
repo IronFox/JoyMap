@@ -1,13 +1,58 @@
 ﻿using JoyMap.ControllerTracking;
+using JoyMap.Profile.Processing;
 
 namespace JoyMap.Profile
 {
     public readonly record struct Trigger(
         ControllerInputId InputId,
+        RangeConfig? Range = null,
+        DitherConfig? Dither = null
+        )
+    {
+        [Obsolete("Use Range.MinValue and Range.MaxValue instead")]
+        public float? MinValue { get; init; }
+        [Obsolete("Use Range.MinValue and Range.MaxValue instead")]
+        public float? MaxValue { get; init; }
+        [Obsolete("Use Range.AutoOffAfterMs instead")]
+        public float? AutoOffAfterMs { get; init; }
+        [Obsolete("Use Range.DelayReleaseMs instead")]
+        public float? DelayReleaseMs { get; init; }
+
+        public Trigger FixImport()
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (Range is null && MinValue is not null && MaxValue is not null)
+            {
+                return this with
+                {
+                    Range = new RangeConfig(
+                        MinValue: MinValue.Value,
+                        MaxValue: MaxValue.Value,
+                        AutoOffAfterMs: AutoOffAfterMs,
+                        DelayReleaseMs: DelayReleaseMs
+                        ),
+                    MinValue = null,
+                    MaxValue = null,
+                    AutoOffAfterMs = null,
+                    DelayReleaseMs = null
+                };
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            return this;
+        }
+    }
+
+    public readonly record struct RangeConfig(
         float MinValue,
         float MaxValue,
         float? AutoOffAfterMs,
         float? DelayReleaseMs
+        );
+
+    public readonly record struct DitherConfig(
+        float RampStart,
+        float RampMax,
+        float Frequency
         );
 
 
@@ -42,28 +87,37 @@ namespace JoyMap.Profile
 
         internal static TriggerInstance Build(Func<float?> getCurrentValue, Trigger t)
         {
-
-            var isTriggered = new Func<bool>(() =>
+            Func<bool> isTriggered;
+            if (t.Range is not null)
             {
-                var v = getCurrentValue();
-                if (v is null)
-                    return false;
-                if (t.InputId.AxisNegated)
-                    v = -v.Value;
+                isTriggered = new Func<bool>(() =>
+                {
+                    var v = getCurrentValue();
+                    if (v is null)
+                        return false;
+                    if (t.InputId.AxisNegated)
+                        v = -v.Value;
 
-                return v.Value >= t.MinValue && v.Value <= t.MaxValue;
-            });
-            if (t.AutoOffAfterMs is not null)
-            {
-                var ao = new TriggerAutoOffRelay(isTriggered, TimeSpan.FromMilliseconds(t.AutoOffAfterMs.Value));
-                isTriggered = new Func<bool>(() => ao.Poll());
+                    return v.Value >= t.Range.Value.MinValue && v.Value <= t.Range.Value.MaxValue;
+                });
+                if (t.Range.Value.AutoOffAfterMs is not null)
+                {
+                    var ao = new TriggerAutoOffRelay(isTriggered, TimeSpan.FromMilliseconds(t.Range.Value.AutoOffAfterMs.Value));
+                    isTriggered = new Func<bool>(() => ao.Poll());
+                }
+                if (t.Range.Value.DelayReleaseMs is not null)
+                {
+                    var dr = new TriggerDelayReleaseRelay(isTriggered, TimeSpan.FromMilliseconds(t.Range.Value.DelayReleaseMs.Value));
+                    isTriggered = new Func<bool>(() => dr.Poll());
+                }
             }
-            if (t.DelayReleaseMs is not null)
+            else if (t.Dither is not null)
             {
-                var dr = new TriggerDelayReleaseRelay(isTriggered, TimeSpan.FromMilliseconds(t.DelayReleaseMs.Value));
-                isTriggered = new Func<bool>(() => dr.Poll());
+                var generator = new DitherGenerator(t.Dither.Value, t.InputId.AxisNegated, getCurrentValue);
+                isTriggered = generator.Sample;
             }
-
+            else
+                throw new InvalidOperationException("Trigger must have either Range or Dither defined.");
 
             return new TriggerInstance(
                 Trigger: t,

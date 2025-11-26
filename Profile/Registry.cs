@@ -84,7 +84,7 @@ namespace JoyMap.Profile
                 var list = JsonUtil.Deserialize<List<Profile>>(json);
                 Profiles.Clear();
                 bool anyDropped = false;
-                foreach (var p in list)
+                foreach (var p in list.Select(x => x.FixImport()))
                 {
                     if (p.Events.Count == 0)
                     {
