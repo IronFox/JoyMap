@@ -34,6 +34,8 @@
             fileToolStripMenuItem = new ToolStripMenuItem();
             saveDebugOnlyToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem6 = new ToolStripSeparator();
+            editControllerFamiliesToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem8 = new ToolStripSeparator();
             quitToolStripMenuItem = new ToolStripMenuItem();
             profilesToolStripMenuItem = new ToolStripMenuItem();
             newToolStripMenuItem = new ToolStripMenuItem();
@@ -98,7 +100,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveDebugOnlyToolStripMenuItem, toolStripMenuItem6, quitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveDebugOnlyToolStripMenuItem, toolStripMenuItem6, editControllerFamiliesToolStripMenuItem, toolStripMenuItem8, quitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(54, 29);
             fileToolStripMenuItem.Text = "File";
@@ -106,19 +108,31 @@
             // saveDebugOnlyToolStripMenuItem
             // 
             saveDebugOnlyToolStripMenuItem.Name = "saveDebugOnlyToolStripMenuItem";
-            saveDebugOnlyToolStripMenuItem.Size = new Size(262, 34);
+            saveDebugOnlyToolStripMenuItem.Size = new Size(311, 34);
             saveDebugOnlyToolStripMenuItem.Text = "Save (Debug Only)";
             saveDebugOnlyToolStripMenuItem.Click += saveDebugOnlyToolStripMenuItem_Click;
             // 
             // toolStripMenuItem6
             // 
             toolStripMenuItem6.Name = "toolStripMenuItem6";
-            toolStripMenuItem6.Size = new Size(259, 6);
+            toolStripMenuItem6.Size = new Size(308, 6);
+            // 
+            // editControllerFamiliesToolStripMenuItem
+            // 
+            editControllerFamiliesToolStripMenuItem.Name = "editControllerFamiliesToolStripMenuItem";
+            editControllerFamiliesToolStripMenuItem.Size = new Size(311, 34);
+            editControllerFamiliesToolStripMenuItem.Text = "Edit Controller Families ...";
+            editControllerFamiliesToolStripMenuItem.Click += editControllerFamiliesToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem8
+            // 
+            toolStripMenuItem8.Name = "toolStripMenuItem8";
+            toolStripMenuItem8.Size = new Size(308, 6);
             // 
             // quitToolStripMenuItem
             // 
             quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            quitToolStripMenuItem.Size = new Size(262, 34);
+            quitToolStripMenuItem.Size = new Size(311, 34);
             quitToolStripMenuItem.Text = "Quit";
             quitToolStripMenuItem.Click += quitToolStripMenuItem_Click;
             // 
@@ -170,7 +184,7 @@
             // 
             undoToolStripMenuItem.Name = "undoToolStripMenuItem";
             undoToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Z;
-            undoToolStripMenuItem.Size = new Size(219, 34);
+            undoToolStripMenuItem.Size = new Size(270, 34);
             undoToolStripMenuItem.Text = "Undo";
             undoToolStripMenuItem.Click += undoToolStripMenuItem_Click;
             // 
@@ -178,7 +192,7 @@
             // 
             redoToolStripMenuItem.Name = "redoToolStripMenuItem";
             redoToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Y;
-            redoToolStripMenuItem.Size = new Size(219, 34);
+            redoToolStripMenuItem.Size = new Size(270, 34);
             redoToolStripMenuItem.Text = "Redo";
             redoToolStripMenuItem.Click += redoToolStripMenuItem_Click;
             // 
@@ -587,5 +601,7 @@
         private ToolStripMenuItem aboutToolStripMenuItem;
         private ToolStripMenuItem suspendSelectedToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem7;
+        private ToolStripMenuItem editControllerFamiliesToolStripMenuItem;
+        private ToolStripSeparator toolStripMenuItem8;
     }
 }

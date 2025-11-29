@@ -6,6 +6,7 @@ namespace JoyMap.ControllerTracking
                 : ControllerStatus(id)
     {
         public ControllerStatus Product { get; } = product;
+        public ControllerFamily? Family { get; set; }
         public string ControllerName { get; } = controllerName;
 
 
@@ -25,26 +26,31 @@ namespace JoyMap.ControllerTracking
         {
             base.Update(state);
             Product.Update(state);
+            Family?.Update(state);
         }
 
         /// <summary>
         /// Fetches the latest status value for the specified input.
+        /// Prioritize the instance value, fall back to the product value, fall back to the family value.
+        /// Return null if none are available.
         /// </summary>
         public new float? Get(InputAxis which)
         {
-            return Product.Get(which) ?? base.Get(which);
+            return base.Get(which) ?? Product.Get(which) ?? Family?.Get(which);
         }
 
         internal override void SignalBegin(Guid instanceGuid)
         {
             base.SignalBegin(instanceGuid);
             Product.SignalBegin(instanceGuid);
+            Family?.SignalBegin(instanceGuid);
         }
 
         internal override void SignalEnd(Guid instanceGuid)
         {
             base.SignalEnd(instanceGuid);
             Product.SignalEnd(instanceGuid);
+            Family?.SignalEnd(instanceGuid);
         }
 
         private float XOf(int[] povs, int index)

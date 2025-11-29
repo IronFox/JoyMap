@@ -1,4 +1,5 @@
-﻿using SharpDX.DirectInput;
+﻿using JoyMap.Util;
+using SharpDX.DirectInput;
 using System.Collections.Concurrent;
 
 namespace JoyMap.ControllerTracking
@@ -177,9 +178,16 @@ namespace JoyMap.ControllerTracking
     public class InputMonitor : IDisposable
     {
         private readonly CancellationTokenSource cancel = new();
-        public InputMonitor(IntPtr windowHandle)
+        public InputMonitor(IntPtr windowHandle, IReadOnlyCollection<JsonControllerFamily> controllerFamilies)
         {
             var di = new DirectInput();
+            foreach (var jf in controllerFamilies)
+            {
+                var family = new ControllerFamily(jf);
+                AllFamilies.Add(family);
+                foreach (var pg in jf.Members)
+                    ProductToFamilyMap[pg.Guid] = family;
+            }
 
             Task.Run(() => RunAsync(di, windowHandle, cancel.Token));
         }
@@ -241,7 +249,11 @@ namespace JoyMap.ControllerTracking
         private InstanceStatus CreateInstanceStatus(ControllerId iid, string productName)
         {
             var productStatus = ProductStatusMap.GetOrAdd(iid.ProductGuid, id => new ControllerStatus(id));
-            return InstanceStatusMap.GetOrAdd(iid, _ => new InstanceStatus(iid.InstanceGuid, productName, productStatus));
+            var result = InstanceStatusMap.GetOrAdd(iid, _ => new InstanceStatus(iid.InstanceGuid, productName, productStatus));
+
+            result.Family = GetFamilyOf(new(iid.ProductGuid, productName));
+
+            return result;
         }
 
         internal void SignalDisturbance(TrackedInput trackedInput)
@@ -259,5 +271,85 @@ namespace JoyMap.ControllerTracking
         }
 
 
+        private LockedList<ControllerFamily> AllFamilies { get; } = [];
+        private ConcurrentDictionary<Guid, ControllerFamily> ProductToFamilyMap { get; } = [];
+        public ControllerFamily GetFamilyOf(Product product)
+        {
+            return ProductToFamilyMap.GetOrAdd(product.Guid, _ =>
+            {
+                var family = new ControllerFamily(Guid.NewGuid(), "Private family of " + product.Name, true);
+                family.Members.Add(product);
+                return family;
+            });
+        }
+
+        public JsonControllerFamily CreateFamily(string name, IReadOnlyCollection<Product> productGuids)
+        {
+            var family = new ControllerFamily(Guid.NewGuid(), name, false);
+            foreach (var pg in productGuids)
+                family.Members.Add(pg);
+            AllFamilies.Add(family);
+            foreach (var pg in productGuids)
+                ProductToFamilyMap[pg.Guid] = family;
+
+            foreach (var pg in InstanceStatusMap.Values)
+            {
+                if (productGuids.Any(x => x.Guid == pg.ControllerId.ProductGuid))
+                {
+                    if (pg.Family is not null && !pg.Family.IsGeneric)
+                        pg.Family.Members.RemoveAll(x => x.Guid == pg.ControllerId.ProductGuid);
+                    pg.Family = family;
+                }
+            }
+
+            return family.ToJson();
+        }
+
+        public JsonControllerFamily UpdateFamily(JsonControllerFamily original, string name, IReadOnlyCollection<Product> productGuids)
+        {
+            var family = AllFamilies.First(x => x.Id == original.Id);
+            family.FamilyName = name;
+            foreach (var pg in family.Members)
+                if (!productGuids.Any(x => x.Guid == pg.Guid))
+                    ProductToFamilyMap.TryRemove(pg.Guid, out _);
+            family.Members.Clear();
+            foreach (var pg in productGuids)
+                family.Members.Add(pg);
+            foreach (var pg in productGuids)
+                ProductToFamilyMap[pg.Guid] = family;
+            foreach (var pg in InstanceStatusMap.Values)
+            {
+                if (pg.Family == family)
+                    continue;
+                if (productGuids.Any(x => x.Guid == pg.ControllerId.ProductGuid))
+                {
+                    if (pg.Family is not null && !pg.Family.IsGeneric)
+                        pg.Family.Members.RemoveAll(x => x.Guid == pg.ControllerId.ProductGuid);
+                    pg.Family = family;
+                }
+            }
+            return family.ToJson();
+        }
+
+        public void DeleteFamily(JsonControllerFamily family)
+        {
+            var fam = AllFamilies.FirstOrDefault(x => x.Id == family.Id);
+            if (fam is null)
+                return;
+            AllFamilies.Remove(fam);
+            foreach (var pg in fam.Members)
+                ProductToFamilyMap.TryRemove(pg.Guid, out _);
+            foreach (var pg in InstanceStatusMap.Values)
+            {
+                if (pg.Family != fam)
+                    continue;
+                pg.Family = GetFamilyOf(new(pg.ControllerId.ProductGuid, pg.ControllerName));
+            }
+        }
+
+        internal IReadOnlyList<JsonControllerFamily> ExportAllFamilies()
+        {
+            return [.. AllFamilies.Select(x => x.ToJson())];
+        }
     }
 }

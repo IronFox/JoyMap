@@ -17,6 +17,7 @@ Each Action can define a delay, repetition frequency, and max repetition count.
 So if the instance GUID changes, it will default to any other instance of the same product, but use the specific instance if it exists.
 1) Automatic switching and activation based on window and process name of the focused window
 1) Autosave and undo/redo
+1) Controller grouping in families
 
 ## Full Manual
 ### Profiles
@@ -43,6 +44,19 @@ When starting, the program will attempt to restore its profile/event configurati
 
 This file is currently stored in
    [My Documents]\JoyMap\Profiles.json
+   
+### Controller Families
+This mechanic allows treating different controllers as functionally identical.
+By default, the input associated with a specific event trigger is first taken from the device instance it was initially recorded from.
+If this device is not connected, it will then move to take the input of every instance of the same product.
+Thus replacing one instance of product A with a new instance will dynamically remap without any need to change triggers.
+To achieve the same across different products which are functionally identical, it is possible to map multiple products onto the same family.
+To do so, click the main menu entry File -> "Edit Controller Families", then use the context menu to add, edit, or delete families.
+In order to add a controller to a family, you must connect that controller or it will not show up in the family dialog.
+Check the devices you wish to be a member of this family, then press OK to finalize the change.
+Note that controllers can only be member of each one family. If they are added to another family, they are removed from the previous one.
+Any change to families will be persisted and take effect as soon as the add/edit family dialog is closed.
+
 
 ### Events
 An event is a combination of triggers and actions. If the trigger combination is considered active, the actions are executed while the target game window is focused
