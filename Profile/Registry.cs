@@ -70,14 +70,14 @@ namespace JoyMap.Profile
             return profile.Profile;
         }
 
-        public static void LoadAll()
+        public static IReadOnlyList<JsonControllerFamily> LoadAll()
         {
             var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var dir = Path.Combine(documents, "JoyMap");
             Directory.CreateDirectory(dir);
             var path = Path.Combine(dir, "Profiles.json");
             if (!File.Exists(path))
-                return;
+                return LoadControllerFamilies();
             var json = File.ReadAllText(path);
             try
             {
@@ -104,6 +104,8 @@ namespace JoyMap.Profile
             {
                 // ignore
             }
+            return LoadControllerFamilies();
+
         }
 
         public static void SaveAll()
@@ -116,6 +118,37 @@ namespace JoyMap.Profile
 
             var json = JsonUtil.Serialize(Profiles.Values.Select(x => x.Profile));
             File.WriteAllText(path, json);
+        }
+
+        public static void SaveAllFamilies(InputMonitor monitor)
+        {
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var dir = Path.Combine(documents, "JoyMap");
+            Directory.CreateDirectory(dir);
+
+            var path = Path.Combine(dir, "ControllerFamilies.json");
+            var json = JsonUtil.Serialize(monitor.ExportAllFamilies());
+            File.WriteAllText(path, json);
+        }
+
+        public static IReadOnlyList<JsonControllerFamily> LoadControllerFamilies()
+        {
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var dir = Path.Combine(documents, "JoyMap");
+            Directory.CreateDirectory(dir);
+            var path = Path.Combine(dir, "ControllerFamilies.json");
+            if (!File.Exists(path))
+                return [];
+            var json = File.ReadAllText(path);
+            try
+            {
+                var list = JsonUtil.Deserialize<List<JsonControllerFamily>>(json);
+                return list;
+            }
+            catch (JsonException)
+            {
+                return [];
+            }
         }
 
         internal static IEnumerable<Profile> GetAllProfiles()

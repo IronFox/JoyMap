@@ -43,8 +43,8 @@ namespace JoyMap
         public MainForm()
         {
             InitializeComponent();
-            InputMonitor = new InputMonitor(Handle);
-            Registry.LoadAll();
+            var families = Registry.LoadAll();
+            InputMonitor = new InputMonitor(Handle, families);
             RefreshProfileList();
 #if !DEBUG
             saveDebugOnlyToolStripMenuItem.Enabled = false;
@@ -613,6 +613,12 @@ namespace JoyMap
                 return;
             ActiveProfile.History.ExecuteAction(new ToggleSuspendEventInstancesAction(this, ActiveProfile, selectedIndexes.ToArray()));
 
+        }
+
+        private void editControllerFamiliesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using var form = new ControllerFamiliesForm(InputMonitor);
+            form.ShowDialog(this);
         }
     }
 }
