@@ -1,138 +1,593 @@
-
-# JoyMap
+﻿# JoyMap
 
 ## Introduction
 
-JoyMap is a Joystick to Keyboard mapping program, somewhat akin to JoyToKey, however more powerful in most aspects.
+JoyMap is a powerful Joystick-to-Keyboard/Mouse/Xbox mapping program that extends beyond tools like JoyToKey with advanced features for complex input routing and profile management.
 
-Key differences
+**Key Features:**
 
-1) JoyMap maintains lists of events, where each event can use any number of joystick inputs, including those already in use by other events.
-1) Independent Joystick ranges on every trigger on every event.
-While the range defaults to [50%,100%], you can define your own with fraction precision (12.34567%).
-1) Simple and complex trigger expressions (and, or, (T0 && T1) || T2, etc.)
-1) Any number of independent Actions that execute if the given combination of triggers on an Event fires.
-Each Action can define a delay, repetition frequency, and max repetition count.
-1) Joysticks are mapped by product GUID -> instance GUID.
-So if the instance GUID changes, it will default to any other instance of the same product, but use the specific instance if it exists.
-1) Automatic switching and activation based on window and process name of the focused window
-1) Autosave and undo/redo
-1) Controller grouping in families
-1) Built-in XBox controller emulation (ViGEmBus)
+1. **Multi-trigger Events**: Each event can use any number of joystick inputs, including those already used by other events
+2. **Independent Axis Ranges**: Every trigger on every event has independent min/max thresholds with fraction precision (e.g., 12.34567%)
+3. **Complex Trigger Logic**: Simple and complex boolean expressions (AND, OR, NOT, parentheses) with trigger labels (T0, T1, ...)
+4. **Multiple Actions per Event**: Each action can specify delays, auto-fire frequency, and repetition limits
+5. **Smart Device Mapping**: Controllers mapped by Product GUID → Instance GUID with automatic fallback to any instance of the same product
+6. **Profile Auto-switching**: Automatically activates profiles based on focused window process/title (regex)
+7. **Undo/Redo Support**: Full undo/redo history for profile editing with auto-save in Release builds
+8. **Controller Families**: Group different controller models to treat them as interchangeable
+9. **Virtual Xbox 360 Controller**: Built-in Xbox controller emulation via ViGEmBus driver
+
+## Installation
+
+1. Download and install the **ViGEmBus driver** from https://github.com/nefarius/ViGEmBus/releases (required for Xbox controller emulation)
+2. Launch JoyMap.exe
+3. Connect your joystick/gamepad via USB or Bluetooth
+
+## Quick Start
+
+1. **Create a Profile**: 
+   - Launch your game
+   - In JoyMap: **Profiles** → **New from Window...**
+   - Click the game window to capture its process/window name
+   
+2. **Add Events**:
+   - Right-click the event list → **New ...**
+   - Add triggers (joystick inputs) and actions (keyboard/mouse/Xbox buttons)
+   
+3. **Automatic Activation**: Focus your game window and JoyMap will automatically activate the matching profile
 
 ## Full Manual
-### Profiles
-The main construct that defines what the program does is a profile.
-A profile has a name and is associated with one or more games.
-To create a new profile, start the game, then use the main menu (Profiles -> New from Window...) to pick its window and create a new profile.
-Alternatively you can create a new empty profile (Profiles -> New Empty). It will have pre-filled profile, process, and window names, which can now be freely edited.
-Process and window names are regular expressions.
-Apart from editing, the "Pick ..." button allows selecting a new process/window name combo.
-Empty regex's will always match, but at least one (process or window name) must be set correctly or the profile will never activate.
-The "Profile: ..." drop down in the top section of the window allows selecting any created profile.
-Focusing a game window that matches a registered process or window name will automatically switch to that profile.
 
-The "Delete" button can be used to delete a profile.
-Alternatively, profiles are automatically removed if they are restored from file without events.
-Removal of a profile can currently not be undone.
+### Profiles
+
+A **profile** is the core configuration that defines all input mappings for a specific game or application.
+
+**Creating Profiles:**
+- **From Window**: **Profiles** → **New from Window...** → Click target window (auto-fills process/window regex)
+- **Empty Profile**: **Profiles** → **New Empty** (manually configure process/window regex)
+
+**Profile Settings:**
+- **Name**: Display name in the profile dropdown
+- **Process Name Regex**: Regular expression matching the executable name (e.g., `game\.exe` or `.*` for all)
+- **Window Name Regex**: Regular expression matching the window title
+- **Note**: At least one regex (process or window) must match for auto-activation. Empty regex matches everything.
+
+**Profile Selection:**
+- Use the **Profile:** dropdown to manually switch profiles
+- Profiles auto-activate when you focus a matching window
+- The **Delete** button permanently removes the current profile (cannot be undone)
+
+**Auto-Activation Logic:**
+- JoyMap continuously monitors the focused window
+- When a window matches a profile's process/window regex, that profile becomes active
+- Only one profile is active at a time (most recent match wins)
 
 ### Save and Load
 
-If the application is compiled and runs in its release configuration, all changes to profiles are immediately written to file.
-Otherwise, you can test modifications without changing the file, and the main menu File -> Save (...) entry will save everything.
+**Auto-Save (Release Builds):**
+- All changes immediately save to disk in Release configuration
+- No manual save required
 
-When starting, the program will attempt to restore its profile/event configuration from file.
+**Manual Save (Debug Builds):**
+- **File** → **Save (Debug Only)** to persist changes
+- Allows testing without modifying saved configuration
 
-This file is currently stored in
-   [My Documents]\JoyMap\Profiles.json
+**Storage Location:**
+- Profiles: `[My Documents]\JoyMap\Profiles.json`
+- Controller Families: `[My Documents]\JoyMap\ControllerFamilies.json`
 
-### XBox Controller Emulation
-JoyMap can emulate an XBox controller using the ViGEmBus driver.
-To enable this feature, first install the ViGEmBus driver from
-https://github.com/nefarius/ViGEmBus/releases.
-   
+**Startup Behavior:**
+- JoyMap automatically loads all profiles and controller families on launch
+- Profiles without events are automatically removed
+
 ### Controller Families
-This mechanic allows treating different controllers as functionally identical.
-By default, the input associated with a specific event trigger is first taken from the device instance it was initially recorded from.
-If this device is not connected, it will then move to take the input of every instance of the same product.
-Thus replacing one instance of product A with a new instance will dynamically remap without any need to change triggers.
-To achieve the same across different products which are functionally identical, it is possible to map multiple products onto the same family.
-To do so, click the main menu entry File -> "Edit Controller Families", then use the context menu to add, edit, or delete families.
-In order to add a controller to a family, you must connect that controller or it will not show up in the family dialog.
-Check the devices you wish to be a member of this family, then press OK to finalize the change.
-Note that controllers can only be member of each one family. If they are added to another family, they are removed from the previous one.
-Any change to families will be persisted and take effect as soon as the add/edit family dialog is closed.
 
+Controller families allow treating different physical controllers as functionally identical.
+
+**Default Behavior:**
+- Triggers first read from the exact device instance they were recorded on
+- If disconnected, fallback to **any** instance of the same product (Product GUID)
+
+**Family Setup:**
+1. **File** → **Edit Controller Families...**
+2. Right-click → **Add Family** (or edit existing)
+3. **Check** all controllers you want in this family
+4. **OK** to save
+
+**Family Rules:**
+- Controllers must be connected to appear in the dialog
+- Each controller can only be in **one** family
+- Adding to a new family removes it from the previous one
+- Changes persist immediately on dialog close
+
+**Use Case Example:**
+- Group "Logitech F310" and "Xbox 360 Controller" in a "Gamepad" family
+- Triggers recorded on F310 will now also accept input from Xbox 360 Controller
+
+### Xbox Controller Emulation
+
+JoyMap creates a **virtual Xbox 360 controller** that games see as a real gamepad.
+
+**Prerequisites:**
+- Install **ViGEmBus driver**: https://github.com/nefarius/ViGEmBus/releases
+- Driver must be running (installed as Windows service)
+
+#### Xbox Axis Binding Tab
+
+The **Xbox Axis Binding** tab maps physical joystick inputs to virtual Xbox 360 controller axes.
+
+**Binding List Columns:**
+- **Xbox Axis**: Target virtual axis (see list below)
+- **Input**: Physical joystick axis/button(s) bound to this axis
+- **Output**: Real-time output value (only updates when JoyMap is focused)
+
+**Available Xbox Axes:**
+| Xbox Axis | Description | Range |
+|-----------|-------------|-------|
+| Move Horizontal | Left stick X | -1 (left) to +1 (right) |
+| Move Vertical | Left stick Y | -1 (down) to +1 (up) |
+| Look Horizontal | Right stick X | -1 (left) to +1 (right) |
+| Look Vertical | Right stick Y | -1 (down) to +1 (up) |
+| Trigger Left | Left trigger (LT) | 0 (released) to 1 (fully pressed) |
+| Trigger Right | Right trigger (RT) | 0 (released) to 1 (fully pressed) |
+
+**Editing Bindings:**
+- **Double-click** an axis or **Right-click** → **Edit Selected...**
+- **Context Menu**: Copy, Paste, Unbind, Suspend
+- **Keyboard Shortcuts**: Ctrl+C (copy), Ctrl+V (paste), Delete (unbind), Ctrl+A (select all)
+
+#### Creating/Editing an Axis Binding
+
+**Binding Dialog Layout:**
+
+1. **Axis Label** (top): Shows which Xbox axis you're configuring
+2. **Input List**: All physical inputs bound to this axis
+
+**Input List Columns:**
+- **Device**: Physical joystick axis or button name (e.g., "TWCS Throttle / Slider")
+- **Transform**: Transformation type (currently only "Linear")
+- **Current**: Real-time input value after transformation
+
+**Adding Inputs:**
+1. **Right-click** → **Add...** or use toolbar button
+2. **Pick Device Input Dialog** opens
+3. **Move** an axis or **press** a button to select it
+4. Configure **DeadZone**, **Scale**, and **Translation**
+5. **OK** to add
+
+**Input Configuration:**
+
+| Parameter | Description | Typical Range |
+|-----------|-------------|---------------|
+| **DeadZone** | Percentage near center/zero to ignore (reduces drift) | 5-15% |
+| **Scale** | Output multiplier (smaller = more sensitive) | 0.5 - 2.0 |
+| **Translation** | Transformation algorithm (currently only "Linear") | Linear |
+
+**Linear Transformation Math:**
+- Input values in the deadzone range [-DeadZone, +DeadZone] map to 0
+- Values outside the deadzone are scaled: output = (input / Scale)
+- Final output is clamped to [-1, +1]
+
+Example: With DeadZone=10% and Scale=1.0:
+- Input -1.0 → Output -1.0
+- Input -0.05 (within deadzone) → Output 0
+- Input +0.5 → Output +0.5
+- Input +1.0 → Output +1.0
+
+**Multiple Inputs (Combining):**
+- **Multiple axes can feed one Xbox axis**
+- Output uses the **largest absolute value** (preserving sign)
+- Example: Bind throttle (0→1) and slider (-1→1) to Trigger Left; stronger input wins
+
+**Common Configurations:**
+
+| Goal | DeadZone | Scale | Notes |
+|------|----------|-------|-------|
+| Reduce stick drift | 10-15% | 1.0 | Ignore small unintentional movements |
+| Increase sensitivity | 5% | 0.5 | Smaller scale = more sensitive (input/scale) |
+| Decrease sensitivity | 5% | 2.0 | Larger scale = less sensitive |
+| Combine multiple axes | varies | 1.0 | Add both to same Xbox axis |
+
+**Future Enhancements:**
+- Additional transformation modes ([-1,1] ↔ [0,1] conversion)
+- Custom curve editor for non-linear response
+- DeadZone and Scale will remain available for all transformation types
+
+#### Xbox Button Mapping (via Events)
+
+In the **Events** tab, actions can now target **Xbox controller buttons** in addition to keyboard/mouse keys.
+
+**Available Xbox Buttons:**
+- A, B, X, Y
+- Back, Start, Guide
+- ShoulderLeft (LB), ShoulderRight (RB)
+- ThumbLeft (L3), ThumbRight (R3)
+
+**Usage:**
+1. Create/edit an event
+2. Add an action → **Pick...** button
+3. Select from keyboard keys, mouse buttons, **or Xbox buttons**
+4. When the event triggers, the virtual Xbox button will press/release
+
+**Example Use Case:**
+- Trigger: Joystick Button 5 (50-100%)
+- Action: Press Xbox Button A
+- Result: Physical button 5 acts as virtual Xbox A button
+
+#### Virtual Controller Lifecycle
+
+- **Connects**: When a profile with ≥1 axis binding or Xbox button action becomes active
+- **Disconnects**: When the profile stops (window unfocused or profile switched)
+- **Games see**: Native Xbox 360 controller (no special drivers needed beyond ViGEmBus)
 
 ### Events
-An event is a combination of triggers and actions. If the trigger combination is considered active, the actions are executed while the target game window is focused
-(or any non JoyMap window if Profiles->"Run Only when Game is Focused" is disabled).
+
+An **event** combines **triggers** (input conditions) and **actions** (outputs). When all trigger conditions are met, all actions execute.
+
+**Execution Context:**
+- Actions execute while the target game window is focused
+- **OR** any non-JoyMap window if **Profiles** → **Run Only when Game is Focused** is disabled
 
 #### Event List
-Most of the main window is one huge list of events. Right click the list, chose 'New ...' to create a new event.
-The buttons and context menu also allow you to change the order, select, edit, copy, paste, and delete events.
-Note that the order of events does not matter.
-It is only a way to structure the list according to personal preferences.
 
-The list shows four columns: 'Name' is the customizable name of the respective event,
-'Triggers' an abbreviation of what causes the event to activate,
-and 'Actions' an abbreviation of what it does while active.
-The 'Active' column is empty if the event is currently not active according to its trigger configuration, 
-and a single 'A' if it currently is and would execute if the target game window was focused
+**Location**: Main window, **Events** tab
+
+**List Columns:**
+| Column | Description |
+|--------|-------------|
+| **Name** | User-defined event name |
+| **Trigger(s)** | Summary of input conditions (e.g., "Button0, AxisY") |
+| **Action(s)** | Summary of outputs (e.g., "Press Space, Hold W") |
+| **Active** | Empty if inactive, **"A"** if currently triggered, **"Suspended"** if suspended |
+
+**Context Menu Actions:**
+- **New...**: Create new event
+- **Edit Selected...** (or double-click): Modify event
+- **Copy Selected** (Ctrl+C): Copy to clipboard
+- **Copy All**: Copy all events
+- **Paste Over** (Ctrl+V): Replace selected events with clipboard
+- **Paste Insert**: Insert clipboard events at selection
+- **Delete** (Del): Remove selected events
+- **Move Selected Up/Down** (Ctrl+↑/↓): Reorder events (visual only, doesn't affect behavior)
+- **Select All** (Ctrl+A): Select all events
+- **(Un)Suspend Selected**: Toggle event suspension (suspended events don't execute)
+
+**Note**: Event order is cosmetic; all events evaluate independently.
 
 #### Event Dialog
-Editing an existing or creating a new event will open a dialog to do so.
-The dialog features a name input in the top section, a trigger section, and an action section.
-Note that any changes made here will take effect only when pressing the "Update / Create" button. This dialog does not have an undo feature.
 
-**_Triggers_**
+**Sections:**
+1. **Name** (top): Event identifier
+2. **Triggers** (middle): Input conditions
+3. **Actions** (bottom): Outputs when triggered
 
-The trigger section is primarily a list of possible triggers (joystick buttons or axes), plus a combiner that tells the system how to combine multiple triggers.
-The columns show the automatically determined label, the device (Joystick), axis/button name, and status.
-As with the event list, the status column shows nothing if the trigger is considered inactive, otherwise a single A.
-To add a new trigger open the context menu and select "Pick/Add ...". Likewise, existing ones can be edited or deleted.
+**Workflow:**
+- Changes only apply when you click **Update/Create**
+- No undo within this dialog (use profile-level undo after closing)
 
-**_Combiners_**
+#### Triggers Section
 
-The combiner input is both a drop-down and a text input. By default, it supports **And** and **Or**, which respectively activate if **_all_** or **_at least one_** trigger is currently active.
-Alternatively, it supports complex expressions where triggers are referenced by their label (T0, T1, T2, ...) and can be combined using ||/or, &&/and, !/not, and ().
-E.g. "(T0 and T1 and T2) or not T3", which is identical to writing "(T0 && T1 && T2) || !T3".
+**Trigger List Columns:**
+- **Label**: Auto-assigned identifier (T0, T1, T2, ...)
+- **Device**: Joystick name
+- **Axis/Button**: Input name
+- **Status**: Empty if inactive, **"A"** if currently active
 
-**_Actions_**
+**Adding/Editing:**
+- **Right-click** → **Pick/Add...**: Record new trigger
+- **Right-click** → **Edit**: Modify existing trigger
+- **Right-click** → **Delete**: Remove trigger
 
-The bottom half of the event dialog is composed of a list of independent actions to perform when the trigger combination is determined as active.
-As with the trigger list, you can add, edit, or remove actions with the context menu.
+**Trigger Combiner:**
+
+Defines how multiple triggers combine:
+
+| Mode | Behavior | Expression |
+|------|----------|------------|
+| **And** | All triggers must be active | `T0 && T1 && T2` |
+| **Or** | At least one trigger active | `T0 \|\| T1 \|\| T2` |
+| **Custom** | Boolean expression with &&, \|\|, !, () | `(T0 && T1) \|\| !T2` |
+
+**Custom Expression Syntax:**
+- **Operators**: `AND`/`&&`, `OR`/`||`, `NOT`/`!`
+- **Grouping**: `(` `)` parentheses
+- **Identifiers**: T0, T1, T2, ... (trigger labels)
+- **Keywords**: `TRUE`, `FALSE` (always on/off)
+
+**Examples:**
+- `T0 AND T1`: Both triggers active
+- `T0 OR T1 OR T2`: Any trigger active
+- `(T0 && T1) || T2`: (T0 and T1) or T2
+- `!(T0 || T1)`: Neither T0 nor T1 active
+- `T0 AND NOT T1`: T0 active but not T1
 
 #### Trigger Dialog
-The trigger dialog opens if you create a new or edit an existing trigger.
-The top two rows show the device (Joystick) and input (axis/button). To change those, use the "Pick ..." button.
-The Min% and Max% inputs will defining the minimum and maximum threshold for the current axis percentage.
-For buttons, the axis percentage is 0% if not pressed and 100% if pressed.
-To invert activation, set min/max to something like 0%/50%.
 
-The option "Auto Release after (ms):" allows forcing the trigger result to off if it has been active for that many milliseconds. Once the device axis is moved out of the min/max range, then in again, this timer will reset.
+**Configuration:**
+| Field | Description |
+|-------|-------------|
+| **Device** | Joystick/controller name |
+| **Input** | Axis or button name |
+| **Min %** | Minimum activation threshold (0-100%) |
+| **Max %** | Maximum activation threshold (0-100%) |
+| **Auto Release after (ms)** | Force inactive after X milliseconds (optional) |
+| **Delay Release by (ms)** | Keep active for X milliseconds after input leaves range (optional) |
 
-The option "Delay Release by (ms):" enables to extend the active time after the device axis was moved out of the min/max range. If both "Auto Release after (ms)" and "Delay Release by (ms)" are set, the delay will effectively extend the auto release timer.
-Like other dialogs, this dialog's inputs will take effect only when pressing "Update / Create".
+**Activation Logic:**
+- Trigger is active when: `Min% ≤ input% ≤ Max%`
+- Buttons: 0% (released), 100% (pressed)
+- Axes: Normalized to 0-100% (or -100% to +100% for centered axes)
+
+**Advanced Options:**
+
+**Auto Release (Timeout):**
+- Forces trigger to deactivate after X ms, even if input still in range
+- Resets when input leaves and re-enters the range
+- Use case: Single-shot activation (e.g., trigger once, then require re-trigger)
+
+**Delay Release (Debounce):**
+- Keeps trigger active for X ms after input leaves the range
+- Use case: Smooth out jittery inputs or hold actions slightly longer
+- **Combined with Auto Release**: Extends the auto-release timer
+
+**Example Configurations:**
+
+| Goal | Min % | Max % | Notes |
+|------|-------|-------|-------|
+| Button pressed | 50 | 100 | Standard button trigger |
+| Button released | 0 | 50 | Inverted button trigger |
+| Axis forward | 60 | 100 | Upper 40% of axis range |
+| Axis centered | 45 | 55 | ±5% around center |
+| Full axis range | 0 | 100 | Always active (not useful alone) |
 
 #### Pick Axis Dialog
-This dialog records and changes in device buttons and axes and provides them for selection. Axes may be listed twice for positive and negative values. Buttons will be listed once only if they have been pressed while the dialog is open.
-Closing and re-opening the dialog will flush all previous inputs.
+
+**Behavior:**
+- **Real-time recording**: Move axes or press buttons to detect them
+- **Axis polarity**: Axes may appear twice (positive/negative directions)
+- **Button persistence**: Buttons only appear after first press
+- **Dialog reset**: Closing and reopening clears the recorded inputs
+
+**Usage:**
+1. Open dialog via **Pick...** button
+2. Move/press the desired input
+3. Select from the list
+4. **OK** to confirm
+
+#### Actions Section
+
+**Action List Columns:**
+- **Name**: User-defined or auto-generated action name
+- **Key/Button**: Target output (keyboard key, mouse button, or Xbox button)
+- **Behavior**: "Hold", "Auto-fire X Hz", "Delayed", etc.
+
+**Adding/Editing:**
+- **Right-click** → **Add...**: Create new action
+- **Right-click** → **Edit**: Modify existing action
+- **Right-click** → **Delete**: Remove action
 
 #### Action Dialog
-This dialog allows configuring a single action to run if an event's trigger composition activates.
-Currently, only one key/mouse event may be issued, either exactly while the trigger is active, or auto-firing at a fixed frequency.
-Initial delay is the time in milliseconds, until this action starts. The key or mouse button can be selected and changed via the "Pick ..." button.
-It may also automatically name the action if it was not previously manually changed.
-If the "Auto Trigger Frequency" checkbox is checked, the chosen key/button will virtually be pressed and released at that frequency (pressed times per second).
 
-The auto-triggering can be delayed by checking "Delay Start (ms):". Doing so will hold the simulated key press until the delay has passed, then switch to autofire.
+**Configuration:**
+| Field | Description | Default |
+|-------|-------------|---------|
+| **Name** | Action identifier (auto-filled from key if blank) | - |
+| **Key/Button** | Target output (keyboard/mouse/Xbox) | None |
+| **Initial Delay (ms)** | Wait X ms before first activation | 0 |
+| **Auto Trigger Frequency** | Enable auto-fire (checkbox) | Off |
+| **Frequency (Hz)** | Presses per second | 10 |
+| **Delay Start (ms)** | Hold first press for X ms before auto-fire | 0 |
+| **Limit Auto-Triggers** | Maximum number of presses (checkbox) | Off |
+| **Limit Count** | Max presses (0 = unlimited) | 0 |
 
-The auto-triggering can further be limited by checking "Limit Auto-Triggers". If set, only that many times, the key/button will be pressed. The last time, it will be held until they trigger combination becomes inactive.
- 
+**Behavior Modes:**
 
+**1. Hold Mode (Auto Trigger OFF):**
+- Press output when event activates
+- Release output when event deactivates
+- Use case: Simple key hold (e.g., W for forward movement)
 
+**2. Auto-Fire Mode (Auto Trigger ON):**
+- Rapidly press/release output at specified frequency
+- Continues until event deactivates or limit reached
+- Use case: Rapid-fire weapon, spam key press
 
-## Assets used
-This application uses a free icon from:
-<a href="https://www.flaticon.com/free-icon/joystick_12585353?term=joystick&page=1&position=15&origin=tag&related_id=12585353" title="Joystick free icon">Joystick free icon - Flaticon</a>
+**3. Delayed Auto-Fire:**
+- Hold first press for "Delay Start" duration
+- Then switch to auto-fire
+- Use case: Charge attack (hold), then rapid combo (auto-fire)
+
+**4. Limited Auto-Fire:**
+- Auto-fire exactly N times
+- Last press is **held** until event deactivates
+- Use case: Fixed combo sequence (press 3x, then hold)
+
+**Key/Button Selection:**
+- **Pick...** button opens picker dialog
+- Shows **all** keyboard keys (A-Z, F1-F12, Shift, Ctrl, ...)
+- Shows **mouse buttons** (Left, Right, Middle, X1, X2)
+- Shows **Xbox buttons** (A, B, X, Y, Back, Start, Guide, LB, RB, L3, R3)
+
+**Examples:**
+
+| Configuration | Behavior |
+|---------------|----------|
+| Hold Space, no auto-fire | Holds Space while event active |
+| Auto-fire 10 Hz, no delay | Presses Space 10x/second while active |
+| Auto-fire 5 Hz, delay 500ms | Holds Space 500ms, then presses 5x/second |
+| Auto-fire 10 Hz, limit 3 | Presses Space 3x rapidly, holds 3rd press until deactivate |
+
+### Undo/Redo
+
+**Availability**: All profile edits (except within dialogs)
+
+**Shortcuts:**
+- **Undo**: Ctrl+Z or **Edit** → **Undo**
+- **Redo**: Ctrl+Y or Ctrl+Shift+Z or **Edit** → **Redo**
+
+**Scope:**
+- Per-profile history (switching profiles doesn't clear)
+- Tracks: Event add/edit/delete/move, profile name/regex changes, axis binding changes
+- **Not tracked**: Changes within open dialogs (only recorded on OK)
+
+**Limitations:**
+- Profile deletion cannot be undone (prompts for confirmation)
+- History cleared on application restart
+
+### Advanced Features
+
+#### Profile Suspension
+
+**Profiles** → **Run Only when Game is Focused** (checked by default):
+- **Checked**: Actions only execute when the game window matching the profile is focused
+- **Unchecked**: Actions execute when **any** non-JoyMap window is focused (allows global hotkeys)
+
+**Individual Event/Binding Suspension:**
+- Right-click event/binding → **(Un)Suspend Selected**
+- Suspended items shown in "Active" column as **"Suspended"**
+- Use case: Temporarily disable specific events without deleting them
+
+#### Clipboard Operations
+
+**Events:**
+- Copy/Paste events between profiles
+- JSON format (can edit externally)
+- Paste Over: Replace selected events (must have same count)
+- Paste Insert: Insert at selection
+
+**Xbox Bindings:**
+- Copy/Paste axis bindings
+- Paste over multiple axes at once
+
+**Tip**: Use Copy All → Paste into text editor to backup or share configurations
+
+#### Keyboard Shortcuts Summary
+
+**Global:**
+- **Ctrl+Z**: Undo
+- **Ctrl+Y** / **Ctrl+Shift+Z**: Redo
+- **Ctrl+N**: New event (Events tab) / New binding (Xbox tab)
+- **Ctrl+A**: Select All
+- **Ctrl+C**: Copy Selected
+- **Ctrl+V**: Paste
+- **Delete**: Delete Selected
+
+**Events Tab:**
+- **Ctrl+↑**: Move Selected Up
+- **Ctrl+↓**: Move Selected Down
+- **Double-click**: Edit event
+
+**Xbox Tab:**
+- **Double-click**: Edit axis binding
+
+## Troubleshooting
+
+**"XBox controller created" does not appear in status bar:**
+- Install ViGEmBus driver: https://github.com/nefarius/ViGEmBus/releases
+- Restart Windows after driver installation
+- Check Windows Device Manager → "System Devices" → "Virtual Gamepad Emulation Bus"
+
+**Controller not detected:**
+- Ensure controller is connected before launching JoyMap
+- Check Windows **Game Controllers** (joy.cpl) to verify detection
+- For HOTAS/throttles: May appear as "Supplemental" or "Flight" device type
+- Try USB connection (not Bluetooth) to rule out connection issues
+
+**Profile doesn't auto-activate:**
+- Check process/window regex is correct (use **Pick...** to recapture)
+- Test regex: Empty regex matches all; `.*` also matches all
+- Ensure **at least one** regex (process OR window) is non-empty and matches
+- Check **Profiles** → **Run Only when Game is Focused** if testing outside game
+
+**Actions not executing:**
+- Verify event "Active" column shows **"A"** when triggered
+- Check trigger Min/Max percentages match your input range
+- Test with simple trigger (button 50-100%) and action (Press A) first
+- Ensure profile is active (shown in dropdown) and game window is focused
+
+**Xbox axis not responding in game:**
+- Check "Output" column shows non-zero values when moving physical axis
+- Verify DeadZone isn't too high (try 0% to test)
+- Check Scale value (1.0 is neutral)
+- Ensure ViGEmBus driver is running (restart if necessary)
+- Test with different game (some games don't support virtual controllers)
+
+## Tips & Best Practices
+
+**Profile Organization:**
+- Name profiles clearly (e.g., "Star Citizen - HOTAS", "Elite Dangerous - Dual Stick")
+- Use specific process/window regex to avoid conflicts (e.g., `EliteDangerous64\.exe` not `.*`)
+
+**Event Design:**
+- Name events descriptively (e.g., "Boost - Hold Shift", "Fire Primary - Auto 10Hz")
+- Start simple: Single trigger + single action, then add complexity
+- Use trigger combiners for advanced logic (e.g., "Fire only when throttle > 50%")
+
+**Trigger Tuning:**
+- Default 50-100% works for most buttons
+- Axes: Test ranges by watching trigger "Status" column
+- Add deadzone (45-55%) for centered axes to avoid constant triggering
+
+**Action Timing:**
+- Initial Delay: Use for sequential macros (e.g., 0ms, 200ms, 400ms delays)
+- Auto-fire: Start with 5-10 Hz, adjust based on game responsiveness
+- Limited triggers: Great for combo sequences (e.g., 3x rapid tap, then hold)
+
+**Xbox Binding:**
+- Start with one axis at a time to verify behavior
+- Use 10-15% deadzone for analog sticks
+- Combine multiple physical axes (e.g., pedals + twist) to one virtual axis
+
+**Controller Families:**
+- Group controllers you frequently swap (e.g., home/travel setups)
+- Don't over-group; keep distinct controller types separate
+
+**Backup:**
+- Copy `[My Documents]\JoyMap\` folder periodically
+- Use Copy All → Paste to text file for configuration snapshots
+
+## Technical Details
+
+**DirectInput Support:**
+- Polls all DirectInput devices (Gamepad, Joystick, Flight, Driving, Supplemental)
+- Reads up to 64 buttons per device
+- Supports axes: X, Y, Z, RotationX, RotationY, RotationZ, Slider(s), POV(s)
+
+**Virtual Xbox 360 Controller:**
+- ViGEmBus driver: https://github.com/nefarius/ViGEmBus
+- Exposes: 2 analog sticks, 2 triggers, D-pad, 10 buttons, Guide button
+- Latency: <5ms typical (depends on DirectInput poll rate)
+
+**File Format:**
+- JSON with UTF-8 encoding
+- Enums serialized as strings (e.g., "Button0", "MoveHorizontal")
+- Backwards-compatible reader (old Keys-only actions load as KeyOrButton)
+
+**Platform:**
+- Windows 10/11 (64-bit recommended)
+- .NET 10 runtime
+- Requires Windows with DirectInput support
+
+## Known Limitations
+
+- Cannot read XInput-only controllers (e.g., Xbox Wireless Controller) as input (only output via emulation)
+- No mouse movement emulation (only button clicks)
+- Profile auto-activation requires focused window; no global profile override
+- Event order in UI is cosmetic; cannot set execution priority
+- Virtual Xbox controller Guide button may not work in all games
+- No per-action undo within event/trigger/action dialogs
+
+## Credits
+
+**Assets:**
+- Icon: [Joystick free icon](https://www.flaticon.com/free-icon/joystick_12585353?term=joystick&page=1&position=15&origin=tag&related_id=12585353) from Flaticon
+
+**Libraries:**
+- [ViGEmClient](https://github.com/nefarius/ViGEmClient) - Virtual gamepad interface
+- [SharpDX.DirectInput](https://github.com/sharpdx/SharpDX) - DirectInput wrapper
+
+**License:**
+See LICENSE file for details.
+
+---
+
+**Version:** Check **Help** → **About...** for current version number
