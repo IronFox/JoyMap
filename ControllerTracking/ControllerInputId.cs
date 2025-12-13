@@ -15,6 +15,10 @@ namespace JoyMap.ControllerTracking
         public bool AxisSigned => Axis > InputAxis.None && Axis < InputAxis.Button0;
 
         [JsonIgnore]
+        public string ControllerAxisName =>
+             $"{ControllerName}:{AxisName}";
+
+        [JsonIgnore]
         public string AxisName =>
              $"{Axis}{(AxisSigned ? (AxisNegated ? " Negative" : " Positive") : "")}";
     }

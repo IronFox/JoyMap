@@ -98,17 +98,17 @@
             columnHeader7 = new ColumnHeader();
             columnHeader6 = new ColumnHeader();
             bindingContextMenu = new ContextMenuStrip(components);
+            tsmEditBinding = new ToolStripMenuItem();
+            toolStripMenuItem12 = new ToolStripSeparator();
             tsmSelectAllBindings = new ToolStripMenuItem();
             toolStripMenuItem9 = new ToolStripSeparator();
-            tsmEditBinding = new ToolStripMenuItem();
-            tsmSuspendBinding = new ToolStripMenuItem();
-            toolStripMenuItem12 = new ToolStripSeparator();
-            tsmCopyBinding = new ToolStripMenuItem();
             tsmCopyAllBindings = new ToolStripMenuItem();
+            tsmCopyBinding = new ToolStripMenuItem();
             toolStripMenuItem16 = new ToolStripSeparator();
             tsmPasteBinding = new ToolStripMenuItem();
             toolStripMenuItem11 = new ToolStripSeparator();
             tsmUnbind = new ToolStripMenuItem();
+            tsmSuspendBinding = new ToolStripMenuItem();
             label6 = new Label();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
@@ -602,6 +602,7 @@
             bindingListView.TabIndex = 14;
             bindingListView.UseCompatibleStateImageBehavior = false;
             bindingListView.View = View.Details;
+            bindingListView.DoubleClick += bindingListView_DoubleClick;
             bindingListView.KeyDown += GlobalShortcuts;
             // 
             // columnHeader1
@@ -624,8 +625,20 @@
             bindingContextMenu.ImageScalingSize = new Size(24, 24);
             bindingContextMenu.Items.AddRange(new ToolStripItem[] { tsmEditBinding, toolStripMenuItem12, tsmSelectAllBindings, toolStripMenuItem9, tsmCopyAllBindings, tsmCopyBinding, toolStripMenuItem16, tsmPasteBinding, toolStripMenuItem11, tsmUnbind, tsmSuspendBinding });
             bindingContextMenu.Name = "bindingContextMenu";
-            bindingContextMenu.Size = new Size(312, 285);
+            bindingContextMenu.Size = new Size(312, 252);
             bindingContextMenu.Opening += bindingContextMenu_Opening;
+            // 
+            // tsmEditBinding
+            // 
+            tsmEditBinding.Name = "tsmEditBinding";
+            tsmEditBinding.Size = new Size(311, 32);
+            tsmEditBinding.Text = "Edit Selected (double click) ...";
+            tsmEditBinding.Click += tsmEditBinding_Click;
+            // 
+            // toolStripMenuItem12
+            // 
+            toolStripMenuItem12.Name = "toolStripMenuItem12";
+            toolStripMenuItem12.Size = new Size(308, 6);
             // 
             // tsmSelectAllBindings
             // 
@@ -640,24 +653,12 @@
             toolStripMenuItem9.Name = "toolStripMenuItem9";
             toolStripMenuItem9.Size = new Size(308, 6);
             // 
-            // tsmEditBinding
+            // tsmCopyAllBindings
             // 
-            tsmEditBinding.Name = "tsmEditBinding";
-            tsmEditBinding.Size = new Size(311, 32);
-            tsmEditBinding.Text = "Edit Selected (double click) ...";
-            tsmEditBinding.Click += tsmEditBinding_Click;
-            // 
-            // tsmSuspendBinding
-            // 
-            tsmSuspendBinding.Name = "tsmSuspendBinding";
-            tsmSuspendBinding.Size = new Size(311, 32);
-            tsmSuspendBinding.Text = "(Un)Suspend Selected";
-            tsmSuspendBinding.Click += tsmSuspendBinding_Click;
-            // 
-            // toolStripMenuItem12
-            // 
-            toolStripMenuItem12.Name = "toolStripMenuItem12";
-            toolStripMenuItem12.Size = new Size(308, 6);
+            tsmCopyAllBindings.Name = "tsmCopyAllBindings";
+            tsmCopyAllBindings.Size = new Size(311, 32);
+            tsmCopyAllBindings.Text = "Copy All";
+            tsmCopyAllBindings.Click += tsmCopyAllBindings_Click;
             // 
             // tsmCopyBinding
             // 
@@ -666,13 +667,6 @@
             tsmCopyBinding.Size = new Size(311, 32);
             tsmCopyBinding.Text = "Copy Selected";
             tsmCopyBinding.Click += tsmCopyBinding_Click;
-            // 
-            // tsmCopyAllBindings
-            // 
-            tsmCopyAllBindings.Name = "tsmCopyAllBindings";
-            tsmCopyAllBindings.Size = new Size(311, 32);
-            tsmCopyAllBindings.Text = "Copy All";
-            tsmCopyAllBindings.Click += tsmCopyAllBindings_Click;
             // 
             // toolStripMenuItem16
             // 
@@ -699,6 +693,13 @@
             tsmUnbind.Size = new Size(311, 32);
             tsmUnbind.Text = "Unbind Selected";
             tsmUnbind.Click += tsmUnbind_Click;
+            // 
+            // tsmSuspendBinding
+            // 
+            tsmSuspendBinding.Name = "tsmSuspendBinding";
+            tsmSuspendBinding.Size = new Size(311, 32);
+            tsmSuspendBinding.Text = "(Un)Suspend Selected";
+            tsmSuspendBinding.Click += tsmSuspendBinding_Click;
             // 
             // label6
             // 

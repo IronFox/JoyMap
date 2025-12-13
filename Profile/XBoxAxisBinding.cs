@@ -70,33 +70,44 @@ namespace JoyMap.Profile
 
         internal static XBoxAxisBindingInstance Load(InputMonitor monitor, XBoxAxisBinding e)
         {
-            var triggerInstances = e.InAxes
+            var axes = e.InAxes
                 .Select(t => AxisInput.Load(monitor, t))
                 .ToList();
             return new XBoxAxisBindingInstance(
                 Binding: e,
-                InputInstances: triggerInstances,
-                GetValue: () =>
-                {
-                    float? max = null;
-                    foreach (var input in triggerInstances)
-                    {
-                        var val = input.GetValue();
-                        if (val != null)
-                        {
-                            if (max is null)
-                                max = val;
-                            else
-                                max = Math.Sign(val.Value)
-                                    * Math.Max(Math.Abs(val.Value), Math.Abs(max.Value));
-                        }
-                    }
-                    if (max == null)
-                        return null;
-                    return max;
-                }
+                InputInstances: axes,
+                GetValue: CombineAxisInputs(axes)
                 );
         }
 
+        public static Func<float?> CombineAxisInputs(IReadOnlyList<AxisInput> axes)
+        {
+            if (axes.Count == 0)
+                return () => null;
+            if (axes.Count == 1)
+            {
+                var a = axes.First();
+                return a.GetValue;
+            }
+            return () =>
+            {
+                float? max = null;
+                foreach (var input in axes)
+                {
+                    var val = input.GetValue();
+                    if (val != null)
+                    {
+                        if (max is null)
+                            max = val;
+                        else
+                            max = Math.Sign(val.Value)
+                                * Math.Max(Math.Abs(val.Value), Math.Abs(max.Value));
+                    }
+                }
+                if (max == null)
+                    return null;
+                return max;
+            };
+        }
     }
 }

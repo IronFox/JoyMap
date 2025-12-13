@@ -25,7 +25,7 @@ namespace JoyMap.Undo.Action.Binding
             var row = Form.RequireRowOf(NewInstance.OutAxis);
             row.GetBound(out var old);
             Old = old;
-            row.SetBound(NewInstance);
+            row.Bind(NewInstance);
             Registry.Persist(TargetProfile);
         }
 
@@ -34,7 +34,7 @@ namespace JoyMap.Undo.Action.Binding
             if (!IsValid)
                 return;
             var row = Form.RequireRowOf(NewInstance.OutAxis);
-            row.SetBound(Old);
+            row.Bind(Old);
             Registry.Persist(TargetProfile);
         }
     }

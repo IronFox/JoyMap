@@ -44,6 +44,7 @@
             btnCancel = new Button();
             btnOk = new Button();
             lOutput = new Label();
+            timer1 = new System.Windows.Forms.Timer(components);
             contextMenuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
@@ -69,6 +70,7 @@
             axisListView.TabIndex = 1;
             axisListView.UseCompatibleStateImageBehavior = false;
             axisListView.View = View.Details;
+            axisListView.DoubleClick += axisListView_DoubleClick;
             // 
             // columnHeader1
             // 
@@ -104,6 +106,7 @@
             editToolStripMenuItem.Name = "editToolStripMenuItem";
             editToolStripMenuItem.Size = new Size(240, 32);
             editToolStripMenuItem.Text = "Edit ... (double click)";
+            editToolStripMenuItem.Click += editToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
@@ -115,6 +118,7 @@
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             deleteToolStripMenuItem.Size = new Size(240, 32);
             deleteToolStripMenuItem.Text = "Delete";
+            deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
             // 
             // statusStrip1
             // 
@@ -164,6 +168,11 @@
             lOutput.TabIndex = 20;
             lOutput.Text = "Output: 0";
             // 
+            // timer1
+            // 
+            timer1.Enabled = true;
+            timer1.Tick += timer1_Tick;
+            // 
             // XBoxAxisBindingForm
             // 
             AcceptButton = btnOk;
@@ -204,5 +213,6 @@
         private ToolStripMenuItem editToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem1;
         private ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.Timer timer1;
     }
 }

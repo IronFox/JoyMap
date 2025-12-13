@@ -22,9 +22,9 @@ namespace JoyMap
                 textDevice.Text = Event.Value.DeviceName;
                 textInput.Text = Event.Value.InputId.AxisName;
                 Translation = input.Value.Input.Translation;
-                RebuildResult(this, EventArgs.Empty);
 
             }
+            RebuildResult(this, EventArgs.Empty);
         }
 
         public DeviceEvent? Event { get; private set; }

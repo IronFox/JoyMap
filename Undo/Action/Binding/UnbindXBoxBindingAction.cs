@@ -30,7 +30,7 @@ namespace JoyMap.Undo.Action.Binding
                 if (item.GetBound(out var bound))
                 {
                     Deleted.Add((axis, bound));
-                    item.SetBound(null);
+                    item.Bind(null);
                 }
             }
             Deleted.Reverse();
@@ -44,7 +44,7 @@ namespace JoyMap.Undo.Action.Binding
             foreach (var (Axis, Binding) in Deleted)
             {
                 var row = Form.RequireRowOf(Axis);
-                row.SetBound(Binding);
+                row.Bind(Binding);
             }
             Registry.Persist(TargetProfile);
             Deleted.Clear();

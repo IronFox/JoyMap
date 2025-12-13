@@ -148,18 +148,10 @@ namespace JoyMap
                 foreach (var axis in Enum.GetValues<XBoxAxis>())
                 {
                     profile.AxisBindings.TryGetValue(axis, out var bound);
-                    var row = bindingListView.Items.Add(axis.ToString());
-                    row.Tag = (object?)bound ?? axis;
-                    if (bound is not null)
-                    {
-                        row.SubItems.Add(string.Join(", ", bound.InputInstances.Select(x => x.Input.InputId.AxisName)));
-                        row.SubItems.Add(bound.GetValue().ToStr());
-                    }
-                    else
-                    {
-                        row.SubItems.Add("");
-                        row.SubItems.Add("Not bound");
-                    }
+                    var row = new AxisRowHandle(this, axis, bindingListView.Items.Add(axis.ToString()));
+                    row.Row.SubItems.Add("");
+                    row.Row.SubItems.Add("");
+                    row.Bind(null, false);
                 }
             });
         }
@@ -208,7 +200,7 @@ namespace JoyMap
                 return bound is not null;
             }
 
-            public void SetBound(XBoxAxisBindingInstance? b, bool updateCurrentProfile = true)
+            public void Bind(XBoxAxisBindingInstance? b, bool updateCurrentProfile = true)
             {
                 AxisUpdateItemTo(Row, Axis, b);
                 if (updateCurrentProfile && Form.ActiveProfile is not null)
@@ -324,7 +316,7 @@ namespace JoyMap
                 foreach (ListViewItem row in bindingListView.Items)
                 {
                     if (row.Tag is not XBoxAxisBindingInstance map) continue;
-                    row.SubItems[1].Text = map.IsSuspended ? "Suspended" : map.GetValue().ToStr();
+                    row.SubItems[2].Text = map.IsSuspended ? "Suspended" : map.GetValue().ToStr();
                 }
             }
 
@@ -736,8 +728,9 @@ namespace JoyMap
 
             if (ActiveProfile is null)
                 return;
-            var axis = AxisOf(bindingListView.SelectedItems[0].Tag);
-            using var form = new XBoxAxisBindingForm(axis);
+            var axis = AxisOf(bindingListView.SelectedItems[0]);
+            ActiveProfile.AxisBindings.TryGetValue(axis, out var binding);
+            using var form = new XBoxAxisBindingForm(axis, binding);
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -819,8 +812,9 @@ namespace JoyMap
             ActiveProfile.History.ExecuteAction(new ToggleSuspendXBoxBindingInstancesAction(this, ActiveProfile, selectedIndexes.ToArray()));
         }
 
-        public static XBoxAxis AxisOf(object? tag)
+        public static XBoxAxis AxisOf(ListViewItem item)
         {
+            var tag = item.Tag;
             if (tag is XBoxAxis axis)
                 return axis;
             if (tag is XBoxAxisBindingInstance axisBindingInstance)
@@ -838,10 +832,15 @@ namespace JoyMap
             }
             else
             {
-                item.SubItems[1].Text = string.Join(", ", b.InputInstances.Select(x => x.Input.InputId.AxisName));
+                item.SubItems[1].Text = string.Join(", ", b.InputInstances.Select(x => x.Input.InputId.ControllerAxisName));
                 item.SubItems[2].Text = b.GetValue().ToStr();
                 item.Tag = b;
             }
+        }
+
+        private void bindingListView_DoubleClick(object sender, EventArgs e)
+        {
+            tsmEditBinding_Click(sender, e);
         }
     }
 }
