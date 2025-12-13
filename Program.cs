@@ -1,4 +1,5 @@
 using JoyMap.Profile;
+using JoyMap.XBox;
 
 namespace JoyMap
 {
@@ -19,6 +20,7 @@ namespace JoyMap
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             Application.Run(new MainForm());
+            Emulator.Destroy();
             Registry.Destroy();
         }
     }

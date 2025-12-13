@@ -1,4 +1,5 @@
 ﻿using JoyMap.Extensions;
+using JoyMap.Windows;
 using System.Text.Json.Serialization;
 
 namespace JoyMap.Profile
@@ -28,7 +29,7 @@ namespace JoyMap.Profile
 
 
     public record SimpleInputEffect(
-        Keys Keys,
+        KeyOrButton Keys,
         float? AutoTriggerDelayMs,
         float? AutoTriggerFrequency,
         int? AutoTriggerLimit
@@ -36,15 +37,15 @@ namespace JoyMap.Profile
     {
         [JsonIgnore]
         public string Action =>
-                $"Key: {PickKeyForm.KeysToString(Keys)}{(AutoTriggerFrequency is not null ? $", f={AutoTriggerFrequency.Value.ToStr()}" : "")}";
+                $"Key: {Keys}{(AutoTriggerFrequency is not null ? $", f={AutoTriggerFrequency.Value.ToStr()}" : "")}";
     }
 
     public record ChangeTriggerInputEffect(
-        Keys Keys
+        KeyOrButton Keys
         )
     {
         [JsonIgnore]
         public string Action =>
-                $"On Change: {PickKeyForm.KeysToString(Keys)}";
+                $"On Change: {Keys}";
     }
 }

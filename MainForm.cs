@@ -42,6 +42,7 @@ namespace JoyMap
 
         public MainForm()
         {
+            Instance = this;
             InitializeComponent();
             var families = Registry.LoadAll();
             InputMonitor = new InputMonitor(Handle, families);
@@ -49,6 +50,7 @@ namespace JoyMap
 #if !DEBUG
             saveDebugOnlyToolStripMenuItem.Enabled = false;
 #endif
+            Log("Ready");
         }
 
         public bool SuppressIfGameIsNotFocused { get; private set; } = true;
@@ -374,6 +376,7 @@ namespace JoyMap
         private bool NoEventFlag { get; set; } = false;
         public bool JoyMapIsFocused { get; private set; }
         public bool GameNotFocused { get; private set; }
+        public static MainForm? Instance { get; private set; }
 
         private void textWindowRegex_TextChanged(object sender, EventArgs e)
         {
@@ -619,6 +622,14 @@ namespace JoyMap
         {
             using var form = new ControllerFamiliesForm(InputMonitor);
             form.ShowDialog(this);
+        }
+
+        internal static void Log(string status, Exception? ex = null)
+        {
+            if (ex is not null)
+                Instance?.toolStripStatusLabel1.Text = $"{status}: {ex.Message}";
+            else
+                Instance?.toolStripStatusLabel1.Text = status;
         }
     }
 }

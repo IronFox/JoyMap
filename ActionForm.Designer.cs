@@ -33,6 +33,7 @@
             btnCancel = new Button();
             tabControl = new TabControl();
             tpSimple = new TabPage();
+            comboSimpleKey = new ComboBox();
             textSimpleAutoTriggerDelayedStartMs = new TextBox();
             cbSimpleAutoTriggerDelayedStart = new CheckBox();
             textSimpleAutoTriggerLimit = new TextBox();
@@ -40,19 +41,21 @@
             textSimpleAutoTriggerFrequency = new TextBox();
             cbSimpleAutoTriggerFrequency = new CheckBox();
             btnSimplePickKey = new Button();
-            textSimpleKey = new TextBox();
             label3 = new Label();
             tpTrigger = new TabPage();
+            comboOnChangeKey = new ComboBox();
             btnChangeTriggerKeySelect = new Button();
-            textTriggerKey = new TextBox();
             label4 = new Label();
             label1 = new Label();
             textDelay = new TextBox();
             textName = new TextBox();
             label2 = new Label();
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel = new ToolStripStatusLabel();
             tabControl.SuspendLayout();
             tpSimple.SuspendLayout();
             tpTrigger.SuspendLayout();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // btnOk
@@ -60,7 +63,7 @@
             btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnOk.DialogResult = DialogResult.OK;
             btnOk.Enabled = false;
-            btnOk.Location = new Point(218, 404);
+            btnOk.Location = new Point(214, 380);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(282, 34);
             btnOk.TabIndex = 20;
@@ -72,7 +75,7 @@
             // 
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(506, 404);
+            btnCancel.Location = new Point(502, 380);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(282, 34);
             btnCancel.TabIndex = 19;
@@ -87,11 +90,12 @@
             tabControl.Location = new Point(12, 90);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(776, 299);
+            tabControl.Size = new Size(776, 284);
             tabControl.TabIndex = 21;
             // 
             // tpSimple
             // 
+            tpSimple.Controls.Add(comboSimpleKey);
             tpSimple.Controls.Add(textSimpleAutoTriggerDelayedStartMs);
             tpSimple.Controls.Add(cbSimpleAutoTriggerDelayedStart);
             tpSimple.Controls.Add(textSimpleAutoTriggerLimit);
@@ -99,14 +103,24 @@
             tpSimple.Controls.Add(textSimpleAutoTriggerFrequency);
             tpSimple.Controls.Add(cbSimpleAutoTriggerFrequency);
             tpSimple.Controls.Add(btnSimplePickKey);
-            tpSimple.Controls.Add(textSimpleKey);
             tpSimple.Controls.Add(label3);
             tpSimple.Location = new Point(4, 34);
             tpSimple.Name = "tpSimple";
             tpSimple.Padding = new Padding(3);
-            tpSimple.Size = new Size(768, 261);
+            tpSimple.Size = new Size(768, 246);
             tpSimple.TabIndex = 0;
             tpSimple.Text = "Simple Trigger";
+            // 
+            // comboSimpleKey
+            // 
+            comboSimpleKey.BackColor = SystemColors.Control;
+            comboSimpleKey.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboSimpleKey.FormattingEnabled = true;
+            comboSimpleKey.Location = new Point(148, 6);
+            comboSimpleKey.Name = "comboSimpleKey";
+            comboSimpleKey.Size = new Size(499, 33);
+            comboSimpleKey.TabIndex = 36;
+            comboSimpleKey.SelectedIndexChanged += AnyInputChanged;
             // 
             // textSimpleAutoTriggerDelayedStartMs
             // 
@@ -186,15 +200,6 @@
             btnSimplePickKey.UseVisualStyleBackColor = true;
             btnSimplePickKey.Click += btnSimplePickKey_Click;
             // 
-            // textSimpleKey
-            // 
-            textSimpleKey.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textSimpleKey.Location = new Point(148, 6);
-            textSimpleKey.Name = "textSimpleKey";
-            textSimpleKey.ReadOnly = true;
-            textSimpleKey.Size = new Size(499, 31);
-            textSimpleKey.TabIndex = 27;
-            // 
             // label3
             // 
             label3.AutoSize = true;
@@ -206,15 +211,25 @@
             // 
             // tpTrigger
             // 
+            tpTrigger.Controls.Add(comboOnChangeKey);
             tpTrigger.Controls.Add(btnChangeTriggerKeySelect);
-            tpTrigger.Controls.Add(textTriggerKey);
             tpTrigger.Controls.Add(label4);
             tpTrigger.Location = new Point(4, 34);
             tpTrigger.Name = "tpTrigger";
             tpTrigger.Padding = new Padding(3);
-            tpTrigger.Size = new Size(768, 261);
+            tpTrigger.Size = new Size(768, 203);
             tpTrigger.TabIndex = 1;
             tpTrigger.Text = "On Change Trigger";
+            // 
+            // comboOnChangeKey
+            // 
+            comboOnChangeKey.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboOnChangeKey.FormattingEnabled = true;
+            comboOnChangeKey.Location = new Point(148, 10);
+            comboOnChangeKey.Name = "comboOnChangeKey";
+            comboOnChangeKey.Size = new Size(499, 33);
+            comboOnChangeKey.TabIndex = 37;
+            comboOnChangeKey.SelectedIndexChanged += AnyInputChanged;
             // 
             // btnChangeTriggerKeySelect
             // 
@@ -226,15 +241,6 @@
             btnChangeTriggerKeySelect.Text = "Pick ...";
             btnChangeTriggerKeySelect.UseVisualStyleBackColor = true;
             btnChangeTriggerKeySelect.Click += btnChangeTriggerKeySelect_Click;
-            // 
-            // textTriggerKey
-            // 
-            textTriggerKey.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textTriggerKey.Location = new Point(148, 10);
-            textTriggerKey.Name = "textTriggerKey";
-            textTriggerKey.ReadOnly = true;
-            textTriggerKey.Size = new Size(499, 31);
-            textTriggerKey.TabIndex = 30;
             // 
             // label4
             // 
@@ -282,6 +288,21 @@
             label2.TabIndex = 24;
             label2.Text = "Name:";
             // 
+            // statusStrip1
+            // 
+            statusStrip1.ImageScalingSize = new Size(24, 24);
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
+            statusStrip1.Location = new Point(0, 428);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(800, 22);
+            statusStrip1.TabIndex = 26;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel
+            // 
+            toolStripStatusLabel.Name = "toolStripStatusLabel";
+            toolStripStatusLabel.Size = new Size(0, 15);
+            // 
             // ActionForm
             // 
             AcceptButton = btnOk;
@@ -289,6 +310,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new Size(800, 450);
+            Controls.Add(statusStrip1);
             Controls.Add(textName);
             Controls.Add(label2);
             Controls.Add(textDelay);
@@ -305,6 +327,8 @@
             tpSimple.PerformLayout();
             tpTrigger.ResumeLayout(false);
             tpTrigger.PerformLayout();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -316,7 +340,6 @@
         private TabControl tabControl;
         private TabPage tpSimple;
         private Button btnSimplePickKey;
-        private TextBox textSimpleKey;
         private Label label3;
         private Label label1;
         private TextBox textDelay;
@@ -330,7 +353,10 @@
         private CheckBox cbSimpleAutoTriggerDelayedStart;
         private TabPage tpTrigger;
         private Button btnChangeTriggerKeySelect;
-        private TextBox textTriggerKey;
         private Label label4;
+        private ComboBox comboSimpleKey;
+        private ComboBox comboOnChangeKey;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel;
     }
 }

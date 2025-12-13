@@ -18,6 +18,7 @@ So if the instance GUID changes, it will default to any other instance of the sa
 1) Automatic switching and activation based on window and process name of the focused window
 1) Autosave and undo/redo
 1) Controller grouping in families
+1) Built-in XBox controller emulation (ViGEmBus)
 
 ## Full Manual
 ### Profiles
@@ -44,6 +45,11 @@ When starting, the program will attempt to restore its profile/event configurati
 
 This file is currently stored in
    [My Documents]\JoyMap\Profiles.json
+
+### XBox Controller Emulation
+JoyMap can emulate an XBox controller using the ViGEmBus driver.
+To enable this feature, first install the ViGEmBus driver from
+https://github.com/nefarius/ViGEmBus/releases.
    
 ### Controller Families
 This mechanic allows treating different controllers as functionally identical.

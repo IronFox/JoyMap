@@ -9,6 +9,7 @@ namespace JoyMap.Profile
         public string ProcessNameRegex { get; set; } = "";
         public string WindowNameRegex { get; set; } = "";
         public List<EventInstance> Events { get; init; } = [];
+        public List<XBoxMappingInstance> Mappings { get; init; } = [];
 
         public bool Exists { get; set; }
         public bool HasChanged { get; set; }
@@ -16,6 +17,7 @@ namespace JoyMap.Profile
         public UndoHistory History { get; } = new();
 
         public IReadOnlyList<EventInstance> EventInstances => Events;
+        public IReadOnlyList<XBoxMappingInstance> MappingInstances => Mappings;
 
         public ProfileInstance ToProfileInstance()
         {
@@ -23,7 +25,8 @@ namespace JoyMap.Profile
             (
                 Profile: ToProfile(),
                 ProcessNameRegex: new(ProcessNameRegex, WindowNameRegex),
-                EventInstances: Events
+                EventInstances: Events,
+                MapperInstances: Mappings
             );
         }
 
@@ -35,7 +38,8 @@ namespace JoyMap.Profile
                 Name: Name,
                 ProcessNameRegex: ProcessNameRegex,
                 WindowNameRegex: WindowNameRegex,
-                Events: Events.Select(x => x.Event).ToList()
+                Events: Events.Select(x => x.Event).ToList(),
+                XBoxMappings: Mappings.Select(x => x.Mapping).ToList()
             );
 
         }
