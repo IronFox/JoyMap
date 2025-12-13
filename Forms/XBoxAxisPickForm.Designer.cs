@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(XBoxAxisPickForm));
             textInput = new TextBox();
             label3 = new Label();
             btnPickDeviceInput = new Button();
@@ -252,6 +253,7 @@
             Controls.Add(btnPickDeviceInput);
             Controls.Add(textDevice);
             Controls.Add(label2);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(847, 400);
             Name = "XBoxAxisPickForm";
             Text = "XboxAxisMapping";

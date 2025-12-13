@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(XBoxAxisBindingForm));
             lAxis = new Label();
             axisListView = new ListView();
             columnHeader1 = new ColumnHeader();
@@ -186,6 +187,7 @@
             Controls.Add(lOutput);
             Controls.Add(axisListView);
             Controls.Add(lAxis);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(822, 506);
             Name = "XBoxAxisBindingForm";
             Text = "XBoxAxisBinding";

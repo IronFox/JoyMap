@@ -10,7 +10,7 @@ namespace JoyMap.Forms
         {
             InitializeComponent();
             Axis = axis;
-            lAxis.Text = $"Axis: {axis}";
+            Text = lAxis.Text = $"Axis: {axis}";
             if (instance != null)
             {
                 foreach (var input in instance.InputInstances)
