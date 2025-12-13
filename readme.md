@@ -356,6 +356,7 @@ The **Dither** trigger mode implements **Pulse Width Modulation (PWM)** using an
 - Games typically poll inputs once per frame
 - High dither frequency + low FPS = unpredictable behavior
 - **Recommended**: Set frequency ≤ game FPS (e.g., 30Hz for 60 FPS games)
+- **Actual FPS**. Generated frames do not work that way. Best disable frame generation while using this program
 
 **Configuration:**
 
