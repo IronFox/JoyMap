@@ -1,9 +1,14 @@
 using JoyMap.ControllerTracking;
 using JoyMap.Extensions;
+using JoyMap.Forms;
 using JoyMap.Profile;
 using JoyMap.Undo.Action;
+using JoyMap.Undo.Action.Binding;
+using JoyMap.Undo.Action.EventAction;
 using JoyMap.Util;
 using JoyMap.Windows;
+using JoyMap.XBox;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace JoyMap
@@ -42,6 +47,7 @@ namespace JoyMap
 
         public MainForm()
         {
+            Instance = this;
             InitializeComponent();
             var families = Registry.LoadAll();
             InputMonitor = new InputMonitor(Handle, families);
@@ -49,6 +55,7 @@ namespace JoyMap
 #if !DEBUG
             saveDebugOnlyToolStripMenuItem.Enabled = false;
 #endif
+            Log("Ready");
         }
 
         public bool SuppressIfGameIsNotFocused { get; private set; } = true;
@@ -137,7 +144,16 @@ namespace JoyMap
                     row.SubItems.Add(string.Join(", ", ev.Actions.Select(x => x.Action)));
                     row.SubItems.Add("");
                 }
-                //ProfileExecution.Start(profile, this);
+                bindingListView.Items.Clear();
+                foreach (var axis in Enum.GetValues<XBoxAxis>())
+                {
+                    profile.AxisBindings.TryGetValue(axis, out var bound);
+                    var row = new AxisRowHandle(this, axis, bindingListView.Items.Add(axis.ToString()));
+                    row.Row.SubItems.Add("");
+                    row.Row.SubItems.Add("");
+
+                    row.Bind(bound, false);
+                }
             });
         }
 
@@ -171,6 +187,32 @@ namespace JoyMap
         }
 
         public ListView EventListView => eventListView;
+        public ListView BindingListView => bindingListView;
+        public AxisRowHandle RequireRowOf(XBoxAxis axis)
+        {
+            return new AxisRowHandle(this, axis, bindingListView.Items.ToEnumerable().First(x => AxisOf(x) == axis));
+        }
+
+        public record AxisRowHandle(MainForm Form, XBoxAxis Axis, ListViewItem Row)
+        {
+            public bool GetBound([NotNullWhen(true)] out XBoxAxisBindingInstance? bound)
+            {
+                bound = Row.Tag as XBoxAxisBindingInstance;
+                return bound is not null;
+            }
+
+            public void Bind(XBoxAxisBindingInstance? b, bool updateCurrentProfile = true)
+            {
+                AxisUpdateItemTo(Row, Axis, b);
+                if (updateCurrentProfile && Form.ActiveProfile is not null)
+                {
+                    if (b is not null)
+                        Form.ActiveProfile.AxisBindings[Axis] = b;
+                    else
+                        Form.ActiveProfile.AxisBindings.Remove(Axis);
+                }
+            }
+        }
 
         private void Flush()
         {
@@ -272,6 +314,11 @@ namespace JoyMap
                     if (row.Tag is not EventInstance ev) continue;
                     row.SubItems[3].Text = ev.IsSuspended ? "Suspended" : ev.IsTriggered() ? "A" : "";
                 }
+                foreach (ListViewItem row in bindingListView.Items)
+                {
+                    if (row.Tag is not XBoxAxisBindingInstance map) continue;
+                    row.SubItems[2].Text = map.IsSuspended ? "Suspended" : map.GetValue().ToStr();
+                }
             }
 
 
@@ -308,7 +355,7 @@ namespace JoyMap
         private void eventContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             copySelectedToolStripMenuItem.Enabled = deleteToolStripMenuItem.Enabled = eventListView.SelectedItems.Count > 0;
-            var copied = ClipboardUtil.GetCopiedEvents();
+            var copied = ClipboardUtil.GetCopied<Event>();
             pasteOverToolStripMenuItem.Enabled = copied?.Count == eventListView.SelectedItems.Count;
             pasteInsertToolStripMenuItem.Enabled = copied is not null;
             moveSelectedUpToolStripMenuItem.Enabled = btnUp.Enabled;
@@ -333,7 +380,7 @@ namespace JoyMap
         {
             if (ActiveProfile is null)
                 return;
-            var copiedEvents = ClipboardUtil.GetCopiedEvents();
+            var copiedEvents = ClipboardUtil.GetCopied<Event>();
             if (copiedEvents is null)
                 return;
             if (eventListView.SelectedItems.Count != copiedEvents.Count)
@@ -347,7 +394,7 @@ namespace JoyMap
         {
             if (ActiveProfile is null)
                 return;
-            var copiedEvents = ClipboardUtil.GetCopiedEvents();
+            var copiedEvents = ClipboardUtil.GetCopied<Event>();
             if (copiedEvents is null)
                 return;
             int insertIndex = eventListView.SelectedItems.Count > 0 ? eventListView.SelectedItems[0].Index : eventListView.Items.Count;
@@ -374,6 +421,7 @@ namespace JoyMap
         private bool NoEventFlag { get; set; } = false;
         public bool JoyMapIsFocused { get; private set; }
         public bool GameNotFocused { get; private set; }
+        public static MainForm? Instance { get; private set; }
 
         private void textWindowRegex_TextChanged(object sender, EventArgs e)
         {
@@ -469,53 +517,91 @@ namespace JoyMap
                 return;
             }
 
-            if (e.Control && e.KeyCode == Keys.C)
-            {
-                copySelectedToolStripMenuItem_Click(this, EventArgs.Empty);
-                e.Handled = true;
-                return;
-            }
 
-            if (e.Control && e.KeyCode == Keys.V)
+            if (tabControl.SelectedTab == tabXBox)
             {
-                pasteInsertToolStripMenuItem_Click(this, EventArgs.Empty);
-                e.Handled = true;
-                return;
-            }
 
-            if (e.KeyCode == Keys.Delete)
-            {
-                deleteToolStripMenuItem_Click(this, EventArgs.Empty);
-                e.Handled = true;
-                return;
-            }
+                if (e.Control && e.KeyCode == Keys.C)
+                {
+                    tsmCopyBinding_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
 
-            if (e.Control && e.KeyCode == Keys.N)
-            {
-                newToolStripMenuItem1_Click(this, EventArgs.Empty);
-                e.Handled = true;
-                return;
-            }
+                if (e.Control && e.KeyCode == Keys.V)
+                {
 
-            if (e.Control && e.KeyCode == Keys.Up)
-            {
-                btnUp_Click(this, EventArgs.Empty);
-                e.Handled = true;
-                return;
-            }
+                    tsmPasteBinding_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
 
-            if (e.Control && e.KeyCode == Keys.Down)
-            {
-                btnDown_Click(this, EventArgs.Empty);
-                e.Handled = true;
-                return;
-            }
+                if (e.KeyCode == Keys.Delete)
+                {
+                    tsmUnbind_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
 
-            if (e.Control && e.KeyCode == Keys.A)
+
+                if (e.Control && e.KeyCode == Keys.A)
+                {
+                    tsmSelectAllBindings_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+            }
+            else if (tabControl.SelectedTab == tabEvents)
             {
-                selectAllToolStripMenuItem_Click(this, EventArgs.Empty);
-                e.Handled = true;
-                return;
+                if (e.Control && e.KeyCode == Keys.C)
+                {
+                    copySelectedToolStripMenuItem_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Control && e.KeyCode == Keys.V)
+                {
+                    pasteInsertToolStripMenuItem_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.KeyCode == Keys.Delete)
+                {
+                    deleteToolStripMenuItem_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Control && e.KeyCode == Keys.N)
+                {
+                    newToolStripMenuItem1_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Control && e.KeyCode == Keys.Up)
+                {
+                    btnUp_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Control && e.KeyCode == Keys.Down)
+                {
+                    btnDown_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Control && e.KeyCode == Keys.A)
+                {
+                    selectAllToolStripMenuItem_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
             }
         }
 
@@ -619,6 +705,143 @@ namespace JoyMap
         {
             using var form = new ControllerFamiliesForm(InputMonitor);
             form.ShowDialog(this);
+        }
+
+        internal static void Log(string status, Exception? ex = null)
+        {
+            if (Instance is null)
+                return;
+
+            if (Instance.InvokeRequired)
+            {
+                Instance.Invoke(() => Log(status, ex));
+                return;
+            }
+
+            if (ex is not null)
+                Instance.toolStripStatusLabel1.Text = $"{status}: {ex.Message}";
+            else
+                Instance.toolStripStatusLabel1.Text = status;
+        }
+
+        private void tsmEditBinding_Click(object sender, EventArgs e)
+        {
+
+            if (ActiveProfile is null)
+                return;
+            var axis = AxisOf(bindingListView.SelectedItems[0]);
+            ActiveProfile.AxisBindings.TryGetValue(axis, out var binding);
+            using var form = new XBoxAxisBindingForm(axis, binding);
+            var result = form.ShowDialog(this);
+            if (result == DialogResult.OK && form.Result is not null)
+            {
+                ActiveProfile.History.ExecuteAction(new SetBindingInstanceAction(this, ActiveProfile, form.Result));
+            }
+        }
+
+        private void tsmCopyBinding_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var selectedEvents = bindingListView.SelectedItems.ToEnumerable()
+                .Select(item => item.Tag)
+                .OfType<XBoxAxisBindingInstance>()
+                .Select(ev => ev.Binding)
+                .ToList();
+            selectedEvents.CopyToClipboard();
+
+        }
+
+        private void tsmCopyAllBindings_Click(object sender, EventArgs e)
+        {
+            ActiveProfile?.AxisBindings.Values.Select(ev => ev.Binding).ToList().CopyToClipboard();
+        }
+
+        private void bindingContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            tsmCopyBinding.Enabled = tsmUnbind.Enabled = bindingListView.SelectedItems.Count > 0;
+            var copied = ClipboardUtil.GetCopied<XBoxAxisBinding>();
+            tsmPasteBinding.Enabled = copied is not null;
+
+            tsmSuspendBinding.Enabled = tsmUnbind.Enabled = tsmSelectAllBindings.Enabled = bindingListView.Items.Count > 0;
+            tsmEditBinding.Enabled = bindingListView.SelectedItems.Count == 1;
+
+        }
+
+        private void tsmSelectAllBindings_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < bindingListView.Items.Count; i++)
+                bindingListView.SelectedIndices.Add(i);
+        }
+
+        private void tsmPasteBinding_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var copied = ClipboardUtil.GetCopied<XBoxAxisBinding>();
+            if (copied is null)
+                return;
+
+            ActiveProfile.History.ExecuteAction(new PasteXBoxBindingsAction(
+                this,
+                ActiveProfile,
+                copied));
+        }
+
+        private IReadOnlyList<XBoxAxis> GetSelectedAxes()
+        {
+            return bindingListView.SelectedItems.ToEnumerable().Select(AxisOf).ToList();
+        }
+
+        private void tsmUnbind_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var selectedIndexes = GetSelectedAxes();
+            if (selectedIndexes.Count == 0)
+                return;
+            ActiveProfile.History.ExecuteAction(new UnbindXBoxBindingAction(this, ActiveProfile, selectedIndexes));
+        }
+
+        private void tsmSuspendBinding_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var selectedIndexes = bindingListView.SelectedIndices;
+            if (selectedIndexes.Count == 0)
+                return;
+            ActiveProfile.History.ExecuteAction(new ToggleSuspendXBoxBindingInstancesAction(this, ActiveProfile, selectedIndexes.ToArray()));
+        }
+
+        public static XBoxAxis AxisOf(ListViewItem item)
+        {
+            var tag = item.Tag;
+            if (tag is XBoxAxis axis)
+                return axis;
+            if (tag is XBoxAxisBindingInstance axisBindingInstance)
+                return axisBindingInstance.Binding.OutAxis;
+            throw new InvalidOperationException($"Row has neither axis nor binding as tag");
+        }
+
+        internal static void AxisUpdateItemTo(ListViewItem item, XBoxAxis outAxis, XBoxAxisBindingInstance? b)
+        {
+            if (b is null)
+            {
+                item.Tag = outAxis;
+                item.SubItems[1].Text = "";
+                item.SubItems[2].Text = "";
+            }
+            else
+            {
+                item.SubItems[1].Text = string.Join(", ", b.InputInstances.Select(x => x.Input.InputId.ControllerAxisName));
+                item.SubItems[2].Text = b.GetValue().ToStr();
+                item.Tag = b;
+            }
+        }
+
+        private void bindingListView_DoubleClick(object sender, EventArgs e)
+        {
+            tsmEditBinding_Click(sender, e);
         }
     }
 }

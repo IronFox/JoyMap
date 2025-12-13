@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using JoyMap.Util;
+using System.Text.Json.Serialization;
 
 namespace JoyMap.ControllerTracking
 {
@@ -8,10 +9,14 @@ namespace JoyMap.ControllerTracking
         string ControllerName,
         InputAxis Axis,
         bool AxisNegated
-    )
+    ) : IJsonCompatible
     {
         [JsonIgnore]
         public bool AxisSigned => Axis > InputAxis.None && Axis < InputAxis.Button0;
+
+        [JsonIgnore]
+        public string ControllerAxisName =>
+             $"{ControllerName}:{AxisName}";
 
         [JsonIgnore]
         public string AxisName =>

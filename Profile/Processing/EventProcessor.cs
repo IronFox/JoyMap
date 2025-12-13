@@ -3,7 +3,7 @@ using JoyMap.Util;
 
 namespace JoyMap.Profile
 {
-    public class EventProcessor : IDisposable
+    public class EventProcessor : IProcessor
     {
         private EventInstance Source { get; }
         private Func<bool> IsTriggered { get; }

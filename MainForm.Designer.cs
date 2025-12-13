@@ -29,6 +29,12 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            ListViewItem listViewItem1 = new ListViewItem("Move Horizontal");
+            ListViewItem listViewItem2 = new ListViewItem("Move Vertical");
+            ListViewItem listViewItem3 = new ListViewItem("Look Horizontal");
+            ListViewItem listViewItem4 = new ListViewItem("Look Vertical");
+            ListViewItem listViewItem5 = new ListViewItem("Trigger Left");
+            ListViewItem listViewItem6 = new ListViewItem("Trigger Right");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             mainMenu = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
@@ -84,8 +90,35 @@
             btnDeleteCurrentProfile = new Button();
             textWindowNameRegex = new TextBox();
             label5 = new Label();
+            tabControl = new TabControl();
+            tabEvents = new TabPage();
+            tabXBox = new TabPage();
+            bindingListView = new ListView();
+            columnHeader1 = new ColumnHeader();
+            columnHeader7 = new ColumnHeader();
+            columnHeader6 = new ColumnHeader();
+            bindingContextMenu = new ContextMenuStrip(components);
+            tsmEditBinding = new ToolStripMenuItem();
+            toolStripMenuItem12 = new ToolStripSeparator();
+            tsmSelectAllBindings = new ToolStripMenuItem();
+            toolStripMenuItem9 = new ToolStripSeparator();
+            tsmCopyAllBindings = new ToolStripMenuItem();
+            tsmCopyBinding = new ToolStripMenuItem();
+            toolStripMenuItem16 = new ToolStripSeparator();
+            tsmPasteBinding = new ToolStripMenuItem();
+            toolStripMenuItem11 = new ToolStripSeparator();
+            tsmUnbind = new ToolStripMenuItem();
+            tsmSuspendBinding = new ToolStripMenuItem();
+            label6 = new Label();
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
             mainMenu.SuspendLayout();
             eventContextMenu.SuspendLayout();
+            tabControl.SuspendLayout();
+            tabEvents.SuspendLayout();
+            tabXBox.SuspendLayout();
+            bindingContextMenu.SuspendLayout();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // mainMenu
@@ -184,7 +217,7 @@
             // 
             undoToolStripMenuItem.Name = "undoToolStripMenuItem";
             undoToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Z;
-            undoToolStripMenuItem.Size = new Size(270, 34);
+            undoToolStripMenuItem.Size = new Size(219, 34);
             undoToolStripMenuItem.Text = "Undo";
             undoToolStripMenuItem.Click += undoToolStripMenuItem_Click;
             // 
@@ -192,7 +225,7 @@
             // 
             redoToolStripMenuItem.Name = "redoToolStripMenuItem";
             redoToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Y;
-            redoToolStripMenuItem.Size = new Size(270, 34);
+            redoToolStripMenuItem.Size = new Size(219, 34);
             redoToolStripMenuItem.Text = "Redo";
             redoToolStripMenuItem.Click += redoToolStripMenuItem_Click;
             // 
@@ -288,9 +321,9 @@
             eventListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             eventListView.Columns.AddRange(new ColumnHeader[] { columnHeader2, columnHeader3, columnHeader4, columnHeader5 });
             eventListView.FullRowSelect = true;
-            eventListView.Location = new Point(12, 212);
+            eventListView.Location = new Point(6, 33);
             eventListView.Name = "eventListView";
-            eventListView.Size = new Size(1123, 613);
+            eventListView.Size = new Size(1127, 559);
             eventListView.TabIndex = 10;
             eventListView.UseCompatibleStateImageBehavior = false;
             eventListView.View = View.Details;
@@ -437,7 +470,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(12, 184);
+            label4.Location = new Point(6, 5);
             label4.Name = "label4";
             label4.Size = new Size(67, 25);
             label4.TabIndex = 11;
@@ -448,7 +481,7 @@
             btnUp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnUp.Enabled = false;
             btnUp.Font = new Font("Segoe UI", 30F);
-            btnUp.Location = new Point(1141, 212);
+            btnUp.Location = new Point(1139, 33);
             btnUp.Name = "btnUp";
             btnUp.Size = new Size(70, 264);
             btnUp.TabIndex = 12;
@@ -462,7 +495,7 @@
             btnDown.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnDown.Enabled = false;
             btnDown.Font = new Font("Segoe UI", 30F);
-            btnDown.Location = new Point(1141, 561);
+            btnDown.Location = new Point(1139, 328);
             btnDown.Name = "btnDown";
             btnDown.Size = new Size(70, 264);
             btnDown.TabIndex = 13;
@@ -514,18 +547,194 @@
             label5.TabIndex = 15;
             label5.Text = "Window name regex:";
             // 
+            // tabControl
+            // 
+            tabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tabControl.Controls.Add(tabEvents);
+            tabControl.Controls.Add(tabXBox);
+            tabControl.Location = new Point(0, 179);
+            tabControl.Name = "tabControl";
+            tabControl.SelectedIndex = 0;
+            tabControl.Size = new Size(1223, 636);
+            tabControl.TabIndex = 17;
+            tabControl.KeyDown += GlobalShortcuts;
+            // 
+            // tabEvents
+            // 
+            tabEvents.Controls.Add(label4);
+            tabEvents.Controls.Add(eventListView);
+            tabEvents.Controls.Add(btnUp);
+            tabEvents.Controls.Add(btnDown);
+            tabEvents.Location = new Point(4, 34);
+            tabEvents.Name = "tabEvents";
+            tabEvents.Padding = new Padding(3);
+            tabEvents.Size = new Size(1215, 598);
+            tabEvents.TabIndex = 0;
+            tabEvents.Text = "Events";
+            // 
+            // tabXBox
+            // 
+            tabXBox.Controls.Add(bindingListView);
+            tabXBox.Controls.Add(label6);
+            tabXBox.Location = new Point(4, 34);
+            tabXBox.Name = "tabXBox";
+            tabXBox.Padding = new Padding(3);
+            tabXBox.Size = new Size(1215, 598);
+            tabXBox.TabIndex = 1;
+            tabXBox.Text = "XBox Axis Binding";
+            // 
+            // bindingListView
+            // 
+            bindingListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            bindingListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader7, columnHeader6 });
+            bindingListView.ContextMenuStrip = bindingContextMenu;
+            bindingListView.FullRowSelect = true;
+            listViewItem1.Tag = "0";
+            listViewItem2.Tag = "1";
+            listViewItem3.Tag = "2";
+            listViewItem4.Tag = "3";
+            listViewItem5.Tag = "4";
+            listViewItem6.Tag = "5";
+            bindingListView.Items.AddRange(new ListViewItem[] { listViewItem1, listViewItem2, listViewItem3, listViewItem4, listViewItem5, listViewItem6 });
+            bindingListView.Location = new Point(6, 33);
+            bindingListView.Name = "bindingListView";
+            bindingListView.Size = new Size(1199, 559);
+            bindingListView.TabIndex = 14;
+            bindingListView.UseCompatibleStateImageBehavior = false;
+            bindingListView.View = View.Details;
+            bindingListView.DoubleClick += bindingListView_DoubleClick;
+            bindingListView.KeyDown += GlobalShortcuts;
+            // 
+            // columnHeader1
+            // 
+            columnHeader1.Text = "XBox Axis";
+            columnHeader1.Width = 400;
+            // 
+            // columnHeader7
+            // 
+            columnHeader7.Text = "Input";
+            columnHeader7.Width = 300;
+            // 
+            // columnHeader6
+            // 
+            columnHeader6.Text = "Output";
+            columnHeader6.Width = 300;
+            // 
+            // bindingContextMenu
+            // 
+            bindingContextMenu.ImageScalingSize = new Size(24, 24);
+            bindingContextMenu.Items.AddRange(new ToolStripItem[] { tsmEditBinding, toolStripMenuItem12, tsmSelectAllBindings, toolStripMenuItem9, tsmCopyAllBindings, tsmCopyBinding, toolStripMenuItem16, tsmPasteBinding, toolStripMenuItem11, tsmUnbind, tsmSuspendBinding });
+            bindingContextMenu.Name = "bindingContextMenu";
+            bindingContextMenu.Size = new Size(312, 252);
+            bindingContextMenu.Opening += bindingContextMenu_Opening;
+            // 
+            // tsmEditBinding
+            // 
+            tsmEditBinding.Name = "tsmEditBinding";
+            tsmEditBinding.Size = new Size(311, 32);
+            tsmEditBinding.Text = "Edit Selected (double click) ...";
+            tsmEditBinding.Click += tsmEditBinding_Click;
+            // 
+            // toolStripMenuItem12
+            // 
+            toolStripMenuItem12.Name = "toolStripMenuItem12";
+            toolStripMenuItem12.Size = new Size(308, 6);
+            // 
+            // tsmSelectAllBindings
+            // 
+            tsmSelectAllBindings.Name = "tsmSelectAllBindings";
+            tsmSelectAllBindings.ShortcutKeys = Keys.Control | Keys.A;
+            tsmSelectAllBindings.Size = new Size(311, 32);
+            tsmSelectAllBindings.Text = "Select All";
+            tsmSelectAllBindings.Click += tsmSelectAllBindings_Click;
+            // 
+            // toolStripMenuItem9
+            // 
+            toolStripMenuItem9.Name = "toolStripMenuItem9";
+            toolStripMenuItem9.Size = new Size(308, 6);
+            // 
+            // tsmCopyAllBindings
+            // 
+            tsmCopyAllBindings.Name = "tsmCopyAllBindings";
+            tsmCopyAllBindings.Size = new Size(311, 32);
+            tsmCopyAllBindings.Text = "Copy All";
+            tsmCopyAllBindings.Click += tsmCopyAllBindings_Click;
+            // 
+            // tsmCopyBinding
+            // 
+            tsmCopyBinding.Name = "tsmCopyBinding";
+            tsmCopyBinding.ShortcutKeys = Keys.Control | Keys.C;
+            tsmCopyBinding.Size = new Size(311, 32);
+            tsmCopyBinding.Text = "Copy Selected";
+            tsmCopyBinding.Click += tsmCopyBinding_Click;
+            // 
+            // toolStripMenuItem16
+            // 
+            toolStripMenuItem16.Name = "toolStripMenuItem16";
+            toolStripMenuItem16.Size = new Size(308, 6);
+            // 
+            // tsmPasteBinding
+            // 
+            tsmPasteBinding.Name = "tsmPasteBinding";
+            tsmPasteBinding.ShortcutKeys = Keys.Control | Keys.V;
+            tsmPasteBinding.Size = new Size(311, 32);
+            tsmPasteBinding.Text = "Paste Over";
+            tsmPasteBinding.Click += tsmPasteBinding_Click;
+            // 
+            // toolStripMenuItem11
+            // 
+            toolStripMenuItem11.Name = "toolStripMenuItem11";
+            toolStripMenuItem11.Size = new Size(308, 6);
+            // 
+            // tsmUnbind
+            // 
+            tsmUnbind.Name = "tsmUnbind";
+            tsmUnbind.ShortcutKeys = Keys.Delete;
+            tsmUnbind.Size = new Size(311, 32);
+            tsmUnbind.Text = "Unbind Selected";
+            tsmUnbind.Click += tsmUnbind_Click;
+            // 
+            // tsmSuspendBinding
+            // 
+            tsmSuspendBinding.Name = "tsmSuspendBinding";
+            tsmSuspendBinding.Size = new Size(311, 32);
+            tsmSuspendBinding.Text = "(Un)Suspend Selected";
+            tsmSuspendBinding.Click += tsmSuspendBinding_Click;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(6, 5);
+            label6.Name = "label6";
+            label6.Size = new Size(113, 25);
+            label6.TabIndex = 12;
+            label6.Text = "Axis Binding:";
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.ImageScalingSize = new Size(24, 24);
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
+            statusStrip1.Location = new Point(0, 805);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(1223, 32);
+            statusStrip1.TabIndex = 18;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(59, 25);
+            toolStripStatusLabel1.Text = "status";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1223, 837);
+            Controls.Add(tabControl);
             Controls.Add(textWindowNameRegex);
             Controls.Add(label5);
             Controls.Add(btnDeleteCurrentProfile);
-            Controls.Add(btnDown);
-            Controls.Add(btnUp);
-            Controls.Add(label4);
-            Controls.Add(eventListView);
             Controls.Add(btnAddPickWindow);
             Controls.Add(textProcessNameRegex);
             Controls.Add(label3);
@@ -534,6 +743,7 @@
             Controls.Add(label1);
             Controls.Add(cbProfile);
             Controls.Add(mainMenu);
+            Controls.Add(statusStrip1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = mainMenu;
             MinimumSize = new Size(1245, 893);
@@ -543,6 +753,14 @@
             mainMenu.ResumeLayout(false);
             mainMenu.PerformLayout();
             eventContextMenu.ResumeLayout(false);
+            tabControl.ResumeLayout(false);
+            tabEvents.ResumeLayout(false);
+            tabEvents.PerformLayout();
+            tabXBox.ResumeLayout(false);
+            tabXBox.PerformLayout();
+            bindingContextMenu.ResumeLayout(false);
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -603,5 +821,27 @@
         private ToolStripSeparator toolStripMenuItem7;
         private ToolStripMenuItem editControllerFamiliesToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem8;
+        private TabControl tabControl;
+        private TabPage tabEvents;
+        private TabPage tabXBox;
+        private StatusStrip statusStrip1;
+        private ListView bindingListView;
+        private ColumnHeader columnHeader1;
+        private ColumnHeader columnHeader6;
+        private Label label6;
+        private ToolStripStatusLabel toolStripStatusLabel1;
+        private ContextMenuStrip bindingContextMenu;
+        private ToolStripMenuItem tsmEditBinding;
+        private ToolStripMenuItem tsmSuspendBinding;
+        private ToolStripSeparator toolStripMenuItem11;
+        private ToolStripMenuItem tsmUnbind;
+        private ToolStripSeparator toolStripMenuItem12;
+        private ToolStripMenuItem tsmCopyBinding;
+        private ToolStripMenuItem tsmCopyAllBindings;
+        private ToolStripSeparator toolStripMenuItem16;
+        private ToolStripMenuItem tsmPasteBinding;
+        private ToolStripMenuItem tsmSelectAllBindings;
+        private ToolStripSeparator toolStripMenuItem9;
+        private ColumnHeader columnHeader7;
     }
 }

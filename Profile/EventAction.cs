@@ -1,4 +1,6 @@
 ﻿using JoyMap.Extensions;
+using JoyMap.Util;
+using JoyMap.Windows;
 using System.Text.Json.Serialization;
 
 namespace JoyMap.Profile
@@ -9,7 +11,7 @@ namespace JoyMap.Profile
         SimpleInputEffect? SimpleInputEffect = null,
         ChangeTriggerInputEffect? ChangeTriggeredInputEffect = null
 
-        )
+        ) : IJsonCompatible
     {
         [JsonIgnore]
         public string TypeName => SimpleInputEffect is not null
@@ -28,23 +30,23 @@ namespace JoyMap.Profile
 
 
     public record SimpleInputEffect(
-        Keys Keys,
+        KeyOrButton Keys,
         float? AutoTriggerDelayMs,
         float? AutoTriggerFrequency,
         int? AutoTriggerLimit
-        )
+        ) : IJsonCompatible
     {
         [JsonIgnore]
         public string Action =>
-                $"Key: {PickKeyForm.KeysToString(Keys)}{(AutoTriggerFrequency is not null ? $", f={AutoTriggerFrequency.Value.ToStr()}" : "")}";
+                $"Key: {Keys}{(AutoTriggerFrequency is not null ? $", f={AutoTriggerFrequency.Value.ToStr()}" : "")}";
     }
 
     public record ChangeTriggerInputEffect(
-        Keys Keys
-        )
+        KeyOrButton Keys
+        ) : IJsonCompatible
     {
         [JsonIgnore]
         public string Action =>
-                $"On Change: {PickKeyForm.KeysToString(Keys)}";
+                $"On Change: {Keys}";
     }
 }

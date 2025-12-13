@@ -1,6 +1,6 @@
 ﻿using JoyMap.Profile;
 
-namespace JoyMap.Undo.Action
+namespace JoyMap.Undo.Action.EventAction
 {
     internal class AddEventInstanceAction : CommonAction, IUndoableAction
     {

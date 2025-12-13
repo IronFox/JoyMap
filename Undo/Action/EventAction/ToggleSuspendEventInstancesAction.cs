@@ -1,7 +1,7 @@
 ﻿using JoyMap.Extensions;
 using JoyMap.Profile;
 
-namespace JoyMap.Undo.Action
+namespace JoyMap.Undo.Action.EventAction
 {
     internal class ToggleSuspendEventInstancesAction : CommonAction, IUndoableAction
     {
@@ -29,7 +29,6 @@ namespace JoyMap.Undo.Action
                 {
                     TargetProfile.Events[idx].IsSuspended = !TargetProfile.Events[idx].IsSuspended;
                 }
-                Registry.Persist(TargetProfile);
             });
         }
 

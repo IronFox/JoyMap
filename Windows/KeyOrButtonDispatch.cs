@@ -1,41 +1,85 @@
-﻿using System.Runtime.InteropServices;
+﻿using JoyMap.Util;
+using JoyMap.XBox;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace JoyMap.Windows
 {
-    // Pseudocode / Plan (inline to satisfy planning requirement):
-    // - Detect mouse keys (already done via isMouse).
-    // - For mouse keys, build a Win32.INPUT of type MOUSE instead of KEYBOARD.
-    // - Map Keys.{LButton,RButton,MButton,XButton1,XButton2} to corresponding MOUSEEVENTF flags:
-    //     LButton -> LEFTDOWN / LEFTUP
-    //     RButton -> RIGHTDOWN / RIGHTUP
-    //     MButton -> MIDDLEDOWN / MIDDLEUP
-    //     XButton1/2 -> XDOWN / XUP + mouseData = 1 or 2
-    // - Populate MOUSEINPUT with dx=0, dy=0 (no movement), wheel=0, time=0, extraInfo=IntPtr.Zero.
-    // - Call SendInput with that single INPUT.
-    // - Return early so keyboard path is skipped.
-    // - Extend Win32 interop:
-    //     * Add INPUT_MOUSE constant.
-    //     * Add MOUSEEVENTF_* constants and XBUTTON* constants.
-    //     * Add MOUSEINPUT struct.
-    //     * Add MOUSEINPUT field to InputUnion.
-    // - Keep existing behavior for keyboard unchanged.
-    //
-    // Additional plan for assigning KEYBDINPUT.wScan:
-    // - Use Win32.MapVirtualKey with MAPVK_VK_TO_VSC to translate the virtual-key to a hardware scan code.
-    // - Assign the computed scan code to KEYBDINPUT.wScan.
-    // - Keep using wVk and do not set KEYEVENTF_SCANCODE to preserve existing behavior.
-    //
-    // Plan addition:
-    // - For PageUp/PageDown keys (and their aliases Prior/Next), set KEYEVENTF_EXTENDEDKEY bit
-    //   in KEYBDINPUT.dwFlags for both key down and key up events.
 
-    internal static class KeyDispatch
+    [JsonConverter(typeof(KeyOrButtonJsonConverter))]
+    public readonly record struct KeyOrButton(
+        Keys? Key,
+        XBoxButton? XBoxButton
+        )
     {
-        private static readonly int[] keyStates = new int[1024];
-
-        internal static void Change(Keys keys, bool nowDown, bool reassert = false)
+        public override string ToString()
         {
-            int idx = (int)keys;
+            if (IsMouseOrKeyboard)
+            {
+                var k = Key.Value;
+                return PickKeyForm.KeysToString(k);
+            }
+            if (IsXBoxButton)
+            {
+                return "XBox:" + XBoxButton;
+            }
+            return "None";
+        }
+        public static KeyOrButton None { get; } = default;
+        public static KeyOrButton[] All { get; } = [.. EnumerateAll()];
+
+        private static IEnumerable<KeyOrButton> EnumerateAll()
+        {
+            // Enumerate all Keys enum values
+            foreach (Keys key in Enum.GetValues<Keys>())
+            {
+                if ((Keys.Modifiers & key) != 0)
+                    continue;
+                if (key == Keys.None)
+                    continue;
+
+                yield return From(key);
+            }
+
+            // Enumerate all XBoxButton enum values
+            foreach (XBoxButton button in Enum.GetValues<XBoxButton>())
+            {
+                yield return From(button);
+            }
+        }
+
+        [JsonIgnore]
+        public int LinearIndex => Key is not null
+            ? (int)Key.Value
+            : XBoxButton is not null
+                ? 1024 + (int)XBoxButton.Value
+                : -1;
+        [JsonIgnore]
+        [MemberNotNullWhen(true, nameof(Key))]
+        public bool IsMouseOrKeyboard => Key is not null;
+
+        [JsonIgnore]
+        [MemberNotNullWhen(true, nameof(XBoxButton))]
+        public bool IsXBoxButton => XBoxButton is not null;
+
+        internal static KeyOrButton From(XBoxButton button)
+            => new(null, button);
+        internal static KeyOrButton From(Keys keys)
+        {
+            if (keys == Keys.None)
+                return None;
+            return new KeyOrButton(keys, null);
+        }
+    }
+
+    internal static class KeyOrButtonDispatch
+    {
+        private static readonly int[] keyStates = new int[1024 + 16];
+
+        internal static void Change(KeyOrButton kb, bool nowDown, bool reassert = false)
+        {
+            int idx = kb.LinearIndex;
             if (idx >= keyStates.Length)
                 return;
 
@@ -51,21 +95,26 @@ namespace JoyMap.Windows
                 if (wasDown == isDown)
                     return;
             }
-
-            bool isMouse = (keys >= Keys.LButton && keys <= Keys.XButton2);
-            if (isMouse)
+            if (kb.IsXBoxButton)
+                Emulator.UpdateButtonState(kb.XBoxButton!.Value, nowDown);
+            else if (kb.IsMouseOrKeyboard)
             {
+                var keys = kb.Key!.Value;
+                bool isMouse = (keys >= Keys.LButton && keys <= Keys.XButton2);
+                if (isMouse)
                 {
-                    Win32.INPUT[] inputs = [MouseEvent(keys, nowDown)];
-                    Win32.SendInput(1, inputs, Win32.INPUT.Size);
+                    {
+                        Win32.INPUT[] inputs = [MouseEvent(keys, nowDown)];
+                        Win32.SendInput(1, inputs, Win32.INPUT.Size);
+                    }
+                    return;
                 }
-                return;
-            }
-            {
-                Win32.INPUT[] kInputs = [
-                    KeyEvent(keys, nowDown)
-                    ];
-                Win32.SendInput(1, kInputs, Win32.INPUT.Size);
+                {
+                    Win32.INPUT[] kInputs = [
+                        KeyEvent(keys, nowDown)
+                        ];
+                    Win32.SendInput(1, kInputs, Win32.INPUT.Size);
+                }
             }
         }
 
@@ -130,42 +179,11 @@ namespace JoyMap.Windows
             return rs;
         }
 
-        internal static void DownUp(Keys keys)
-        {
-            int idx = (int)keys;
-            if (idx >= keyStates.Length)
-                return;
 
-            bool isDown = keyStates[idx] > 0;
-            if (isDown)
-                return;
-
-            bool isMouse = (keys >= Keys.LButton && keys <= Keys.XButton2);
-            if (isMouse)
-            {
-                {
-                    Win32.INPUT[] inputs = [MouseEvent(keys, true), MouseEvent(keys, false)];
-                    Win32.SendInput(2, inputs, Win32.INPUT.Size);
-                }
-                return;
-            }
-            {
-                Win32.INPUT[] kInputs = [
-                    KeyEvent(keys, true),
-                    KeyEvent(keys, false)
-                    ];
-                Win32.SendInput(2, kInputs, Win32.INPUT.Size);
-            }
-
-
-
-        }
-
-
-        internal static KeyHandle Press(Keys keys)
+        internal static KeyHandle Press(KeyOrButton keys)
             => new(keys);
 
-        internal static void Reassert(Keys keys)
+        internal static void Reassert(KeyOrButton keys)
             => Change(keys, true, reassert: true);
 
         //internal static void Up(Keys keys, bool reassert = false)
@@ -189,7 +207,7 @@ namespace JoyMap.Windows
         /// </summary>
         /// <param name="keys">The key to associate with this handle.</param>
         /// <param name="startPressed">true to set the key as pressed upon creation; otherwise, false. The default is true.</param>
-        public KeyHandle(Keys keys, bool startPressed = true)
+        public KeyHandle(KeyOrButton keys, bool startPressed = true)
         {
             Keys = keys;
             if (startPressed)
@@ -198,7 +216,7 @@ namespace JoyMap.Windows
         /// <summary>
         /// Gets the key or button to be emitted to the WinApi when this handle is pressed or released.
         /// </summary>
-        public Keys Keys { get; }
+        public KeyOrButton Keys { get; }
 
         /// <summary>
         /// Gets a value indicating whether the key/button is currently pressed.
@@ -259,7 +277,7 @@ namespace JoyMap.Windows
         /// expected key state.</remarks>
         public void Reassert()
         {
-            KeyDispatch.Change(Keys, IsPressed, reassert: true);
+            KeyOrButtonDispatch.Change(Keys, IsPressed, reassert: true);
             LastActionAt = DateTime.UtcNow;
         }
 
@@ -273,7 +291,7 @@ namespace JoyMap.Windows
         {
             if (IsPressed)
             {
-                KeyDispatch.Change(Keys, false, reassert: false);
+                KeyOrButtonDispatch.Change(Keys, false, reassert: false);
                 IsPressed = false;
                 LastChangeAt = LastActionAt = LastReleasedAt = DateTime.UtcNow;
                 return true;
@@ -291,7 +309,7 @@ namespace JoyMap.Windows
         {
             if (!IsPressed)
             {
-                KeyDispatch.Change(Keys, true, reassert: false);
+                KeyOrButtonDispatch.Change(Keys, true, reassert: false);
                 IsPressed = true;
                 LastChangeAt = LastActionAt = LastPressedAt = DateTime.UtcNow;
                 return true;

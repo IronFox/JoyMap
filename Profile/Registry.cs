@@ -64,7 +64,7 @@ namespace JoyMap.Profile
 #if DEBUG
             if (force)
 #endif
-            SaveAll();
+                SaveAll();
             if (ProfileExecution.Stop(p))
                 ProfileExecution.Start(p);
             return profile.Profile;
@@ -192,7 +192,8 @@ namespace JoyMap.Profile
                 Name = profile.Profile.Name,
                 ProcessNameRegex = profile.Profile.ProcessNameRegex ?? "",
                 WindowNameRegex = profile.Profile.WindowNameRegex ?? "",
-                Events = [.. profile.EventInstances]
+                Events = [.. profile.EventInstances],
+                AxisBindings = profile.XBoxAxisBindingInstances.ToDictionary(x => x.OutAxis)
             };
             if (slot is not null)
                 slot.WorkProfile = workProfile;

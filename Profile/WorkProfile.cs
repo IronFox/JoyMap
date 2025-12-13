@@ -1,4 +1,5 @@
 ﻿using JoyMap.Undo;
+using JoyMap.XBox;
 
 namespace JoyMap.Profile
 {
@@ -9,6 +10,7 @@ namespace JoyMap.Profile
         public string ProcessNameRegex { get; set; } = "";
         public string WindowNameRegex { get; set; } = "";
         public List<EventInstance> Events { get; init; } = [];
+        public Dictionary<XBoxAxis, XBoxAxisBindingInstance> AxisBindings { get; init; } = [];
 
         public bool Exists { get; set; }
         public bool HasChanged { get; set; }
@@ -16,6 +18,7 @@ namespace JoyMap.Profile
         public UndoHistory History { get; } = new();
 
         public IReadOnlyList<EventInstance> EventInstances => Events;
+        public IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindings => [.. AxisBindings.Values];
 
         public ProfileInstance ToProfileInstance()
         {
@@ -23,7 +26,8 @@ namespace JoyMap.Profile
             (
                 Profile: ToProfile(),
                 ProcessNameRegex: new(ProcessNameRegex, WindowNameRegex),
-                EventInstances: Events
+                EventInstances: Events,
+                XBoxAxisBindingInstances: XBoxAxisBindings
             );
         }
 
@@ -35,7 +39,8 @@ namespace JoyMap.Profile
                 Name: Name,
                 ProcessNameRegex: ProcessNameRegex,
                 WindowNameRegex: WindowNameRegex,
-                Events: Events.Select(x => x.Event).ToList()
+                Events: Events.Select(x => x.Event).ToList(),
+                XBoxAxisBindings: AxisBindings.Values.Select(x => x.Binding).ToList()
             );
 
         }

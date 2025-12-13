@@ -1,4 +1,4 @@
-﻿using JoyMap.Windows;
+﻿using JoyMap.Profile.Processing;
 
 namespace JoyMap.Profile
 {
@@ -35,34 +35,41 @@ namespace JoyMap.Profile
         public ProfileExecution(IProfileInstance profileInstance)
         {
             Events = profileInstance.EventInstances;
+            Mappings = profileInstance.XBoxAxisBindings;
             Console.WriteLine($"Starting ProfileExecution with {Events.Count} events.");
 
 
             ListenCancel = new CancellationTokenSource();
             var cancel = ListenCancel.Token;
-            var processors = Events.Select(ev => ev.ToProcessor()).OfType<EventProcessor>().ToList();
-            Task.Run(() => ListenLoop(processors, cancel), cancel);
+            var processors = Events
+                .Select(ev => ev.ToProcessor())
+                .OfType<IProcessor>();
+
+            if (Mappings.Count > 0)
+            {
+                processors = processors.Append(new XBoxAxisProcessor(Mappings));
+            }
+
+            Task.Run(() => ListenLoop([.. processors], cancel), cancel);
         }
 
 
         public IReadOnlyList<EventInstance> Events { get; }
+        public IReadOnlyList<XBoxAxisBindingInstance> Mappings { get; }
 
 
         private CancellationTokenSource ListenCancel { get; } = new();
 
         private TaskCompletionSource DisposeCompletion { get; } = new();
 
-        private async Task ListenLoop(List<EventProcessor> processors, CancellationToken cancel)
+        private async Task ListenLoop(IReadOnlyList<IProcessor> processors, CancellationToken cancel)
         {
             try
             {
                 while (true)
                 {
-                    var focused = WindowReference.OfFocused();
                     foreach (var p in processors)
-                    {
                         p.Update();
-                    }
                     await Task.Delay(5, cancel).ConfigureAwait(false);
                 }
             }

@@ -92,5 +92,15 @@ namespace JoyMap.Extensions
                 yield return item;
             }
         }
+
+        public static void Configure<T>(this ComboBox comboBox, IEnumerable<T> options)
+            where T : notnull
+        {
+            comboBox.Items.Clear();
+            foreach (var opt in options)
+                comboBox.Items.Add(opt);
+            comboBox.FlatStyle = FlatStyle.Flat;
+        }
+
     }
 }

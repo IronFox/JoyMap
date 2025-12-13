@@ -9,9 +9,11 @@ namespace JoyMap.Extensions
             return ClipboardUtil.CopyText(text);
         }
 
-        public static bool CopyToClipboard(this IReadOnlyList<Profile.Event> events)
+        public static bool CopyToClipboard<T>(this IReadOnlyList<T> events)
+            where T : IJsonCompatible
         {
             return ClipboardUtil.Copy(events);
         }
+
     }
 }

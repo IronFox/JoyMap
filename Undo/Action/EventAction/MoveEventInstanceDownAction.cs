@@ -1,10 +1,10 @@
 ﻿using JoyMap.Profile;
 
-namespace JoyMap.Undo.Action
+namespace JoyMap.Undo.Action.EventAction
 {
-    internal class MoveEventInstanceUpAction : CommonMoveInstanceAction, IUndoableAction
+    internal class MoveEventInstanceDownAction : CommonMoveInstanceAction, IUndoableAction
     {
-        public MoveEventInstanceUpAction(MainForm mainForm, WorkProfile activeProfile, IReadOnlyList<int> selectedRowIndexes)
+        public MoveEventInstanceDownAction(MainForm mainForm, WorkProfile activeProfile, IReadOnlyList<int> selectedRowIndexes)
             : base(mainForm, activeProfile, selectedRowIndexes)
         { }
 
@@ -15,16 +15,17 @@ namespace JoyMap.Undo.Action
             Form.EventListView.BeginUpdate();
             try
             {
-                foreach (var oldRowIndex in SelectedRowIndexes)
+                for (int i = SelectedRowIndexes.Count - 1; i >= 0; i--)
                 {
-                    if (oldRowIndex <= 0)
+                    var oldRowIndex = SelectedRowIndexes[i];
+                    if (oldRowIndex >= TargetProfile.Events.Count - 1)
                         continue;
                     var eventInstance = TargetProfile.Events[oldRowIndex];
                     TargetProfile.Events.RemoveAt(oldRowIndex);
-                    TargetProfile.Events.Insert(oldRowIndex - 1, eventInstance);
+                    TargetProfile.Events.Insert(oldRowIndex + 1, eventInstance);
                     var row = Form.EventListView.Items[oldRowIndex];
                     Form.EventListView.Items.RemoveAt(oldRowIndex);
-                    Form.EventListView.Items.Insert(oldRowIndex - 1, row);
+                    Form.EventListView.Items.Insert(oldRowIndex + 1, row);
                 }
                 Registry.Persist(TargetProfile);
             }
@@ -32,7 +33,6 @@ namespace JoyMap.Undo.Action
             {
                 Form.EventListView.EndUpdate();
             }
-
         }
 
         public void Undo()
@@ -42,16 +42,15 @@ namespace JoyMap.Undo.Action
             Form.EventListView.BeginUpdate();
             try
             {
-                for (int i = SelectedRowIndexes.Count - 1; i >= 0; i--)
+                foreach (var oldRowIndex in SelectedRowIndexes)
                 {
-                    var oldRowIndex = SelectedRowIndexes[i];
-                    if (oldRowIndex <= 0)
+                    if (oldRowIndex >= TargetProfile.Events.Count - 1)
                         continue;
-                    var eventInstance = TargetProfile.Events[oldRowIndex - 1];
-                    TargetProfile.Events.RemoveAt(oldRowIndex - 1);
+                    var eventInstance = TargetProfile.Events[oldRowIndex + 1];
+                    TargetProfile.Events.RemoveAt(oldRowIndex + 1);
                     TargetProfile.Events.Insert(oldRowIndex, eventInstance);
-                    var row = Form.EventListView.Items[oldRowIndex - 1];
-                    Form.EventListView.Items.RemoveAt(oldRowIndex - 1);
+                    var row = Form.EventListView.Items[oldRowIndex + 1];
+                    Form.EventListView.Items.RemoveAt(oldRowIndex + 1);
                     Form.EventListView.Items.Insert(oldRowIndex, row);
                 }
                 Registry.Persist(TargetProfile);
