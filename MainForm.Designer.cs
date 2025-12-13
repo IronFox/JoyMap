@@ -95,6 +95,7 @@
             tabXBox = new TabPage();
             bindingListView = new ListView();
             columnHeader1 = new ColumnHeader();
+            columnHeader7 = new ColumnHeader();
             columnHeader6 = new ColumnHeader();
             bindingContextMenu = new ContextMenuStrip(components);
             tsmSelectAllBindings = new ToolStripMenuItem();
@@ -585,7 +586,7 @@
             // bindingListView
             // 
             bindingListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            bindingListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader6 });
+            bindingListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader7, columnHeader6 });
             bindingListView.ContextMenuStrip = bindingContextMenu;
             bindingListView.FullRowSelect = true;
             listViewItem1.Tag = "0";
@@ -607,6 +608,11 @@
             // 
             columnHeader1.Text = "XBox Axis";
             columnHeader1.Width = 400;
+            // 
+            // columnHeader7
+            // 
+            columnHeader7.Text = "Input";
+            columnHeader7.Width = 300;
             // 
             // columnHeader6
             // 
@@ -646,6 +652,7 @@
             tsmSuspendBinding.Name = "tsmSuspendBinding";
             tsmSuspendBinding.Size = new Size(311, 32);
             tsmSuspendBinding.Text = "(Un)Suspend Selected";
+            tsmSuspendBinding.Click += tsmSuspendBinding_Click;
             // 
             // toolStripMenuItem12
             // 
@@ -834,5 +841,6 @@
         private ToolStripMenuItem tsmPasteBinding;
         private ToolStripMenuItem tsmSelectAllBindings;
         private ToolStripSeparator toolStripMenuItem9;
+        private ColumnHeader columnHeader7;
     }
 }

@@ -2,9 +2,12 @@ using JoyMap.ControllerTracking;
 using JoyMap.Extensions;
 using JoyMap.Profile;
 using JoyMap.Undo.Action;
+using JoyMap.Undo.Action.Binding;
+using JoyMap.Undo.Action.EventAction;
 using JoyMap.Util;
 using JoyMap.Windows;
 using JoyMap.XBox;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace JoyMap
@@ -148,10 +151,14 @@ namespace JoyMap
                     row.Tag = (object?)bound ?? axis;
                     if (bound is not null)
                     {
+                        row.SubItems.Add(string.Join(", ", bound.InputInstances.Select(x => x.Input.InputId.AxisName)));
                         row.SubItems.Add(bound.GetValue().ToStr());
                     }
                     else
+                    {
+                        row.SubItems.Add("");
                         row.SubItems.Add("Not bound");
+                    }
                 }
             });
         }
@@ -187,6 +194,24 @@ namespace JoyMap
 
         public ListView EventListView => eventListView;
         public ListView BindingListView => bindingListView;
+        public AxisRowHandle RequireRowOf(XBoxAxis axis)
+        {
+            return new AxisRowHandle(this, axis, bindingListView.Items.ToEnumerable().First(x => AxisOf(x) == axis));
+        }
+
+        public record AxisRowHandle(MainForm Form, XBoxAxis Axis, ListViewItem Row)
+        {
+            public bool GetBound([NotNullWhen(true)] out XBoxAxisBindingInstance? bound)
+            {
+                bound = Row.Tag as XBoxAxisBindingInstance;
+                return bound is not null;
+            }
+
+            public void SetBound(XBoxAxisBindingInstance? b, bool updateProfile = true)
+            {
+                AxisUpdateItemTo(Row, Axis, b);
+            }
+        }
 
         private void Flush()
         {
@@ -701,6 +726,19 @@ namespace JoyMap
         private void tsmEditBinding_Click(object sender, EventArgs e)
         {
 
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
 
         private void tsmCopyBinding_Click(object sender, EventArgs e)
@@ -727,7 +765,7 @@ namespace JoyMap
             var copied = ClipboardUtil.GetCopied<XBoxAxisBinding>();
             tsmPasteBinding.Enabled = copied is not null;
 
-            tsmUnbind.Enabled = tsmSelectAllBindings.Enabled = bindingListView.Items.Count > 0;
+            tsmSuspendBinding.Enabled = tsmUnbind.Enabled = tsmSelectAllBindings.Enabled = bindingListView.Items.Count > 0;
             tsmEditBinding.Enabled = bindingListView.SelectedItems.Count == 1;
 
         }
@@ -752,9 +790,54 @@ namespace JoyMap
                 copied));
         }
 
+        private IReadOnlyList<XBoxAxis> GetSelectedAxes()
+        {
+            return bindingListView.SelectedItems.ToEnumerable().Select(AxisOf).ToList();
+        }
+
         private void tsmUnbind_Click(object sender, EventArgs e)
         {
+            if (ActiveProfile is null)
+                return;
+            var selectedIndexes = GetSelectedAxes();
+            if (selectedIndexes.Count == 0)
+                return;
+            ActiveProfile.History.ExecuteAction(new UnbindXBoxBindingAction(this, ActiveProfile, selectedIndexes));
+        }
 
+        private void tsmSuspendBinding_Click(object sender, EventArgs e)
+        {
+            if (ActiveProfile is null)
+                return;
+            var selectedIndexes = bindingListView.SelectedIndices;
+            if (selectedIndexes.Count == 0)
+                return;
+            ActiveProfile.History.ExecuteAction(new ToggleSuspendXBoxBindingInstancesAction(this, ActiveProfile, selectedIndexes.ToArray()));
+        }
+
+        public static XBoxAxis AxisOf(object? tag)
+        {
+            if (tag is XBoxAxis axis)
+                return axis;
+            if (tag is XBoxAxisBindingInstance axisBindingInstance)
+                return axisBindingInstance.Binding.OutAxis;
+            throw new InvalidOperationException($"Row has neither axis nor binding as tag");
+        }
+
+        internal static void AxisUpdateItemTo(ListViewItem item, XBoxAxis outAxis, XBoxAxisBindingInstance? b)
+        {
+            if (b is null)
+            {
+                item.Tag = outAxis;
+                item.SubItems[1].Text = "";
+                item.SubItems[2].Text = "Not bound";
+            }
+            else
+            {
+                item.SubItems[1].Text = string.Join(", ", b.InputInstances.Select(x => x.Input.InputId.AxisName));
+                item.SubItems[2].Text = b.GetValue().ToStr();
+                item.Tag = b;
+            }
         }
     }
 }

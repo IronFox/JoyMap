@@ -64,6 +64,8 @@ namespace JoyMap.Profile
         )
     {
         public bool IsSuspended { get; set; }
+        public XBoxAxis OutAxis => Binding.OutAxis;
+
         internal static XBoxAxisBindingInstance Load(InputMonitor monitor, XBoxAxisBinding e)
         {
             var triggerInstances = e.InAxes
