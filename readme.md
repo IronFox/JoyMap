@@ -244,8 +244,8 @@ An **event** combines **triggers** (input conditions) and **actions** (outputs).
 - **Edit Selected...** (or double-click): Modify event
 - **Copy Selected** (Ctrl+C): Copy to clipboard
 - **Copy All**: Copy all events
-- **Paste Over** (Ctrl+V): Replace selected events with clipboard
-- **Paste Insert**: Insert clipboard events at selection
+- **Paste Over**: Replace selected events with clipboard
+- **Paste Insert** (Ctrl+V): Insert clipboard events at selection
 - **Delete** (Del): Remove selected events
 - **Move Selected Up/Down** (Ctrl+↑/↓): Reorder events (visual only, doesn't affect behavior)
 - **Select All** (Ctrl+A): Select all events
