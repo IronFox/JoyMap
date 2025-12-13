@@ -14,13 +14,11 @@ namespace JoyMap
             Text = "XBox Axis Input - " + axis;
             if (input is not null)
             {
-                Event = new DeviceEvent(
-                    InputId: input.Value.Input.InputId,
-                    Status: input.Value.GetValue() ?? 0,
-                    GetLatestStatus: input.Value.GetValue
-                    );
+                Event = input.Value.OriginalInput;
                 textDevice.Text = Event.Value.DeviceName;
                 textInput.Text = Event.Value.InputId.AxisName;
+                textDeadzone.Text = (input.Value.Input.DeadZone * 100).ToStr();
+                textScale.Text = (input.Value.Input.Scale * 100).ToStr();
                 Translation = input.Value.Input.Translation;
 
             }
@@ -47,13 +45,21 @@ namespace JoyMap
                 statusLabel.Text = "Invalid deadzone";
                 return;
             }
+            var scale = textScale.GetFloat(true);
+            if (scale == null)
+            {
+                statusLabel.Text = $"Invalid scale";
+                return;
+            }
             var input = new XBoxInputAxis(
                     InputId: Event.Value.InputId,
                     DeadZone: deadZone.Value,
+                    Scale: scale.Value,
                     Translation: Translation
                     );
             Result = new AxisInput(
                 Input: input,
+                OriginalInput: Event.Value,
                 GetValue: AxisInput.BuildGetter(Event.Value.GetLatestStatus, input)
                 );
             btnOk.Enabled = true;

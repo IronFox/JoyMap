@@ -12,6 +12,7 @@ namespace JoyMap.Profile
     public record XBoxInputAxis(
         ControllerInputId InputId,
         float DeadZone,
+        float Scale,
         XBoxAxisTranslation Translation
         ) : IJsonCompatible;
 
@@ -22,6 +23,7 @@ namespace JoyMap.Profile
 
     public readonly record struct AxisInput(
         XBoxInputAxis Input,
+        DeviceEvent OriginalInput,
         Func<float?> GetValue
         )
     {
@@ -38,11 +40,14 @@ namespace JoyMap.Profile
                 {
                     case XBoxAxisTranslation.Linear:
                         float effectiveRange = 1f - t.DeadZone;
-                        return Math.Abs(val.Value) <= t.DeadZone
+                        return Math.Clamp(
+                            (Math.Abs(val.Value) <= t.DeadZone
                             ? 0f
                             : val.Value > 0
                                 ? (val.Value - t.DeadZone) / effectiveRange
-                                : (val.Value + t.DeadZone) / effectiveRange;
+                                : (val.Value + t.DeadZone) / effectiveRange
+                            ) * t.Scale,
+                            -1, 1);
                     default:
                         return val;
                 }
@@ -54,6 +59,7 @@ namespace JoyMap.Profile
             var raw = monitor.GetFunction(t.InputId);
             return new AxisInput(
                 Input: t,
+                OriginalInput: new(t.InputId, raw() ?? 0, raw),
                 GetValue: BuildGetter(raw, t)
                 );
         }

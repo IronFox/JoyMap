@@ -151,7 +151,8 @@ namespace JoyMap
                     var row = new AxisRowHandle(this, axis, bindingListView.Items.Add(axis.ToString()));
                     row.Row.SubItems.Add("");
                     row.Row.SubItems.Add("");
-                    row.Bind(null, false);
+
+                    row.Bind(bound, false);
                 }
             });
         }
@@ -828,7 +829,7 @@ namespace JoyMap
             {
                 item.Tag = outAxis;
                 item.SubItems[1].Text = "";
-                item.SubItems[2].Text = "Not bound";
+                item.SubItems[2].Text = "";
             }
             else
             {

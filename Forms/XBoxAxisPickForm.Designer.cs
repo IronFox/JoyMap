@@ -46,6 +46,8 @@
             statusStrip1 = new StatusStrip();
             statusLabel = new ToolStripStatusLabel();
             updateTimer = new System.Windows.Forms.Timer(components);
+            label1 = new Label();
+            textScale = new TextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             statusStrip1.SuspendLayout();
@@ -102,10 +104,10 @@
             // 
             tabControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl1.Controls.Add(tabPage1);
-            tabControl1.Location = new Point(12, 123);
+            tabControl1.Location = new Point(12, 160);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(801, 146);
+            tabControl1.Size = new Size(801, 109);
             tabControl1.TabIndex = 14;
             // 
             // tabPage1
@@ -114,7 +116,7 @@
             tabPage1.Location = new Point(4, 34);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(793, 108);
+            tabPage1.Size = new Size(793, 71);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Linear";
             // 
@@ -209,6 +211,25 @@
             updateTimer.Enabled = true;
             updateTimer.Tick += updateTimer_Tick;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 126);
+            label1.Name = "label1";
+            label1.Size = new Size(72, 25);
+            label1.TabIndex = 21;
+            label1.Text = "Scale %";
+            // 
+            // textScale
+            // 
+            textScale.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textScale.Location = new Point(135, 123);
+            textScale.Name = "textScale";
+            textScale.Size = new Size(678, 31);
+            textScale.TabIndex = 20;
+            textScale.Text = "100";
+            textScale.TextChanged += RebuildResult;
+            // 
             // XBoxAxisPickForm
             // 
             AcceptButton = btnOk;
@@ -216,6 +237,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new Size(825, 344);
+            Controls.Add(label1);
+            Controls.Add(textScale);
             Controls.Add(label5);
             Controls.Add(statusStrip1);
             Controls.Add(textDeadzone);
@@ -260,5 +283,7 @@
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel statusLabel;
         private System.Windows.Forms.Timer updateTimer;
+        private Label label1;
+        private TextBox textScale;
     }
 }
