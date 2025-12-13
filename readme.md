@@ -548,13 +548,13 @@ Input: 80% ┌────────┐┌────────┐┌──
 **Global:**
 - **Ctrl+Z**: Undo
 - **Ctrl+Y** / **Ctrl+Shift+Z**: Redo
-- **Ctrl+N**: New event (Events tab) / New binding (Xbox tab)
 - **Ctrl+A**: Select All
 - **Ctrl+C**: Copy Selected
 - **Ctrl+V**: Paste
 - **Delete**: Delete Selected
 
 **Events Tab:**
+- **Ctrl+N**: New event
 - **Ctrl+↑**: Move Selected Up
 - **Ctrl+↓**: Move Selected Down
 - **Double-click**: Edit event
