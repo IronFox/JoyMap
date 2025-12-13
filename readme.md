@@ -159,15 +159,15 @@ The **Xbox Axis Binding** tab maps physical joystick inputs to virtual Xbox 360 
 | Parameter | Description | Typical Range |
 |-----------|-------------|---------------|
 | **DeadZone** | Percentage near center/zero to ignore (reduces drift) | 5-15% |
-| **Scale** | Output multiplier (smaller = more sensitive) | 0.5 - 2.0 |
+| **Scale** | Output multiplier (smaller = more sensitive) | 50% - 200% |
 | **Translation** | Transformation algorithm (currently only "Linear") | Linear |
 
 **Linear Transformation Math:**
 - Input values in the deadzone range [-DeadZone, +DeadZone] map to 0
-- Values outside the deadzone are scaled: output = (input / Scale)
+- Values outside the deadzone are scaled: output = input * Scale
 - Final output is clamped to [-1, +1]
 
-Example: With DeadZone=10% and Scale=1.0:
+Example: With DeadZone=10% and Scale=100%:
 - Input -1.0 → Output -1.0
 - Input -0.05 (within deadzone) → Output 0
 - Input +0.5 → Output +0.5
@@ -182,10 +182,10 @@ Example: With DeadZone=10% and Scale=1.0:
 
 | Goal | DeadZone | Scale | Notes |
 |------|----------|-------|-------|
-| Reduce stick drift | 10-15% | 1.0 | Ignore small unintentional movements |
-| Increase sensitivity | 5% | 0.5 | Smaller scale = more sensitive (input/scale) |
-| Decrease sensitivity | 5% | 2.0 | Larger scale = less sensitive |
-| Combine multiple axes | varies | 1.0 | Add both to same Xbox axis |
+| Reduce stick drift | 10-15% | 100% | Ignore small unintentional movements |
+| Increase sensitivity | 5% | 50% | Smaller scale = less sensitive (input*scale) |
+| Decrease sensitivity | 5% | 200% | Larger scale = more sensitive |
+| Combine multiple axes | varies | 100% | Add both to same Xbox axis |
 
 **Future Enhancements:**
 - Additional transformation modes ([-1,1] ↔ [0,1] conversion)
@@ -507,7 +507,7 @@ Defines how multiple triggers combine:
 **Xbox axis not responding in game:**
 - Check "Output" column shows non-zero values when moving physical axis
 - Verify DeadZone isn't too high (try 0% to test)
-- Check Scale value (1.0 is neutral)
+- Check Scale value (100% is neutral)
 - Ensure ViGEmBus driver is running (restart if necessary)
 - Test with different game (some games don't support virtual controllers)
 
