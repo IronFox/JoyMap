@@ -455,7 +455,7 @@ Input: 80% ┌────────┐┌────────┐┌──
 | **Frequency (Hz)** | Presses per second (consider game FPS) | 10 |
 | **Delay Start (ms)** | Hold first press for X ms before auto-fire | 0 |
 | **Limit Auto-Triggers** | Maximum number of presses (checkbox) | Off |
-| **Limit Count** | Max presses (0 = unlimited) | 0 |
+| **Limit Count** | Max presses | 3 |
 
 **⚠ Action Frequency & Game FPS:**
 - Like dither triggers, action auto-fire should consider game FPS
@@ -482,7 +482,7 @@ Input: 80% ┌────────┐┌────────┐┌──
 **4. Limited Auto-Fire:**
 - Auto-fire exactly N times
 - Last press is **held** until event deactivates
-- Use case: Fixed combo sequence (press 3x, then hold)
+- Use case: Double jump with subsequent glide (press 2x, then hold)
 
 **Key/Button Selection:**
 - **Pick...** button opens picker dialog
