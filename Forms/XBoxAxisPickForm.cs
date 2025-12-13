@@ -5,9 +5,9 @@ using JoyMap.XBox;
 
 namespace JoyMap
 {
-    public partial class XboxAxisMapping : Form
+    public partial class XBoxAxisPickForm : Form
     {
-        public XboxAxisMapping(XBoxAxis axis, AxisInput? input)
+        public XBoxAxisPickForm(XBoxAxis axis, AxisInput? input)
         {
             InitializeComponent();
             Axis = axis;

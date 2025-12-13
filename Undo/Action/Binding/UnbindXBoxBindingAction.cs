@@ -30,7 +30,6 @@ namespace JoyMap.Undo.Action.Binding
                 if (item.GetBound(out var bound))
                 {
                     Deleted.Add((axis, bound));
-                    TargetProfile.AxisBindings.Remove(axis);
                     item.SetBound(null);
                 }
             }
@@ -46,7 +45,6 @@ namespace JoyMap.Undo.Action.Binding
             {
                 var row = Form.RequireRowOf(Axis);
                 row.SetBound(Binding);
-                TargetProfile.AxisBindings[Binding.OutAxis] = Binding;
             }
             Registry.Persist(TargetProfile);
             Deleted.Clear();

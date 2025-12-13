@@ -622,7 +622,7 @@
             // bindingContextMenu
             // 
             bindingContextMenu.ImageScalingSize = new Size(24, 24);
-            bindingContextMenu.Items.AddRange(new ToolStripItem[] { tsmSelectAllBindings, toolStripMenuItem9, tsmEditBinding, tsmSuspendBinding, toolStripMenuItem12, tsmCopyBinding, tsmCopyAllBindings, toolStripMenuItem16, tsmPasteBinding, toolStripMenuItem11, tsmUnbind });
+            bindingContextMenu.Items.AddRange(new ToolStripItem[] { tsmEditBinding, toolStripMenuItem12, tsmSelectAllBindings, toolStripMenuItem9, tsmCopyAllBindings, tsmCopyBinding, toolStripMenuItem16, tsmPasteBinding, toolStripMenuItem11, tsmUnbind, tsmSuspendBinding });
             bindingContextMenu.Name = "bindingContextMenu";
             bindingContextMenu.Size = new Size(312, 285);
             bindingContextMenu.Opening += bindingContextMenu_Opening;

@@ -1,6 +1,6 @@
 ﻿namespace JoyMap
 {
-    partial class XboxAxisMapping
+    partial class XBoxAxisPickForm
     {
         /// <summary>
         /// Required designer variable.
@@ -105,7 +105,7 @@
             tabControl1.Location = new Point(12, 123);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(801, 152);
+            tabControl1.Size = new Size(801, 146);
             tabControl1.TabIndex = 14;
             // 
             // tabPage1
@@ -114,7 +114,7 @@
             tabPage1.Location = new Point(4, 34);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(793, 114);
+            tabPage1.Size = new Size(793, 108);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Linear";
             // 
@@ -144,12 +144,13 @@
             textDeadzone.Size = new Size(678, 31);
             textDeadzone.TabIndex = 1;
             textDeadzone.Text = "5";
+            textDeadzone.TextChanged += RebuildResult;
             // 
             // lInput
             // 
-            lInput.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lInput.Anchor = AnchorStyles.Bottom;
             lInput.AutoSize = true;
-            lInput.Location = new Point(16, 286);
+            lInput.Location = new Point(16, 280);
             lInput.Name = "lInput";
             lInput.Size = new Size(73, 25);
             lInput.TabIndex = 15;
@@ -157,9 +158,9 @@
             // 
             // lOutput
             // 
-            lOutput.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lOutput.Anchor = AnchorStyles.Bottom;
             lOutput.AutoSize = true;
-            lOutput.Location = new Point(166, 286);
+            lOutput.Location = new Point(166, 280);
             lOutput.Name = "lOutput";
             lOutput.Size = new Size(88, 25);
             lOutput.TabIndex = 16;
@@ -167,8 +168,9 @@
             // 
             // btnOk
             // 
-            btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnOk.Location = new Point(481, 281);
+            btnOk.Anchor = AnchorStyles.Bottom;
+            btnOk.DialogResult = DialogResult.OK;
+            btnOk.Location = new Point(481, 275);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(161, 34);
             btnOk.TabIndex = 17;
@@ -177,8 +179,9 @@
             // 
             // btnCancel
             // 
-            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnCancel.Location = new Point(648, 281);
+            btnCancel.Anchor = AnchorStyles.Bottom;
+            btnCancel.DialogResult = DialogResult.Cancel;
+            btnCancel.Location = new Point(648, 275);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(161, 34);
             btnCancel.TabIndex = 18;
@@ -189,23 +192,24 @@
             // 
             statusStrip1.ImageScalingSize = new Size(24, 24);
             statusStrip1.Items.AddRange(new ToolStripItem[] { statusLabel });
-            statusStrip1.Location = new Point(0, 322);
+            statusStrip1.Location = new Point(0, 312);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(825, 22);
+            statusStrip1.Size = new Size(825, 32);
             statusStrip1.TabIndex = 19;
             statusStrip1.Text = "statusStrip1";
             // 
             // statusLabel
             // 
             statusLabel.Name = "statusLabel";
-            statusLabel.Size = new Size(0, 15);
+            statusLabel.Size = new Size(67, 25);
+            statusLabel.Text = "           ";
             // 
             // updateTimer
             // 
             updateTimer.Enabled = true;
             updateTimer.Tick += updateTimer_Tick;
             // 
-            // XboxAxisMapping
+            // XBoxAxisPickForm
             // 
             AcceptButton = btnOk;
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -226,7 +230,7 @@
             Controls.Add(textDevice);
             Controls.Add(label2);
             MinimumSize = new Size(847, 400);
-            Name = "XboxAxisMapping";
+            Name = "XBoxAxisPickForm";
             Text = "XboxAxisMapping";
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);

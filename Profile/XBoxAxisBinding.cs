@@ -32,6 +32,8 @@ namespace JoyMap.Profile
                 var val = raw();
                 if (val == null)
                     return null;
+                if (t.InputId.AxisNegated)
+                    val = -val;
                 switch (t.Translation)
                 {
                     case XBoxAxisTranslation.Linear:

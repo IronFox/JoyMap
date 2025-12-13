@@ -27,7 +27,6 @@ namespace JoyMap.Undo.Action.Binding
                     Old.Add(bound);
                 var b = XBoxAxisBindingInstance.Load(Form.InputMonitor, c);
                 item.SetBound(b);
-                TargetProfile.AxisBindings[c.OutAxis] = b;
             }
             Registry.Persist(TargetProfile);
         }
@@ -38,7 +37,6 @@ namespace JoyMap.Undo.Action.Binding
             {
                 var item = Form.RequireRowOf(b.OutAxis);
                 item.SetBound(b);
-                TargetProfile.AxisBindings[b.OutAxis] = b;
             }
             Registry.Persist(TargetProfile);
         }

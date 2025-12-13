@@ -1,5 +1,6 @@
 using JoyMap.ControllerTracking;
 using JoyMap.Extensions;
+using JoyMap.Forms;
 using JoyMap.Profile;
 using JoyMap.Undo.Action;
 using JoyMap.Undo.Action.Binding;
@@ -147,7 +148,7 @@ namespace JoyMap
                 foreach (var axis in Enum.GetValues<XBoxAxis>())
                 {
                     profile.AxisBindings.TryGetValue(axis, out var bound);
-                    var row = eventListView.Items.Add(axis.ToString());
+                    var row = bindingListView.Items.Add(axis.ToString());
                     row.Tag = (object?)bound ?? axis;
                     if (bound is not null)
                     {
@@ -207,9 +208,16 @@ namespace JoyMap
                 return bound is not null;
             }
 
-            public void SetBound(XBoxAxisBindingInstance? b, bool updateProfile = true)
+            public void SetBound(XBoxAxisBindingInstance? b, bool updateCurrentProfile = true)
             {
                 AxisUpdateItemTo(Row, Axis, b);
+                if (updateCurrentProfile && Form.ActiveProfile is not null)
+                {
+                    if (b is not null)
+                        Form.ActiveProfile.AxisBindings[Axis] = b;
+                    else
+                        Form.ActiveProfile.AxisBindings.Remove(Axis);
+                }
             }
         }
 
@@ -726,19 +734,15 @@ namespace JoyMap
         private void tsmEditBinding_Click(object sender, EventArgs e)
         {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+            if (ActiveProfile is null)
+                return;
+            var axis = AxisOf(bindingListView.SelectedItems[0].Tag);
+            using var form = new XBoxAxisBindingForm(axis);
+            var result = form.ShowDialog(this);
+            if (result == DialogResult.OK && form.Result is not null)
+            {
+                ActiveProfile.History.ExecuteAction(new SetBindingInstanceAction(this, ActiveProfile, form.Result));
+            }
         }
 
         private void tsmCopyBinding_Click(object sender, EventArgs e)
