@@ -302,11 +302,19 @@ Defines how multiple triggers combine:
 
 #### Trigger Dialog
 
-**Configuration:**
+The Trigger Dialog has **two tabs**: **Range** (traditional threshold-based) and **Dither** (PWM duty-cycle).
+
+**Common Fields:**
 | Field | Description |
 |-------|-------------|
 | **Device** | Joystick/controller name |
 | **Input** | Axis or button name |
+
+##### Range Tab (Traditional Trigger)
+
+**Configuration:**
+| Field | Description |
+|-------|-------------|
 | **Min %** | Minimum activation threshold (0-100%) |
 | **Max %** | Maximum activation threshold (0-100%) |
 | **Auto Release after (ms)** | Force inactive after X milliseconds (optional) |
@@ -338,6 +346,169 @@ Defines how multiple triggers combine:
 | Axis forward | 60 | 100 | Upper 40% of axis range |
 | Axis centered | 45 | 55 | ±5% around center |
 | Full axis range | 0 | 100 | Always active (not useful alone) |
+
+##### Dither Tab (PWM Duty-Cycle Trigger)
+
+The **Dither** trigger mode implements **Pulse Width Modulation (PWM)** using analog input values to control activation duty cycle. This converts analog axes into time-varying digital triggers.
+
+**⚠ Important: Match Game FPS**
+- Dither frequency should align with your game's framerate
+- Games typically poll inputs once per frame
+- High dither frequency + low FPS = unpredictable behavior
+- **Recommended**: Set frequency ≤ game FPS (e.g., 30Hz for 60 FPS games)
+
+**Configuration:**
+
+| Field | Description | Typical Range |
+|-------|-------------|---------------|
+| **Ramp Start %** | Input value where dithering begins (0-100%) | 10-50% |
+| **Ramp Max %** | Input value where trigger is always active (0-100%) | 50-100% |
+| **Frequency (Hz)** | Dither cycle rate (must consider game FPS) | 5-30 Hz |
+
+**How Dither Works:**
+
+The trigger oscillates on/off in a **repeating cycle**, with the duty cycle (percentage of time "on") determined by the input value:
+
+1. **Input < Ramp Start**: Always **inactive** (0% duty cycle)
+2. **Ramp Start ≤ Input < Ramp Max**: **Oscillating** activation
+   - Duty Cycle = `(Input - RampStart) / (RampMax - RampStart)`
+   - Higher input = longer "on" time per cycle
+3. **Input ≥ Ramp Max**: Always **active** (100% duty cycle)
+
+**Mathematical Formula:**
+
+```
+if input < RampStart:
+    trigger = always false
+else
+    if input >= RampMax:
+        trigger = always true
+    else:
+        normalizedValue = (input - RampStart) / (RampMax - RampStart)
+        cyclePosition = (elapsedTime * Frequency) % 1.0
+        trigger = (cyclePosition < normalizedValue)
+```
+
+**Visual Example (RampStart=20%, RampMax=80%, Frequency=10Hz):**
+
+```
+Input: 20% ┌─┐     ┌─┐     ┌─┐     (minimal on-time, ~0% duty)
+           └─┘─────└─┘─────└─┘─────
+Input: 50% ┌────┐  ┌────┐  ┌────┐  (50% duty cycle)
+           └────┘──└────┘──└────┘──
+Input: 80% ┌────────┐┌────────┐┌── (maximum on-time, 100% duty)
+           └────────┘└────────┘└──
+     0ms   50ms  100ms 150ms 200ms  (at 10Hz = 100ms cycle)
+```
+
+**Frequency Selection Guidelines:**
+
+| Game FPS | Recommended Dither Frequency | Rationale |
+|----------|----------------------------|-----------|
+| 30 FPS | 10-15 Hz | 2-3 dither cycles per frame |
+| 60 FPS | 15-30 Hz | 2-4 dither cycles per frame |
+| 120 FPS | 30-60 Hz | 2-4 dither cycles per frame |
+| 144+ FPS | 30-60 Hz | Diminishing returns above 60Hz |
+
+**Why FPS Matters:**
+- Games sample inputs at their render framerate
+- If dither frequency >> game FPS: Game may miss state transitions
+- If dither frequency << game FPS: Effect appears choppy/steppy
+- **Optimal**: 2-4 dither cycles per game frame ensures smooth sampling
+
+**Example Scenarios:**
+
+**Scenario 1: Racing Game Turbo (60 FPS)**
+
+Configuration:
+•	RampStart: 30% (gentle throttle)
+•	RampMax: 90% (full throttle)
+•	Frequency: 20 Hz (3 cycles per 60 FPS frame)
+Behavior:
+•	30% throttle → 0% duty (turbo off)
+•	50% throttle → 33% duty (turbo activates 1/3 of the time)
+•	70% throttle → 67% duty (turbo activates 2/3 of the time)
+•	90%+ throttle → 100% duty (turbo always on)
+Result: Smooth power progression tied to analog pedal input
+
+**Scenario 2: Flight Sim Afterburner (30 FPS)**
+
+Configuration:
+•	RampStart: 50% (half throttle)
+•	RampMax: 100% (full throttle)
+•	Frequency: 10 Hz (3 cycles per 30 FPS frame)
+Behavior:
+•	Below 50% → Afterburner always off
+•	75% → Afterburner on 50% of the time (pulsing)
+•	100% → Afterburner always on
+Result: Progressive afterburner engagement without sudden on/off
+
+**Scenario 3: Variable Fire Rate (120 FPS)**
+
+Configuration:
+•	RampStart: 10% (barely pulling trigger)
+•	RampMax: 80% (firm trigger pull)
+•	Frequency: 30 Hz (3 cycles per 120 FPS frame)
+•	Action: Auto-fire at 10 Hz
+Behavior:
+•	Creates "double PWM" (dither modulates action auto-fire)
+•	Light trigger pull → Occasional bursts
+•	Heavy trigger pull → Sustained fire
+Result: Analog trigger controls weapon fire intensity
+
+
+**Common Configurations:**
+
+| Use Case | Ramp Start | Ramp Max | Frequency | Game FPS | Notes |
+|----------|-----------|----------|-----------|----------|-------|
+| Smooth binary threshold | 45% | 55% | 20-30 Hz | 60+ | Narrow range, faster switching |
+| Progressive activation | 20% | 80% | 10-15 Hz | 30-60 | Wide proportional range |
+| Turbo/boost control | 30% | 90% | 15-20 Hz | 60 | Maps throttle to turbo intensity |
+| Variable weapon fire | 10% | 70% | 20-30 Hz | 60-120 | Combine with auto-fire action |
+| Gentle state transition | 40% | 60% | 5-10 Hz | 30 | Slow, smooth on/off |
+
+**Combining Dither with Actions:**
+
+| Action Type | Combined Behavior | Use Case |
+|-------------|-------------------|----------|
+| **Hold** | PWM key press (e.g., 50% duty = key pressed half the time) | Analog-controlled digital input |
+| **Auto-fire** | Nested PWM (dither controls outer rate, action inner rate) | Variable-intensity rapid fire |
+| **Delayed** | Initial delay on first activation, then dither continues | Charged attack → sustained fire |
+| **Limited** | Dither controls N activations, then holds last | Burst fire with analog intensity |
+
+**Dither vs. Range + Auto-fire:**
+
+| Feature | Dither Trigger | Range Trigger + Auto-fire Action |
+|---------|---------------|----------------------------------|
+| Timing control | Input-proportional (analog→duty cycle) | Fixed frequency (on/off only) |
+| Complexity | Single trigger config | Trigger + action config |
+| Use case | Analog intensity mapping | Fixed-rate repetition |
+| FPS sensitivity | High (must match game FPS) | Low (game polls fixed rate) |
+
+**Troubleshooting Dither:**
+
+**Issue**: Erratic behavior / missed activations
+- **Cause**: Frequency too high for game FPS
+- **Fix**: Reduce frequency to ≤ half of game FPS
+
+**Issue**: Choppy/steppy effect
+- **Cause**: Frequency too low
+- **Fix**: Increase frequency (but stay ≤ game FPS)
+
+**Issue**: No visible dithering (always on/off)
+- **Cause**: Input outside Ramp range
+- **Fix**: Adjust RampStart/RampMax to match your axis range
+- **Check**: "Status" column should show flickering "A"
+
+**Issue**: Inverted behavior (high input = less activation)
+- **Cause**: RampStart > RampMax
+- **Fix**: Swap values (Start must be < Max)
+
+**Advanced Tip: Frame-Perfect Timing**
+For frame-perfect inputs (speedruns, rhythm games):
+- Set Frequency = exact multiple of game FPS (e.g., 30Hz for 60 FPS)
+- Use narrow Ramp range (e.g., 48-52%) for near-binary behavior
+- Combine with Action Initial Delay for frame-accurate sequences
 
 #### Pick Axis Dialog
 
@@ -374,10 +545,15 @@ Defines how multiple triggers combine:
 | **Key/Button** | Target output (keyboard/mouse/Xbox) | None |
 | **Initial Delay (ms)** | Wait X ms before first activation | 0 |
 | **Auto Trigger Frequency** | Enable auto-fire (checkbox) | Off |
-| **Frequency (Hz)** | Presses per second | 10 |
+| **Frequency (Hz)** | Presses per second (consider game FPS) | 10 |
 | **Delay Start (ms)** | Hold first press for X ms before auto-fire | 0 |
 | **Limit Auto-Triggers** | Maximum number of presses (checkbox) | Off |
 | **Limit Count** | Max presses (0 = unlimited) | 0 |
+
+**⚠ Action Frequency & Game FPS:**
+- Like dither triggers, action auto-fire should consider game FPS
+- High auto-fire frequency in low-FPS games may cause missed inputs
+- **Recommended**: Auto-fire frequency ≤ game FPS
 
 **Behavior Modes:**
 
@@ -511,6 +687,13 @@ Defines how multiple triggers combine:
 - Ensure ViGEmBus driver is running (restart if necessary)
 - Test with different game (some games don't support virtual controllers)
 
+**Dither trigger not working as expected:**
+- **Flickering "A" in Status column**: Dither is working; check game responsiveness
+- **Always on/off**: Input outside Ramp range; adjust RampStart/RampMax
+- **Erratic behavior**: Frequency too high for game FPS; reduce to ≤ game FPS
+- **Choppy effect**: Frequency too low; increase (but stay under game FPS)
+- **Use case**: Check your game's FPS setting and set dither frequency to half of that value
+
 ## Tips & Best Practices
 
 **Profile Organization:**
@@ -526,11 +709,13 @@ Defines how multiple triggers combine:
 - Default 50-100% works for most buttons
 - Axes: Test ranges by watching trigger "Status" column
 - Add deadzone (45-55%) for centered axes to avoid constant triggering
+- **Dither**: Always check your game's FPS first; set frequency = FPS / 2 as starting point
 
 **Action Timing:**
 - Initial Delay: Use for sequential macros (e.g., 0ms, 200ms, 400ms delays)
-- Auto-fire: Start with 5-10 Hz, adjust based on game responsiveness
+- Auto-fire: Match to game FPS (e.g., 30Hz action for 60 FPS game)
 - Limited triggers: Great for combo sequences (e.g., 3x rapid tap, then hold)
+- **FPS-aware**: Lower action frequency in low-FPS games to prevent missed inputs
 
 **Xbox Binding:**
 - Start with one axis at a time to verify behavior
@@ -545,6 +730,12 @@ Defines how multiple triggers combine:
 - Copy `[My Documents]\JoyMap\` folder periodically
 - Use Copy All → Paste to text file for configuration snapshots
 
+**FPS-Specific Tuning:**
+- **30 FPS games**: Use 10-15 Hz dither/auto-fire
+- **60 FPS games**: Use 20-30 Hz dither/auto-fire
+- **120+ FPS games**: Use 30-60 Hz (diminishing returns above 60)
+- **Variable FPS**: Use conservative values (lowest expected FPS / 2)
+
 ## Technical Details
 
 **DirectInput Support:**
@@ -557,10 +748,18 @@ Defines how multiple triggers combine:
 - Exposes: 2 analog sticks, 2 triggers, D-pad, 10 buttons, Guide button
 - Latency: <5ms typical (depends on DirectInput poll rate)
 
+**Dither Implementation:**
+- High-resolution time-based PWM using DateTime.UtcNow
+- Elapsed time = UtcNow - trigger creation time
+- Cycle position calculated per evaluation: (elapsed_seconds * Frequency) % 1.0
+- Duty cycle = (input - RampStart) / (RampMax - RampStart)
+- Thread-safe: Each trigger maintains independent state
+
 **File Format:**
 - JSON with UTF-8 encoding
 - Enums serialized as strings (e.g., "Button0", "MoveHorizontal")
 - Backwards-compatible reader (old Keys-only actions load as KeyOrButton)
+- Trigger serialization: Either `Range` or `Dither` object (mutually exclusive)
 
 **Platform:**
 - Windows 10/11 (64-bit recommended)
@@ -575,6 +774,8 @@ Defines how multiple triggers combine:
 - Event order in UI is cosmetic; cannot set execution priority
 - Virtual Xbox controller Guide button may not work in all games
 - No per-action undo within event/trigger/action dialogs
+- **Dither/auto-fire frequency limited by game FPS**: High frequencies (>60Hz) may cause unpredictable behavior in low-FPS games
+- **No frame-sync**: Dither timing is wall-clock based, not frame-synchronized
 
 ## Credits
 
@@ -591,3 +792,4 @@ See LICENSE file for details.
 ---
 
 **Version:** Check **Help** → **About...** for current version number
+
