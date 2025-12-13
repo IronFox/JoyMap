@@ -183,8 +183,8 @@ Example: With DeadZone=10% and Scale=100%:
 | Goal | DeadZone | Scale | Notes |
 |------|----------|-------|-------|
 | Reduce stick drift | 10-15% | 100% | Ignore small unintentional movements |
-| Increase sensitivity | 5% | 50% | Smaller scale = less sensitive (input*scale) |
-| Decrease sensitivity | 5% | 200% | Larger scale = more sensitive |
+| Decrease sensitivity | 5% | 50% | Smaller scale = less sensitive (input*scale) |
+| Increase sensitivity | 5% | 200% | Larger scale = more sensitive |
 | Combine multiple axes | varies | 100% | Add both to same Xbox axis |
 
 **Future Enhancements:**
