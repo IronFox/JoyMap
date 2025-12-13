@@ -159,7 +159,7 @@ The **Xbox Axis Binding** tab maps physical joystick inputs to virtual Xbox 360 
 | Parameter | Description | Typical Range |
 |-----------|-------------|---------------|
 | **DeadZone** | Percentage near center/zero to ignore (reduces drift) | 5-15% |
-| **Scale** | Output multiplier (smaller = more sensitive) | 50% - 200% |
+| **Scale** | Output multiplier (larger = more sensitive) | 50% - 200% |
 | **Translation** | Transformation algorithm (currently only "Linear") | Linear |
 
 **Linear Transformation Math:**
