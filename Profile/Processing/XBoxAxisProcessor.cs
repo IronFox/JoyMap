@@ -4,11 +4,11 @@ namespace JoyMap.Profile.Processing
 {
     public class XBoxAxisProcessor : IProcessor
     {
-        public XBoxAxisProcessor(IReadOnlyList<XBoxMappingInstance> xBoxMappingInstance)
+        public XBoxAxisProcessor(IReadOnlyList<XBoxAxisBindingInstance> xBoxMappingInstance)
         {
             Feed = xBoxMappingInstance
                 .ToDictionary(
-                    mi => mi.Mapping.OutAxis,
+                    mi => mi.Binding.OutAxis,
                     mi => mi.GetValue
                     );
             Emulator.SignalStart();

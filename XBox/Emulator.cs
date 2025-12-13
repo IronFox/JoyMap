@@ -6,7 +6,7 @@ namespace JoyMap.XBox
     {
         private static VirtualController? _controller;
         private static bool _triedCreate;
-
+        private static object _lock = new();
         public static void Destroy()
         {
             try
@@ -25,16 +25,23 @@ namespace JoyMap.XBox
 
         internal static void SignalStart()
         {
-            if (_controller is null)
+            if (_controller is null && !_triedCreate)
             {
-                try
+                lock (_lock)
                 {
-                    _controller = new VirtualController();
-                    MainForm.Log("XBox controller created");
-                }
-                catch (Exception ex)
-                {
-                    MainForm.Log("Failed to create XBox controller emulator", ex);
+                    if (_controller is null && !_triedCreate)
+                    {
+                        _triedCreate = true;
+                        try
+                        {
+                            _controller = new VirtualController();
+                            MainForm.Log("XBox controller created");
+                        }
+                        catch (Exception ex)
+                        {
+                            MainForm.Log("Failed to create XBox controller emulator", ex);
+                        }
+                    }
                 }
             }
         }
@@ -46,6 +53,7 @@ namespace JoyMap.XBox
 
         internal static void UpdateButtonState(XBoxButton value, bool nowDown)
         {
+            SignalStart();
             _controller?.ChangeButtonState(value, nowDown);
         }
     }

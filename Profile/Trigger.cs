@@ -1,5 +1,6 @@
 ﻿using JoyMap.ControllerTracking;
 using JoyMap.Profile.Processing;
+using JoyMap.Util;
 
 namespace JoyMap.Profile
 {
@@ -7,20 +8,20 @@ namespace JoyMap.Profile
         ControllerInputId InputId,
         RangeConfig? Range = null,
         DitherConfig? Dither = null
-        );
+        ) : IJsonCompatible;
 
     public readonly record struct RangeConfig(
         float MinValue,
         float MaxValue,
         float? AutoOffAfterMs,
         float? DelayReleaseMs
-        );
+        ) : IJsonCompatible;
 
     public readonly record struct DitherConfig(
         float RampStart,
         float RampMax,
         float Frequency
-        );
+        ) : IJsonCompatible;
 
 
     public record TriggerInstance(

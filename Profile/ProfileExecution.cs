@@ -35,7 +35,7 @@ namespace JoyMap.Profile
         public ProfileExecution(IProfileInstance profileInstance)
         {
             Events = profileInstance.EventInstances;
-            Mappings = profileInstance.MappingInstances;
+            Mappings = profileInstance.XBoxAxisBindings;
             Console.WriteLine($"Starting ProfileExecution with {Events.Count} events.");
 
 
@@ -55,7 +55,7 @@ namespace JoyMap.Profile
 
 
         public IReadOnlyList<EventInstance> Events { get; }
-        public IReadOnlyList<XBoxMappingInstance> Mappings { get; }
+        public IReadOnlyList<XBoxAxisBindingInstance> Mappings { get; }
 
 
         private CancellationTokenSource ListenCancel { get; } = new();

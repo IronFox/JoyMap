@@ -1,4 +1,5 @@
 ﻿using JoyMap.ControllerTracking;
+using JoyMap.Util;
 
 namespace JoyMap.Profile
 {
@@ -6,7 +7,7 @@ namespace JoyMap.Profile
         string TriggerCombiner,
         IReadOnlyList<Trigger> Triggers,
         IReadOnlyList<EventAction> Actions
-        );
+        ) : IJsonCompatible;
 
     public record EventInstance(
         Event Event,

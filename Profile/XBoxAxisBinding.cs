@@ -1,4 +1,5 @@
 ﻿using JoyMap.ControllerTracking;
+using JoyMap.Util;
 using JoyMap.XBox;
 
 namespace JoyMap.Profile
@@ -12,12 +13,12 @@ namespace JoyMap.Profile
         ControllerInputId InputId,
         float DeadZone,
         XBoxAxisTranslation Translation
-        );
+        ) : IJsonCompatible;
 
-    public record XBoxMapping(
+    public record XBoxAxisBinding(
         IReadOnlyList<XBoxInputAxis> InAxes,
         XBoxAxis OutAxis
-        );
+        ) : IJsonCompatible;
 
     public readonly record struct AxisInput(
         XBoxInputAxis Input,
@@ -56,20 +57,20 @@ namespace JoyMap.Profile
         }
     }
 
-    public record XBoxMappingInstance(
-        XBoxMapping Mapping,
+    public record XBoxAxisBindingInstance(
+        XBoxAxisBinding Binding,
         IReadOnlyList<AxisInput> InputInstances,
         Func<float?> GetValue
         )
     {
         public bool IsSuspended { get; set; }
-        internal static XBoxMappingInstance Load(InputMonitor monitor, XBoxMapping e)
+        internal static XBoxAxisBindingInstance Load(InputMonitor monitor, XBoxAxisBinding e)
         {
             var triggerInstances = e.InAxes
                 .Select(t => AxisInput.Load(monitor, t))
                 .ToList();
-            return new XBoxMappingInstance(
-                Mapping: e,
+            return new XBoxAxisBindingInstance(
+                Binding: e,
                 InputInstances: triggerInstances,
                 GetValue: () =>
                 {

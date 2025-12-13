@@ -9,7 +9,7 @@ namespace JoyMap.Profile
         string? ProcessNameRegex,
         string? WindowNameRegex,
         IReadOnlyList<Event> Events,
-        IReadOnlyList<XBoxMapping>? XBoxMappings
+        IReadOnlyList<XBoxAxisBinding>? XBoxAxisBindings
         );
 
 
@@ -17,7 +17,7 @@ namespace JoyMap.Profile
         Profile Profile,
         ProcessRegex ProcessNameRegex,
         IReadOnlyList<EventInstance> EventInstances,
-        IReadOnlyList<XBoxMappingInstance> MapperInstances
+        IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindingInstances
         )
     {
         public bool Is(WindowReference wr)
@@ -30,14 +30,14 @@ namespace JoyMap.Profile
             var eventInstances = profile.Events
                 .Select(e => EventInstance.Load(monitor, e))
                 .ToList();
-            var mapperInstances = (profile.XBoxMappings ?? [])
-                .Select(m => XBoxMappingInstance.Load(monitor, m))
+            var axisBindingInstances = (profile.XBoxAxisBindings ?? [])
+                .Select(a => XBoxAxisBindingInstance.Load(monitor, a))
                 .ToList();
             return new ProfileInstance(
                 Profile: profile,
                 ProcessNameRegex: new(profile.ProcessNameRegex, profile.WindowNameRegex),
                 EventInstances: eventInstances,
-                MapperInstances: mapperInstances
+                XBoxAxisBindingInstances: axisBindingInstances
                 );
         }
     }
