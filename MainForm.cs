@@ -843,5 +843,18 @@ namespace JoyMap
         {
             tsmEditBinding_Click(sender, e);
         }
+
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_INPUT = 0x00FF;
+
+            if (m.Msg == WM_INPUT)
+            {
+                // Access the mouse monitor through InputMonitor
+                InputMonitor.ProcessMouseInput(m.LParam);
+            }
+
+            base.WndProc(ref m);
+        }
     }
 }

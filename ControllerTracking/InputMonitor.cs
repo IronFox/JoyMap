@@ -178,6 +178,7 @@ namespace JoyMap.ControllerTracking
     public class InputMonitor : IDisposable
     {
         private readonly CancellationTokenSource cancel = new();
+        private readonly RawMouseInputMonitor _mouseMonitor;
         public InputMonitor(IntPtr windowHandle, IReadOnlyCollection<JsonControllerFamily> controllerFamilies)
         {
             var di = new DirectInput();
@@ -190,10 +191,15 @@ namespace JoyMap.ControllerTracking
             }
 
             Task.Run(() => RunAsync(di, windowHandle, cancel.Token));
+
+            // Add mouse as virtual joystick
+            _mouseMonitor = new RawMouseInputMonitor(windowHandle);
         }
         public void Dispose()
         {
             cancel.Cancel();
+            _mouseMonitor?.Dispose();
+            cancel.Dispose();
         }
 
         private ConcurrentDictionary<Guid, TrackedInput> TrackedInputs { get; } = new();
@@ -266,6 +272,13 @@ namespace JoyMap.ControllerTracking
 
         internal Func<float?> GetFunction(ControllerInputId inputId)
         {
+            // Check if this is the mouse virtual joystick
+            if (inputId.ControllerId.ProductGuid == MouseControllerId.ProductGuid)
+            {
+                // Return raw value WITHOUT negation - BuildGetter will handle it
+                return () => _mouseMonitor.GetAxisValue(inputId.Axis);
+            }
+
             var instanceStatus = CreateInstanceStatus(inputId.ControllerId, inputId.ControllerName);
             return () => instanceStatus.Get(inputId.Axis);
         }
@@ -350,6 +363,28 @@ namespace JoyMap.ControllerTracking
         internal IReadOnlyList<JsonControllerFamily> ExportAllFamilies()
         {
             return [.. AllFamilies.Select(x => x.ToJson())];
+        }
+
+        /// <summary>
+        /// Gets all available input sources including mouse
+        /// </summary>
+        public IEnumerable<ControllerInputId> GetAvailableInputs()
+        {
+            // Mouse axes
+            yield return MouseInputIdFactory.CreateMouseAxis(MouseAxisType.X, false);
+            yield return MouseInputIdFactory.CreateMouseAxis(MouseAxisType.X, true);
+            yield return MouseInputIdFactory.CreateMouseAxis(MouseAxisType.Y, false);
+            yield return MouseInputIdFactory.CreateMouseAxis(MouseAxisType.Y, true);
+
+            // ... existing DirectInput enumeration ...
+        }
+
+        /// <summary>
+        /// Process raw mouse input from WndProc
+        /// </summary>
+        public void ProcessMouseInput(IntPtr lParam)
+        {
+            _mouseMonitor?.ProcessRawInput(lParam);
         }
     }
 }
