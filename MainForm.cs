@@ -322,7 +322,7 @@ namespace JoyMap
             }
 
 
-            var focusedWindow = WindowReference.OfFocused();
+            var focusedWindow = WindowReference.OfTopMost();
             if (focusedWindow is not null)
             {
 

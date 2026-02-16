@@ -103,6 +103,63 @@ namespace JoyMap.Windows
         [DllImport("user32.dll")]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
+
+        private const int GWL_EXSTYLE = -20;
+        private const int WS_EX_TOPMOST = 0x00000008;
+
+        internal static WindowReference? OfTopMost()
+        {
+            WindowReference? topmost = null;
+
+            EnumWindows((hWnd, lParam) =>
+            {
+                if (!IsWindowVisible(hWnd))
+                    return true;
+
+                // Check if window has topmost style
+                IntPtr exStyle = IntPtr.Size == 8
+                    ? GetWindowLongPtr(hWnd, GWL_EXSTYLE)
+                    : new IntPtr(GetWindowLong(hWnd, GWL_EXSTYLE));
+
+                if ((exStyle.ToInt32() & WS_EX_TOPMOST) == 0)
+                    return true;
+
+                int len = GetWindowTextLength(hWnd);
+                if (len == 0)
+                    return true;
+
+                var sb = new StringBuilder(len + 1);
+                GetWindowText(hWnd, sb, sb.Capacity);
+                var title = sb.ToString();
+                if (string.IsNullOrWhiteSpace(title))
+                    return true;
+
+                System.Diagnostics.Process? process = null;
+                try
+                {
+                    GetWindowThreadProcessId(hWnd, out uint pid);
+                    int processId = (int)pid;
+                    process = processId != 0
+                        ? System.Diagnostics.Process.GetProcessById(processId)
+                        : null;
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                topmost = new WindowReference(title, hWnd, process);
+                return false; // Stop enumeration, we found the first topmost window
+            }, IntPtr.Zero);
+
+            return topmost;
+        }
+
         internal static WindowReference? OfFocused()
         {
             var hWnd = GetForegroundWindow();
