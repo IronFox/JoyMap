@@ -103,11 +103,8 @@ namespace JoyMap.Profile
                     var val = input.GetValue();
                     if (val != null)
                     {
-                        if (max is null)
+                        if (max is null || Math.Abs(val.Value) > Math.Abs(max.Value))
                             max = val;
-                        else
-                            max = Math.Sign(val.Value)
-                                * Math.Max(Math.Abs(val.Value), Math.Abs(max.Value));
                     }
                 }
                 if (max == null)
