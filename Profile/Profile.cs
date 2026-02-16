@@ -6,6 +6,7 @@ namespace JoyMap.Profile
     public record Profile(
         Guid Id,
         string Name,
+        string? Notes,
         string? ProcessNameRegex,
         string? WindowNameRegex,
         IReadOnlyList<Event> Events,

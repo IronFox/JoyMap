@@ -126,6 +126,8 @@ namespace JoyMap
             ActiveProfile = profile;
             WithNoEvent(() =>
             {
+                textNotes.Text = profile.Notes;
+                textNotes.Enabled = true;
                 textProcessNameRegex.Text = profile.ProcessNameRegex;
                 textProcessNameRegex.Enabled = true;
                 textWindowNameRegex.Text = profile.WindowNameRegex;
@@ -219,6 +221,8 @@ namespace JoyMap
             if (ActiveProfile is not null)
                 ProfileExecution.Stop();
             ActiveProfile = null;
+            textNotes.Enabled = false;
+            textNotes.Text = "";
             textProcessNameRegex.Text = "";
             textProcessNameRegex.Enabled = false;
             textProfileName.Text = "";
@@ -842,6 +846,27 @@ namespace JoyMap
         private void bindingListView_DoubleClick(object sender, EventArgs e)
         {
             tsmEditBinding_Click(sender, e);
+        }
+
+        private void textNotes_TextChanged(object sender, EventArgs e)
+        {
+            if (NoEventFlag)
+                return;
+            if (ActiveProfile is null)
+            {
+                textNotes.Enabled = false;
+                return;
+            }
+
+            var lastUndo = ActiveProfile.History.NextUndoAction;
+            if (lastUndo is SetProfileNotesAction swra)
+            {
+                swra.UpdateNewValue(textNotes.Text);
+            }
+            else
+            {
+                ActiveProfile.History.ExecuteAction(new SetProfileNotesAction(this, ActiveProfile, textNotes));
+            }
         }
     }
 }

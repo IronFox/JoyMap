@@ -110,6 +110,8 @@
             tsmUnbind = new ToolStripMenuItem();
             tsmSuspendBinding = new ToolStripMenuItem();
             label6 = new Label();
+            tabNotes = new TabPage();
+            textNotes = new TextBox();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             mainMenu.SuspendLayout();
@@ -118,6 +120,7 @@
             tabEvents.SuspendLayout();
             tabXBox.SuspendLayout();
             bindingContextMenu.SuspendLayout();
+            tabNotes.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -552,6 +555,7 @@
             tabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl.Controls.Add(tabEvents);
             tabControl.Controls.Add(tabXBox);
+            tabControl.Controls.Add(tabNotes);
             tabControl.Location = new Point(0, 179);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
@@ -710,6 +714,28 @@
             label6.TabIndex = 12;
             label6.Text = "Axis Binding:";
             // 
+            // tabNotes
+            // 
+            tabNotes.Controls.Add(textNotes);
+            tabNotes.Location = new Point(4, 34);
+            tabNotes.Name = "tabNotes";
+            tabNotes.Padding = new Padding(3);
+            tabNotes.Size = new Size(1215, 598);
+            tabNotes.TabIndex = 2;
+            tabNotes.Text = "Notes";
+            tabNotes.UseVisualStyleBackColor = true;
+            // 
+            // textNotes
+            // 
+            textNotes.Dock = DockStyle.Fill;
+            textNotes.Enabled = false;
+            textNotes.Location = new Point(3, 3);
+            textNotes.Multiline = true;
+            textNotes.Name = "textNotes";
+            textNotes.Size = new Size(1209, 592);
+            textNotes.TabIndex = 0;
+            textNotes.TextChanged += textNotes_TextChanged;
+            // 
             // statusStrip1
             // 
             statusStrip1.ImageScalingSize = new Size(24, 24);
@@ -759,6 +785,8 @@
             tabXBox.ResumeLayout(false);
             tabXBox.PerformLayout();
             bindingContextMenu.ResumeLayout(false);
+            tabNotes.ResumeLayout(false);
+            tabNotes.PerformLayout();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             ResumeLayout(false);
@@ -843,5 +871,7 @@
         private ToolStripMenuItem tsmSelectAllBindings;
         private ToolStripSeparator toolStripMenuItem9;
         private ColumnHeader columnHeader7;
+        private TabPage tabNotes;
+        private TextBox textNotes;
     }
 }

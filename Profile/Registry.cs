@@ -190,6 +190,7 @@ namespace JoyMap.Profile
             {
                 Id = profile.Profile.Id,
                 Name = profile.Profile.Name,
+                Notes = profile.Profile.Notes,
                 ProcessNameRegex = profile.Profile.ProcessNameRegex ?? "",
                 WindowNameRegex = profile.Profile.WindowNameRegex ?? "",
                 Events = [.. profile.EventInstances],

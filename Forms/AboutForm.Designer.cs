@@ -64,7 +64,7 @@
             textBox1.Size = new Size(776, 331);
             textBox1.TabIndex = 2;
             textBox1.TabStop = false;
-            textBox1.Text = "JoyMap is a Joystick to Keyboard mapping program.\r\n\r\nhttps://github.com/IronFox/JoyMap\r\nWritten by Stefan Elsen 2025";
+            textBox1.Text = "JoyMap is a Joystick to Keyboard mapping program.\r\n\r\nhttps://github.com/IronFox/JoyMap\r\nWritten by Stefan Elsen 2025 - 2026\r\n";
             // 
             // btnOk
             // 

@@ -9,6 +9,7 @@ namespace JoyMap.Profile
         public string Name { get; set; } = "";
         public string ProcessNameRegex { get; set; } = "";
         public string WindowNameRegex { get; set; } = "";
+        public string? Notes { get; set; }
         public List<EventInstance> Events { get; init; } = [];
         public Dictionary<XBoxAxis, XBoxAxisBindingInstance> AxisBindings { get; init; } = [];
 
@@ -37,6 +38,7 @@ namespace JoyMap.Profile
             (
                 Id: Id,
                 Name: Name,
+                Notes: Notes,
                 ProcessNameRegex: ProcessNameRegex,
                 WindowNameRegex: WindowNameRegex,
                 Events: Events.Select(x => x.Event).ToList(),

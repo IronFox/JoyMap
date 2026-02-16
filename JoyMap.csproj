@@ -27,8 +27,8 @@
     <PropertyGroup>
       <CurrentBuildNumber>@(_BNLines)</CurrentBuildNumber>
       <NewBuildNumber>$([MSBuild]::Add($(CurrentBuildNumber),1))</NewBuildNumber>
-      <ComputedAssemblyVersion>2.0.$(NewBuildNumber).0</ComputedAssemblyVersion>
-      <ComputedInformationalVersion>2.0.$(NewBuildNumber)</ComputedInformationalVersion>
+      <ComputedAssemblyVersion>2.1.$(NewBuildNumber).0</ComputedAssemblyVersion>
+      <ComputedInformationalVersion>2.1.$(NewBuildNumber)</ComputedInformationalVersion>
     </PropertyGroup>
     <WriteLinesToFile File="$(BuildNumberFile)" Lines="$(NewBuildNumber)" Overwrite="true" />
 
