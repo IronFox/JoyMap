@@ -25,6 +25,10 @@ namespace JoyMap.Profile
         {
             return ProcessNameRegex.IsMatch(wr);
         }
+        public bool Is(FocusPredicate wr)
+        {
+            return wr.ProcessNameIsMatch(ProcessNameRegex);
+        }
 
         public static ProfileInstance Load(InputMonitor monitor, Profile profile)
         {

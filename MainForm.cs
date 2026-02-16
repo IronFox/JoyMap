@@ -326,8 +326,8 @@ namespace JoyMap
             }
 
 
-            var focusedWindow = WindowReference.OfTopMost();
-            if (focusedWindow is not null)
+            var focusedWindow = FocusPredicate.Get();
+            if (focusedWindow.Any)
             {
 
                 var match = Registry.FindAndLoadForWindow(focusedWindow, InputMonitor);
@@ -345,10 +345,12 @@ namespace JoyMap
 
             if (!JoyMapIsFocused && !GameNotFocused)
             {
+                //focusedWindow.TopMost?.Focus();
                 ProfileExecution.Start(ActiveProfile);
             }
             else
-                ProfileExecution.Stop();
+                if (ProfileExecution.IsActive)
+                    ProfileExecution.Stop();
         }
 
         private void copyAllToolStripMenuItem_Click(object sender, EventArgs e)

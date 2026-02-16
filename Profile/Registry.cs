@@ -21,7 +21,7 @@ namespace JoyMap.Profile
 
 
 
-        public static ProfileInstance? FindAndLoadForWindow(WindowReference window, InputMonitor monitor)
+        public static ProfileInstance? FindAndLoadForWindow(FocusPredicate window, InputMonitor monitor)
         {
             foreach (var slot in Profiles.Values)
             {
@@ -34,7 +34,7 @@ namespace JoyMap.Profile
                     else
                         slot.ProcessNameRegex = new(slot.Profile.ProcessNameRegex, slot.Profile.WindowNameRegex);
                 }
-                if (slot.ProcessNameRegex.IsMatch(window))
+                if (window.ProcessNameIsMatch(slot.ProcessNameRegex))
                 {
                     if (slot.Loaded is not null)
                         return slot.Loaded;

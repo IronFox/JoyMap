@@ -26,6 +26,7 @@ namespace JoyMap.Profile
             return false;
         }
 
+        public static bool IsActive => Active is not null;
         public static void Stop()
         {
             Active?.Dispose();
