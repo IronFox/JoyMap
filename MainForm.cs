@@ -724,10 +724,11 @@ namespace JoyMap
                 return;
             }
 
+            var timestamp = DateTime.Now.ToString("HH:mm:ss");
             if (ex is not null)
-                Instance.toolStripStatusLabel1.Text = $"{status}: {ex.Message}";
+                Instance.toolStripStatusLabel1.Text = $"[{timestamp}] {status}: {ex.Message}";
             else
-                Instance.toolStripStatusLabel1.Text = status;
+                Instance.toolStripStatusLabel1.Text = $"[{timestamp}] {status}";
         }
 
         private void tsmEditBinding_Click(object sender, EventArgs e)

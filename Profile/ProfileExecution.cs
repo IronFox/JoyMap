@@ -37,7 +37,7 @@ namespace JoyMap.Profile
         {
             Events = profileInstance.EventInstances;
             Mappings = profileInstance.XBoxAxisBindings;
-            Console.WriteLine($"Starting ProfileExecution with {Events.Count} events.");
+            MainForm.Log($"Profile execution started with {Events.Count} events");
 
 
             ListenCancel = new CancellationTokenSource();
@@ -70,7 +70,16 @@ namespace JoyMap.Profile
                 while (true)
                 {
                     foreach (var p in processors)
-                        p.Update();
+                    {
+                        try
+                        {
+                            p.Update();
+                        }
+                        catch (Exception ex)
+                        {
+                            MainForm.Log($"Processor error [{p.GetType().Name}]", ex);
+                        }
+                    }
                     await Task.Delay(5, cancel).ConfigureAwait(false);
                 }
             }
@@ -80,13 +89,12 @@ namespace JoyMap.Profile
             }
             catch (Exception ex)
             {
-                // Log exception
-                Console.WriteLine($"ListenLoop Exception: {ex}");
+                MainForm.Log("ListenLoop fatal error", ex);
                 throw;
             }
             finally
             {
-                Console.WriteLine($"ProfileExecution ListenLoop ending.");
+                MainForm.Log("Profile execution stopped");
                 foreach (var processor in processors)
                 {
                     processor.Dispose();

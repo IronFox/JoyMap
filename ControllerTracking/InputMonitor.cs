@@ -56,8 +56,9 @@ namespace JoyMap.ControllerTracking
                     Joystick.Poll();
                     TargetStatus.UpdateInstance(Joystick.GetCurrentState(), Resolution);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    MainForm.Log($"Controller disconnected: {Device.ProductName}", ex);
                     Owner.SignalDisturbance(this);
                     return;
                 }

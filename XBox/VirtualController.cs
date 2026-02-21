@@ -1,6 +1,7 @@
 ﻿using Nefarius.ViGEm.Client;
 using Nefarius.ViGEm.Client.Targets;
 using Nefarius.ViGEm.Client.Targets.Xbox360;
+using System.Diagnostics;
 
 namespace JoyMap.XBox
 {
@@ -34,7 +35,7 @@ namespace JoyMap.XBox
                 _ => throw new ArgumentOutOfRangeException(nameof(button), $"Unhandled button: {button}"),
             };
             _controller.SetButtonState(xboxButton, pressed);
-            _controller.SubmitReport();
+            SubmitSafe();
         }
 
         public void UpdateFromInputState(
@@ -50,7 +51,7 @@ namespace JoyMap.XBox
             // Triggers (0-255)
             ApplySlider(XBoxAxis.TriggerLeft, Xbox360Slider.LeftTrigger, analogFeed);
 
-            _controller.SubmitReport();
+            SubmitSafe();
         }
 
         private void ApplySlider(XBoxAxis inTriggerAxis, Xbox360Slider outSlider, IReadOnlyDictionary<XBoxAxis, Func<float?>> feed)
@@ -70,6 +71,25 @@ namespace JoyMap.XBox
                 var v = get();
                 if (v.HasValue)
                     _controller.SetAxisValue(outAxis, NormalizeAxis(v.Value));
+            }
+        }
+
+        private const int SlowSubmitThresholdMs = 50;
+
+        private void SubmitSafe()
+        {
+            var start = Stopwatch.GetTimestamp();
+            try
+            {
+                _controller.SubmitReport();
+                var elapsed = Stopwatch.GetElapsedTime(start);
+                if (elapsed.TotalMilliseconds >= SlowSubmitThresholdMs)
+                    MainForm.Log($"XBox SubmitReport slow: {elapsed.TotalMilliseconds:F0}ms");
+            }
+            catch (Exception ex)
+            {
+                var elapsed = Stopwatch.GetElapsedTime(start);
+                MainForm.Log($"XBox SubmitReport failed after {elapsed.TotalMilliseconds:F0}ms", ex);
             }
         }
 
