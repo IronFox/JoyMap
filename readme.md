@@ -9,7 +9,7 @@ JoyMap is a powerful Joystick-to-Keyboard/Mouse/Xbox mapping program that extend
 1. **Multi-trigger Events**: Each event can use any number of joystick inputs, including those already used by other events
 2. **Independent Axis Ranges**: Every trigger on every event has independent min/max thresholds with fraction precision (e.g., 12.34567%)
 3. **Complex Trigger Logic**: Simple and complex boolean expressions (AND, OR, NOT, parentheses) with trigger labels (T0, T1, ...)
-4. **Multiple Actions per Event**: Each action can specify delays, auto-fire frequency, and repetition limits
+4. **Multiple Actions per Event**: Each action can specify delays, auto-fire frequency, explicit hold/release timing cycles, and repetition limits
 5. **Smart Device Mapping**: Controllers mapped by Product GUID → Instance GUID with automatic fallback to any instance of the same product
 6. **Profile Auto-switching**: Automatically activates profiles based on focused window process/title (regex)
 7. **Undo/Redo Support**: Full undo/redo history for profile editing with auto-save in Release builds
@@ -437,7 +437,7 @@ Input: 80% ┌────────┐┌────────┐┌──
 **Action List Columns:**
 - **Name**: User-defined or auto-generated action name
 - **Key/Button**: Target output (keyboard key, mouse button, or Xbox button)
-- **Behavior**: "Hold", "Auto-fire X Hz", "Delayed", etc.
+- **Behavior**: "Hold", "Auto-fire X Hz", "t=[hold]/[release]ms" (Timing mode), "Delayed", etc.
 
 **Adding/Editing:**
 - **Right-click** → **Add...**: Create new action
@@ -452,16 +452,20 @@ Input: 80% ┌────────┐┌────────┐┌──
 | **Name** | Action identifier (auto-filled from key if blank) | - |
 | **Key/Button** | Target output (keyboard/mouse/Xbox) | None |
 | **Initial Delay (ms)** | Wait X ms before first activation | 0 |
-| **Auto Trigger Frequency** | Enable auto-fire (checkbox) | Off |
-| **Frequency (Hz)** | Presses per second (consider game FPS) | 10 |
-| **Delay Start (ms)** | Hold first press for X ms before auto-fire | 0 |
-| **Limit Auto-Triggers** | Maximum number of presses (checkbox) | Off |
-| **Limit Count** | Max presses | 3 |
+| **Auto Trigger Frequency** | Enable frequency-based auto-fire (checkbox; mutually exclusive with Timing) | Off |
+| **Frequency (Hz)** | Presses per second when using Frequency mode (consider game FPS) | 10 |
+| **Auto Trigger Timing** | Enable timing-controlled hold/release cycle (checkbox; mutually exclusive with Frequency) | Off |
+| **Hold (ms)** | Duration key is held pressed per cycle when using Timing mode | 200 |
+| **Release (ms)** | Duration key is kept released between presses when using Timing mode | 200 |
+| **Delay Start (ms)** | Hold first press for X ms before auto-fire or timing cycle begins | 0 |
+| **Limit Auto-Triggers** | Maximum number of presses (checkbox; applies to both modes) | Off |
+| **Limit Count** | Max presses (minimum useful value is **2**; see note below) | 3 |
 
 **⚠ Action Frequency & Game FPS:**
 - Like dither triggers, action auto-fire should consider game FPS
 - High auto-fire frequency in low-FPS games may cause missed inputs
 - **Recommended**: Auto-fire frequency ≤ game FPS
+- **Timing mode**: Hold/Release cycle timing is wall-clock based and not FPS-dependent; use it when precise hold/release durations matter more than a target press rate
 
 **Behavior Modes:**
 
@@ -470,20 +474,31 @@ Input: 80% ┌────────┐┌────────┐┌──
 - Release output when event deactivates
 - Use case: Simple key hold (e.g., W for forward movement)
 
-**2. Auto-Fire Mode (Auto Trigger ON):**
+**2. Auto-Fire Mode (Auto Trigger Frequency ON):**
 - Rapidly press/release output at specified frequency
 - Continues until event deactivates or limit reached
 - Use case: Rapid-fire weapon, spam key press
 
-**3. Delayed Auto-Fire:**
-- Hold first press for "Delay Start" duration
-- Then switch to auto-fire
-- Use case: Charge attack (hold), then rapid combo (auto-fire)
+**3. Timing Mode (Auto Trigger Timing ON):**
+- Holds output for **Hold (ms)**, then releases for **Release (ms)**, cycling continuously
+- Total cycle time = Hold + Release ms
+- Cycle begins with the key held (initial press at activation); use Delay Start for a plain-hold phase before cycling begins
+- Continues until event deactivates or limit reached
+- Use case: Controlled rhythmic keypresses where exact hold/release durations matter (e.g., hold 300ms, gap 100ms)
 
-**4. Limited Auto-Fire:**
-- Auto-fire exactly N times
+> **Note**: Auto Trigger Frequency and Auto Trigger Timing are **mutually exclusive** — checking one automatically unchecks the other. Delay Start and Limit apply to both modes.
+
+**4. Delayed Auto-Fire/Timing:**
+- Hold first press for "Delay Start" duration
+- Then switch to auto-fire or timing cycle
+- Use case: Charge attack (hold), then rapid combo
+
+**5. Limited Auto-Fire/Timing:**
+- Auto-fire or timing cycle exactly N times
 - Last press is **held** until event deactivates
 - Use case: Double jump with subsequent glide (press 2x, then hold)
+
+> ⚠ **Limit = 1 caveat**: With a limit of 1 the key fires once after the first half-cycle interval and is then held for the remainder of the event, which is almost indistinguishable from Hold Mode. Set **Limit ≥ 2** for meaningful repetition.
 
 **Key/Button Selection:**
 - **Pick...** button opens picker dialog
@@ -496,9 +511,12 @@ Input: 80% ┌────────┐┌────────┐┌──
 | Configuration | Behavior |
 |---------------|----------|
 | Hold Space, no auto-fire | Holds Space while event active |
-| Auto-fire 10 Hz, no delay | Presses Space 10x/second while active |
-| Auto-fire 5 Hz, delay 500ms | Holds Space 500ms, then presses 5x/second |
-| Auto-fire 10 Hz, limit 3 | Presses Space 3x rapidly, holds 3rd press until deactivate |
+| Auto-fire 10 Hz, no delay | Presses Space 10×/second while active |
+| Auto-fire 5 Hz, delay 500ms | Holds Space 500ms, then presses 5×/second |
+| Auto-fire 10 Hz, limit 3 | Presses Space 3× rapidly, holds 3rd press until deactivate |
+| Timing: Hold=300ms, Release=100ms | Key held 300ms, released 100ms, repeating while active |
+| Timing: Hold=200ms, Release=200ms, delay 500ms | Holds Space 500ms, then cycles 200ms on / 200ms off |
+| Timing: Hold=500ms, Release=50ms, limit 3 | 3 slow presses (500ms held, 50ms gap each), last press held |
 
 ### Undo/Redo
 
@@ -622,8 +640,9 @@ Input: 80% ┌────────┐┌────────┐┌──
 **Action Timing:**
 - Initial Delay: Use for sequential macros (e.g., 0ms, 200ms, 400ms delays)
 - Auto-fire: Match to game FPS (e.g., 30Hz action for 60 FPS game)
-- Limited triggers: Great for combo sequences (e.g., 3x rapid tap, then hold)
-- **FPS-aware**: Lower action frequency in low-FPS games to prevent missed inputs
+- Auto-Trigger Timing: Use when exact hold/release durations matter more than a press rate (e.g., hold 300ms, release 100ms); not FPS-dependent
+- Limited triggers: Great for combo sequences (e.g., 3× rapid tap, then hold)
+- **FPS-aware**: Lower auto-fire frequency in low-FPS games to prevent missed inputs; Timing mode is wall-clock based and unaffected by game FPS
 
 **Xbox Binding:**
 - Start with one axis at a time to verify behavior
@@ -684,6 +703,7 @@ Input: 80% ┌────────┐┌────────┐┌──
 - No per-action undo within event/trigger/action dialogs
 - **Dither/auto-fire frequency limited by game FPS**: High frequencies (>60Hz) may cause unpredictable behavior in low-FPS games
 - **No frame-sync**: Dither timing is wall-clock based, not frame-synchronized
+- **Auto-trigger Limit = 1 behaves like Hold Mode**: A limit of 1 fires the key once after the first half-cycle interval and then holds it, making the auto-cycle option effectively inactive; use Limit ≥ 2 for actual repetition
 
 ## Credits
 
