@@ -1,4 +1,6 @@
-﻿namespace JoyMap
+﻿using System.Runtime.InteropServices;
+
+namespace JoyMap
 {
     public partial class PickKeyForm : Form
     {
@@ -48,6 +50,9 @@
                 Keys.Oem6 => "]",
                 Keys.Oem7 => "'",
                 Keys.OemMinus => "-",
+                Keys.Menu => "Alt",
+                Keys.LMenu => "LAlt",
+                Keys.RMenu => "RAlt",
                 _ => k.ToString()
             };
         }
@@ -70,8 +75,41 @@
             }
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            const int WM_KEYDOWN = 0x0100;
+            const int WM_SYSKEYDOWN = 0x0104;
+            if (msg.Msg == WM_SYSKEYDOWN)
+            {
+                var vk = keyData & Keys.KeyCode;
+                if (vk is Keys.Menu or Keys.LMenu or Keys.RMenu)
+                    {
+                        if (vk == Keys.RMenu)
+                            CleanupCtrlGroup();
+                        RelayKey(vk, true, singleKey: false);
+                        return true;
+                    }
+            }
+            if (msg.Msg == WM_KEYDOWN && (keyData & Keys.KeyCode) == Keys.LControlKey && IsAltGrSyntheticCtrl())
+                return true;
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_SYSCOMMAND = 0x0112;
+            const int SC_KEYMENU = 0xF100;
+            if (m.Msg == WM_SYSCOMMAND && (int)m.WParam == SC_KEYMENU)
+                return;
+            base.WndProc(ref m);
+        }
+
         private void PickKeyForm_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.LControlKey && IsAltGrSyntheticCtrl())
+                return;
+            if (e.KeyCode == Keys.RMenu)
+                CleanupCtrlGroup();
             RelayKey(e.KeyData, true, singleKey: true);
         }
 
@@ -94,6 +132,14 @@
                     RelayKey(rest, isPressed);
                 return;
             }
+            if ((k & Keys.Alt) != 0)
+            {
+                RelayKey(Keys.Menu, isPressed);
+                var rest = k & ~Keys.Alt;
+                if (rest != Keys.Menu)
+                    RelayKey(rest, isPressed);
+                return;
+            }
 
             if (k == Keys.ControlKey)
             {
@@ -104,6 +150,11 @@
             {
                 RelayKey(Keys.LShiftKey, isPressed);
                 RelayKey(Keys.RShiftKey, isPressed);
+            }
+            if (k == Keys.Menu)
+            {
+                RelayKey(Keys.LMenu, isPressed);
+                RelayKey(Keys.RMenu, isPressed);
             }
             if (k == Keys.PageUp)
             {
@@ -165,6 +216,8 @@
 
         private void PickKeyForm_KeyUp(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.LControlKey && Status.TryGetValue(Keys.RMenu, out var rMenuActive) && rMenuActive)
+                return;
             RelayKey(e.KeyData, false);
         }
 
@@ -181,6 +234,28 @@
                 }
             }
 
+        }
+
+        [DllImport("user32.dll")]
+        private static extern short GetAsyncKeyState(int vKey);
+
+        private static bool IsAltGrSyntheticCtrl()
+        {
+            const int VK_RMENU = 0xA5;
+            return (GetAsyncKeyState(VK_RMENU) & 0x8000) != 0;
+        }
+
+        private void CleanupCtrlGroup()
+        {
+            foreach (var k in new[] { Keys.LControlKey, Keys.RControlKey, Keys.ControlKey })
+            {
+                if (Rows.TryGetValue(k, out var row))
+                {
+                    inputList.Items.Remove(row);
+                    Rows.Remove(k);
+                }
+                Status.Remove(k);
+            }
         }
     }
 }
