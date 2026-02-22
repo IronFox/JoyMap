@@ -53,6 +53,11 @@ namespace JoyMap
                 Keys.Menu => "Alt",
                 Keys.LMenu => "LAlt",
                 Keys.RMenu => "RAlt",
+                Keys.Next => "Page Down",      // VK_NEXT alias
+                Keys.Prior => "Page Up",       // VK_PRIOR alias
+                Keys.Return => "Enter",        // VK_RETURN alias
+                Keys.Capital => "Caps Lock",   // VK_CAPITAL alias
+                Keys.Snapshot => "Print Screen", // VK_SNAPSHOT alias
                 _ => k.ToString()
             };
         }
