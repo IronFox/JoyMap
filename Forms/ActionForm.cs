@@ -29,6 +29,12 @@ namespace JoyMap
                         cbSimpleAutoTriggerFrequency.Checked = true;
                         textSimpleAutoTriggerFrequency.Text = effect.SimpleInputEffect.AutoTriggerFrequency.Value.ToStr();
                     }
+                    if (effect.SimpleInputEffect.AutoTriggerTiming is not null)
+                    {
+                        cbSimpleAutoTriggerTiming.Checked = true;
+                        textSimpleAutoTriggerHoldMs.Text = effect.SimpleInputEffect.AutoTriggerTiming.Value.HoldMs.ToStr();
+                        textSimpleAutoTriggerReleaseMs.Text = effect.SimpleInputEffect.AutoTriggerTiming.Value.ReleaseMs.ToStr();
+                    }
                     if (effect.SimpleInputEffect.AutoTriggerLimit is not null)
                     {
                         cbSimpleAutoTriggerLimit.Checked = true;
@@ -104,17 +110,34 @@ namespace JoyMap
                 var autoTriggerDelayedStartMs = textSimpleAutoTriggerDelayedStartMs.GetFloat(false);
                 var triggerFrequency = textSimpleAutoTriggerFrequency.GetFloat(false);
                 var autoTriggerLimit = textSimpleAutoTriggerLimit.GetInt();
+                var autoTriggerHoldMs = textSimpleAutoTriggerHoldMs.GetFloat(false);
+                var autoTriggerReleaseMs = textSimpleAutoTriggerReleaseMs.GetFloat(false);
+                AutoTriggerTiming? autoTriggerTiming = null;
                 if (!cbSimpleAutoTriggerFrequency.Checked)
                 {
                     triggerFrequency = null;
+                }
+                if (cbSimpleAutoTriggerTiming.Checked)
+                {
+                    if (autoTriggerHoldMs is null || autoTriggerHoldMs.Value <= 0)
+                    {
+                        toolStripStatusLabel.Text = $"Unable to parse auto-trigger hold time";
+                        return;
+                    }
+                    else if (autoTriggerReleaseMs is null || autoTriggerReleaseMs.Value <= 0)
+                    {
+                        toolStripStatusLabel.Text = $"Unable to parse auto-trigger release time";
+                        return;
+                    }
+                    autoTriggerTiming = new AutoTriggerTiming(autoTriggerHoldMs.Value, autoTriggerReleaseMs.Value);
                 }
                 if (!cbSimpleAutoTriggerDelayedStart.Checked)
                 {
                     autoTriggerDelayedStartMs = null;
                 }
-                else if (triggerFrequency is null || triggerFrequency.Value <= 0)
+                else if ((triggerFrequency is null || triggerFrequency.Value <= 0) && autoTriggerTiming is null)
                 {
-                    toolStripStatusLabel.Text = $"Unable to parse trigger frequency";
+                    toolStripStatusLabel.Text = $"Unable to parse trigger frequency or timing";
                     return;
                 }
                 if (!cbSimpleAutoTriggerLimit.Checked || !cbSimpleAutoTriggerLimit.Checked)
@@ -141,7 +164,8 @@ namespace JoyMap
                         Keys: key.Value,
                         AutoTriggerDelayMs: autoTriggerDelayedStartMs,
                         AutoTriggerFrequency: triggerFrequency,
-                        AutoTriggerLimit: autoTriggerLimit
+                        AutoTriggerLimit: autoTriggerLimit,
+                        AutoTriggerTiming: autoTriggerTiming
                     )
                     );
             }
@@ -179,14 +203,8 @@ namespace JoyMap
         {
             if (tabControl.SelectedTab == tpSimple)
             {
-                float? triggerFrequency;
-                if (!cbSimpleAutoTriggerFrequency.Checked)
-                {
-                    triggerFrequency = null;
-                }
-                else
-                    triggerFrequency = textSimpleAutoTriggerFrequency.GetFloat(false);
-                return $"{comboSimpleKey.Text}{(triggerFrequency is not null ? " (auto)" : "")}";
+                bool isAuto = cbSimpleAutoTriggerFrequency.Checked || cbSimpleAutoTriggerTiming.Checked;
+                return $"{comboSimpleKey.Text}{(isAuto ? " (auto)" : "")}";
             }
             if (tabControl.SelectedTab == tpTrigger)
             {
@@ -216,15 +234,50 @@ namespace JoyMap
             AnyInputChanged(sender, e);
         }
 
-        private void cbSimpleAutoTriggerFrequency_CheckedChanged(object sender, EventArgs e)
+        private bool _updatingAutoTriggerCheckboxes;
+
+        private void UpdateAutoTriggerDependents()
         {
+            bool anyAutoMode = cbSimpleAutoTriggerFrequency.Checked || cbSimpleAutoTriggerTiming.Checked;
             cbSimpleAutoTriggerDelayedStart.Enabled =
                 cbSimpleAutoTriggerLimit.Enabled =
                 textSimpleAutoTriggerLimit.Enabled =
-                textSimpleAutoTriggerDelayedStartMs.Enabled =
-                cbSimpleAutoTriggerFrequency.Checked;
+                textSimpleAutoTriggerDelayedStartMs.Enabled = anyAutoMode;
+            textSimpleAutoTriggerHoldMs.Enabled =
+                textSimpleAutoTriggerReleaseMs.Enabled = cbSimpleAutoTriggerTiming.Checked;
+        }
 
+        private void cbSimpleAutoTriggerFrequency_CheckedChanged(object sender, EventArgs e)
+        {
+            if (_updatingAutoTriggerCheckboxes) return;
+            _updatingAutoTriggerCheckboxes = true;
+            try
+            {
+                if (cbSimpleAutoTriggerFrequency.Checked)
+                    cbSimpleAutoTriggerTiming.Checked = false;
+                UpdateAutoTriggerDependents();
+            }
+            finally
+            {
+                _updatingAutoTriggerCheckboxes = false;
+            }
+            AnyInputChanged(sender, e);
+        }
 
+        private void cbSimpleAutoTriggerTiming_CheckedChanged(object sender, EventArgs e)
+        {
+            if (_updatingAutoTriggerCheckboxes) return;
+            _updatingAutoTriggerCheckboxes = true;
+            try
+            {
+                if (cbSimpleAutoTriggerTiming.Checked)
+                    cbSimpleAutoTriggerFrequency.Checked = false;
+                UpdateAutoTriggerDependents();
+            }
+            finally
+            {
+                _updatingAutoTriggerCheckboxes = false;
+            }
             AnyInputChanged(sender, e);
         }
 
@@ -243,6 +296,18 @@ namespace JoyMap
             cbSimpleAutoTriggerDelayedStart.Checked = true;
             AnyInputChanged(sender, e);
 
+        }
+
+        private void textSimpleAutoTriggerHoldMs_TextChanged(object sender, EventArgs e)
+        {
+            cbSimpleAutoTriggerTiming.Checked = true;
+            AnyInputChanged(sender, e);
+        }
+
+        private void textSimpleAutoTriggerReleaseMs_TextChanged(object sender, EventArgs e)
+        {
+            cbSimpleAutoTriggerTiming.Checked = true;
+            AnyInputChanged(sender, e);
         }
 
         private void btnChangeTriggerKeySelect_Click(object sender, EventArgs e)

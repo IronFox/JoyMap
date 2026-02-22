@@ -40,6 +40,11 @@
             cbSimpleAutoTriggerLimit = new CheckBox();
             textSimpleAutoTriggerFrequency = new TextBox();
             cbSimpleAutoTriggerFrequency = new CheckBox();
+            cbSimpleAutoTriggerTiming = new CheckBox();
+            labelSimpleAutoTriggerHoldMs = new Label();
+            textSimpleAutoTriggerHoldMs = new TextBox();
+            labelSimpleAutoTriggerReleaseMs = new Label();
+            textSimpleAutoTriggerReleaseMs = new TextBox();
             btnSimplePickKey = new Button();
             label3 = new Label();
             tpTrigger = new TabPage();
@@ -63,7 +68,7 @@
             btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnOk.DialogResult = DialogResult.OK;
             btnOk.Enabled = false;
-            btnOk.Location = new Point(214, 380);
+            btnOk.Location = new Point(214, 417);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(282, 34);
             btnOk.TabIndex = 20;
@@ -75,7 +80,7 @@
             // 
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(502, 380);
+            btnCancel.Location = new Point(502, 417);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(282, 34);
             btnCancel.TabIndex = 19;
@@ -90,7 +95,7 @@
             tabControl.Location = new Point(12, 90);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(776, 284);
+            tabControl.Size = new Size(776, 321);
             tabControl.TabIndex = 21;
             // 
             // tpSimple
@@ -100,6 +105,11 @@
             tpSimple.Controls.Add(cbSimpleAutoTriggerDelayedStart);
             tpSimple.Controls.Add(textSimpleAutoTriggerLimit);
             tpSimple.Controls.Add(cbSimpleAutoTriggerLimit);
+            tpSimple.Controls.Add(textSimpleAutoTriggerReleaseMs);
+            tpSimple.Controls.Add(labelSimpleAutoTriggerReleaseMs);
+            tpSimple.Controls.Add(textSimpleAutoTriggerHoldMs);
+            tpSimple.Controls.Add(labelSimpleAutoTriggerHoldMs);
+            tpSimple.Controls.Add(cbSimpleAutoTriggerTiming);
             tpSimple.Controls.Add(textSimpleAutoTriggerFrequency);
             tpSimple.Controls.Add(cbSimpleAutoTriggerFrequency);
             tpSimple.Controls.Add(btnSimplePickKey);
@@ -107,7 +117,7 @@
             tpSimple.Location = new Point(4, 34);
             tpSimple.Name = "tpSimple";
             tpSimple.Padding = new Padding(3);
-            tpSimple.Size = new Size(768, 246);
+            tpSimple.Size = new Size(768, 283);
             tpSimple.TabIndex = 0;
             tpSimple.Text = "Simple Trigger";
             // 
@@ -126,7 +136,7 @@
             // 
             textSimpleAutoTriggerDelayedStartMs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textSimpleAutoTriggerDelayedStartMs.Enabled = false;
-            textSimpleAutoTriggerDelayedStartMs.Location = new Point(245, 81);
+            textSimpleAutoTriggerDelayedStartMs.Location = new Point(245, 118);
             textSimpleAutoTriggerDelayedStartMs.Name = "textSimpleAutoTriggerDelayedStartMs";
             textSimpleAutoTriggerDelayedStartMs.Size = new Size(517, 31);
             textSimpleAutoTriggerDelayedStartMs.TabIndex = 35;
@@ -137,7 +147,7 @@
             // 
             cbSimpleAutoTriggerDelayedStart.AutoSize = true;
             cbSimpleAutoTriggerDelayedStart.Enabled = false;
-            cbSimpleAutoTriggerDelayedStart.Location = new Point(6, 83);
+            cbSimpleAutoTriggerDelayedStart.Location = new Point(6, 120);
             cbSimpleAutoTriggerDelayedStart.Name = "cbSimpleAutoTriggerDelayedStart";
             cbSimpleAutoTriggerDelayedStart.Size = new Size(166, 29);
             cbSimpleAutoTriggerDelayedStart.TabIndex = 34;
@@ -149,7 +159,7 @@
             // 
             textSimpleAutoTriggerLimit.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textSimpleAutoTriggerLimit.Enabled = false;
-            textSimpleAutoTriggerLimit.Location = new Point(245, 118);
+            textSimpleAutoTriggerLimit.Location = new Point(245, 155);
             textSimpleAutoTriggerLimit.Name = "textSimpleAutoTriggerLimit";
             textSimpleAutoTriggerLimit.Size = new Size(517, 31);
             textSimpleAutoTriggerLimit.TabIndex = 33;
@@ -160,7 +170,7 @@
             // 
             cbSimpleAutoTriggerLimit.AutoSize = true;
             cbSimpleAutoTriggerLimit.Enabled = false;
-            cbSimpleAutoTriggerLimit.Location = new Point(6, 120);
+            cbSimpleAutoTriggerLimit.Location = new Point(6, 157);
             cbSimpleAutoTriggerLimit.Name = "cbSimpleAutoTriggerLimit";
             cbSimpleAutoTriggerLimit.Size = new Size(193, 29);
             cbSimpleAutoTriggerLimit.TabIndex = 32;
@@ -188,6 +198,53 @@
             cbSimpleAutoTriggerFrequency.Text = "Auto-Trigger Frequency:";
             cbSimpleAutoTriggerFrequency.UseVisualStyleBackColor = true;
             cbSimpleAutoTriggerFrequency.CheckedChanged += cbSimpleAutoTriggerFrequency_CheckedChanged;
+            // 
+            // cbSimpleAutoTriggerTiming
+            // 
+            cbSimpleAutoTriggerTiming.AutoSize = true;
+            cbSimpleAutoTriggerTiming.Location = new Point(6, 83);
+            cbSimpleAutoTriggerTiming.Name = "cbSimpleAutoTriggerTiming";
+            cbSimpleAutoTriggerTiming.TabIndex = 38;
+            cbSimpleAutoTriggerTiming.Text = "Auto-Trigger Timing:";
+            cbSimpleAutoTriggerTiming.UseVisualStyleBackColor = true;
+            cbSimpleAutoTriggerTiming.CheckedChanged += cbSimpleAutoTriggerTiming_CheckedChanged;
+            // 
+            // labelSimpleAutoTriggerHoldMs
+            // 
+            labelSimpleAutoTriggerHoldMs.AutoSize = true;
+            labelSimpleAutoTriggerHoldMs.Location = new Point(240, 86);
+            labelSimpleAutoTriggerHoldMs.Name = "labelSimpleAutoTriggerHoldMs";
+            labelSimpleAutoTriggerHoldMs.TabIndex = 39;
+            labelSimpleAutoTriggerHoldMs.Text = "Hold (ms):";
+            // 
+            // textSimpleAutoTriggerHoldMs
+            // 
+            textSimpleAutoTriggerHoldMs.Enabled = false;
+            textSimpleAutoTriggerHoldMs.Location = new Point(325, 83);
+            textSimpleAutoTriggerHoldMs.Name = "textSimpleAutoTriggerHoldMs";
+            textSimpleAutoTriggerHoldMs.Size = new Size(135, 31);
+            textSimpleAutoTriggerHoldMs.TabIndex = 40;
+            textSimpleAutoTriggerHoldMs.Text = "200";
+            textSimpleAutoTriggerHoldMs.TextChanged += textSimpleAutoTriggerHoldMs_TextChanged;
+            // 
+            // labelSimpleAutoTriggerReleaseMs
+            // 
+            labelSimpleAutoTriggerReleaseMs.AutoSize = true;
+            labelSimpleAutoTriggerReleaseMs.Location = new Point(465, 86);
+            labelSimpleAutoTriggerReleaseMs.Name = "labelSimpleAutoTriggerReleaseMs";
+            labelSimpleAutoTriggerReleaseMs.TabIndex = 41;
+            labelSimpleAutoTriggerReleaseMs.Text = "Release (ms):";
+            // 
+            // textSimpleAutoTriggerReleaseMs
+            // 
+            textSimpleAutoTriggerReleaseMs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textSimpleAutoTriggerReleaseMs.Enabled = false;
+            textSimpleAutoTriggerReleaseMs.Location = new Point(590, 83);
+            textSimpleAutoTriggerReleaseMs.Name = "textSimpleAutoTriggerReleaseMs";
+            textSimpleAutoTriggerReleaseMs.Size = new Size(172, 31);
+            textSimpleAutoTriggerReleaseMs.TabIndex = 42;
+            textSimpleAutoTriggerReleaseMs.Text = "200";
+            textSimpleAutoTriggerReleaseMs.TextChanged += textSimpleAutoTriggerReleaseMs_TextChanged;
             // 
             // btnSimplePickKey
             // 
@@ -292,7 +349,7 @@
             // 
             statusStrip1.ImageScalingSize = new Size(24, 24);
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
-            statusStrip1.Location = new Point(0, 428);
+            statusStrip1.Location = new Point(0, 465);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(800, 22);
             statusStrip1.TabIndex = 26;
@@ -309,7 +366,7 @@
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(800, 487);
             Controls.Add(statusStrip1);
             Controls.Add(textName);
             Controls.Add(label2);
@@ -319,7 +376,7 @@
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MinimumSize = new Size(822, 506);
+            MinimumSize = new Size(822, 543);
             Name = "ActionForm";
             Text = "Action";
             tabControl.ResumeLayout(false);
@@ -358,5 +415,10 @@
         private ComboBox comboOnChangeKey;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel;
+        private CheckBox cbSimpleAutoTriggerTiming;
+        private Label labelSimpleAutoTriggerHoldMs;
+        private TextBox textSimpleAutoTriggerHoldMs;
+        private Label labelSimpleAutoTriggerReleaseMs;
+        private TextBox textSimpleAutoTriggerReleaseMs;
     }
 }

@@ -33,12 +33,13 @@ namespace JoyMap.Profile
         KeyOrButton Keys,
         float? AutoTriggerDelayMs,
         float? AutoTriggerFrequency,
-        int? AutoTriggerLimit
+        int? AutoTriggerLimit,
+        AutoTriggerTiming? AutoTriggerTiming = null
         ) : IJsonCompatible
     {
         [JsonIgnore]
         public string Action =>
-                $"Key: {Keys}{(AutoTriggerFrequency is not null ? $", f={AutoTriggerFrequency.Value.ToStr()}" : "")}";
+                $"Key: {Keys}{(AutoTriggerFrequency is not null ? $", f={AutoTriggerFrequency.Value.ToStr()}" : AutoTriggerTiming is not null ? $", {AutoTriggerTiming}" : "")}";
     }
 
     public record ChangeTriggerInputEffect(

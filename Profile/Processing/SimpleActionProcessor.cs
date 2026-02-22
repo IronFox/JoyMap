@@ -13,6 +13,12 @@ namespace JoyMap.Profile
 
             var retrig = Effect.AutoTriggerFrequency ?? 0;
             ToggleInterval = retrig > 0 ? TimeSpan.FromSeconds(1f / retrig) / 2 : TimeSpan.MaxValue;
+            HoldInterval = effect.AutoTriggerTiming is not null
+                ? TimeSpan.FromMilliseconds(effect.AutoTriggerTiming.Value.HoldMs)
+                : TimeSpan.Zero;
+            ReleaseInterval = effect.AutoTriggerTiming is not null
+                ? TimeSpan.FromMilliseconds(effect.AutoTriggerTiming.Value.ReleaseMs)
+                : TimeSpan.Zero;
             TriggerLimit = Effect.AutoTriggerLimit ?? int.MaxValue;
             AutoTriggerDelay = Effect.AutoTriggerDelayMs is not null
                 ? TimeSpan.FromMilliseconds(Effect.AutoTriggerDelayMs.Value)
@@ -22,6 +28,8 @@ namespace JoyMap.Profile
 
         private TimeSpan ReassertDelay { get; } = TimeSpan.FromSeconds(0.1f);
         private TimeSpan ToggleInterval { get; }
+        private TimeSpan HoldInterval { get; }
+        private TimeSpan ReleaseInterval { get; }
         private TimeSpan AutoTriggerDelay { get; }
         public KeyHandle Key { get; }
         public EventAction Source { get; }
@@ -58,13 +66,26 @@ namespace JoyMap.Profile
                 return;
 
 
-            if (Effect.AutoTriggerFrequency is null || TriggerCount >= TriggerLimit || elapsed < AutoTriggerDelay)
+            var hasFrequencyMode = Effect.AutoTriggerFrequency is not null;
+            var hasTimingMode = Effect.AutoTriggerTiming is not null;
+
+            if (!hasFrequencyMode && !hasTimingMode || TriggerCount >= TriggerLimit || elapsed < AutoTriggerDelay)
             {
                 Key.Press();
             }
-            else
+            else if (hasFrequencyMode)
             {
                 if (Key.TimeSinceLastChange > ToggleInterval)
+                {
+                    Key.Toggle();
+                    if (Key.IsPressed)
+                        TriggerCount++;
+                }
+            }
+            else
+            {
+                var currentInterval = Key.IsPressed ? HoldInterval : ReleaseInterval;
+                if (Key.TimeSinceLastChange > currentInterval)
                 {
                     Key.Toggle();
                     if (Key.IsPressed)
