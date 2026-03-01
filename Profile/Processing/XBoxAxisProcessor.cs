@@ -9,8 +9,11 @@ namespace JoyMap.Profile.Processing
             Feed = xBoxMappingInstance
                 .ToDictionary(
                     mi => mi.Binding.OutAxis,
-                    mi => mi.GetValue
-                    );
+                    mi =>
+                    {
+                        var getter = mi.GetValue;
+                        return (Func<float?>)(() => mi.IsSuspended ? 0f : getter());
+                    });
             Emulator.SignalStart();
         }
 
