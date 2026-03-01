@@ -1,5 +1,4 @@
 using JoyMap.Profile;
-using JoyMap.Profile.Processing;
 
 namespace JoyMap.Forms
 {
@@ -25,6 +24,33 @@ namespace JoyMap.Forms
             IReadOnlyList<GlobalStatusRef>? globalInputs = null)
         {
             InitializeComponent();
+
+            txtHelpText.Text =
+                "EXPRESSION LANGUAGE\r\n" +
+                "\r\n" +
+                "Operators\r\n" +
+                "  &&   Both conditions active simultaneously  (e.g. T0 && T1)\r\n" +
+                "  ||   Either condition active  (e.g. T0 || T1)\r\n" +
+                "  !    Condition must NOT be active  (e.g. !T0)\r\n" +
+                "  ()   Group to control evaluation order  (e.g. (T0 || T1) && T2)\r\n" +
+                "\r\n" +
+                "Identifiers\r\n" +
+                "  T0, T1, \u2026   Local trigger inputs (see table above)\r\n" +
+                "  G0, G1, \u2026   Global status inputs (see table above)\r\n" +
+                "\r\n" +
+                "Shorthand modes\r\n" +
+                "  Or    Any trigger fires  \u2014  equivalent to T0 || T1 || T2 || \u2026\r\n" +
+                "  And   All triggers fire  \u2014  equivalent to T0 && T1 && T2 && \u2026\r\n" +
+                "\r\n" +
+                "Examples\r\n" +
+                "  T0                       Active when trigger 0 fires\r\n" +
+                "  T0 || T1                 Active when T0 OR T1 fires\r\n" +
+                "  T0 && T1                 Active when T0 AND T1 fire simultaneously\r\n" +
+                "  !T0                      Active when T0 is NOT firing\r\n" +
+                "  (T0 || T1) && !T2        Active when (T0 or T1) fires but T2 does not\r\n" +
+                "  G0 && (T0 || T1)         Active when status G0 is on and T0 or T1 fires\r\n" +
+                "\r\n" +
+                "Tip: double-click any row in the input lists to insert that identifier.";
 
             LocalInputs = localInputs;
             GlobalInputs = globalInputs ?? [];
@@ -158,6 +184,13 @@ namespace JoyMap.Forms
 
         // ── Context menu ─────────────────────────────────────────────────────
 
+        private void insertAndMenuItem_Click(object sender, EventArgs e) => InsertText(" && ");
+        private void insertOrMenuItem_Click(object sender, EventArgs e) => InsertText(" || ");
+        private void insertNotMenuItem_Click(object sender, EventArgs e) => InsertText("!");
+        private void insertParensMenuItem_Click(object sender, EventArgs e) => InsertParens();
+        private void setOrMenuItem_Click(object sender, EventArgs e) => txtExpression.Text = "Or";
+        private void setAndMenuItem_Click(object sender, EventArgs e) => txtExpression.Text = "And";
+
         private void exprContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // Remove previously generated dynamic items
@@ -174,7 +207,7 @@ namespace JoyMap.Forms
             foreach (var inp in LocalInputs)
             {
                 var label = inp.Label;
-                var item = new ToolStripMenuItem($"Insert {label}  ({inp.Device} / {inp.Axis})");
+                var item = new ToolStripMenuItem($"Insert '{label}'  —  {inp.Device} / {inp.Axis}");
                 item.Click += (s, ev) => InsertText(label);
                 exprContextMenu.Items.Insert(insertAt++, item);
                 DynamicMenuItems.Add(item);
@@ -188,7 +221,7 @@ namespace JoyMap.Forms
                 foreach (var gs in GlobalInputs)
                 {
                     var id = gs.Id;
-                    var item = new ToolStripMenuItem($"Insert {id}  ({gs.Name})");
+                    var item = new ToolStripMenuItem($"Insert '{id}'  —  {gs.Name}");
                     item.Click += (s, ev) => InsertText(id);
                     exprContextMenu.Items.Insert(insertAt++, item);
                     DynamicMenuItems.Add(item);
@@ -209,6 +242,47 @@ namespace JoyMap.Forms
                 row.SubItems[3].Text = isActive() ? "●" : "";
             foreach (var (row, isActive) in GlobalRows)
                 row.SubItems[2].Text = isActive() ? "●" : "";
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            FitColumns();
+        }
+
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            if (IsHandleCreated)
+                BeginInvoke(FitColumns);
+        }
+
+        private void FitColumns()
+        {
+            AutoFitColumn(localListView, chLocalDevice);
+            AutoFitColumn(globalListView, chGlobalName);
+        }
+
+        private static void AutoFitColumn(ListView lv, ColumnHeader stretchCol)
+        {
+            if (lv.ClientSize.Width <= 0)
+                return;
+            var totalFixed = lv.Columns.Cast<ColumnHeader>().Where(c => c != stretchCol).Sum(c => c.Width);
+            var available = lv.ClientSize.Width - totalFixed;
+            if (available > 0)
+                stretchCol.Width = available;
+        }
+
+        private void localListView_DoubleClick(object sender, EventArgs e)
+        {
+            if (localListView.SelectedItems.Count == 1)
+                InsertText(localListView.SelectedItems[0].Text);
+        }
+
+        private void globalListView_DoubleClick(object sender, EventArgs e)
+        {
+            if (globalListView.SelectedItems.Count == 1)
+                InsertText(globalListView.SelectedItems[0].Text);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
