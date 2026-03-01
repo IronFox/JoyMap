@@ -8,13 +8,17 @@ JoyMap is a powerful Joystick-to-Keyboard/Mouse/Xbox mapping program that extend
 
 1. **Multi-trigger Events**: Each event can use any number of joystick inputs, including those already used by other events
 2. **Independent Axis Ranges**: Every trigger on every event has independent min/max thresholds with fraction precision (e.g., 12.34567%)
-3. **Complex Trigger Logic**: Simple and complex boolean expressions (AND, OR, NOT, parentheses) with trigger labels (T0, T1, ...)
-Each action can specify delays, auto-fire frequency, explicit hold/gap timing cycles, and repetition limits
+3. **Complex Trigger Logic**: Boolean expressions (AND, OR, NOT, parentheses) with trigger labels (T0, T1, ...) plus live combiner help dialog
+4. **Action Timing**: Actions support delays, auto-fire frequency, explicit hold/gap timing cycles, and repetition limits
 5. **Smart Device Mapping**: Controllers mapped by Product GUID → Instance GUID with automatic fallback to any instance of the same product
 6. **Profile Auto-switching**: Automatically activates profiles based on focused window process/title (regex)
 7. **Undo/Redo Support**: Full undo/redo history for profile editing with auto-save in Release builds
 8. **Controller Families**: Group different controller models to treat them as interchangeable
 9. **Virtual Xbox 360 Controller**: Built-in Xbox controller emulation via ViGEmBus driver
+10. **Global Statuses**: Named boolean values (always-on/off, combiner-driven, or toggle) referenceable in any combiner expression
+11. **Mode Groups**: Mutually exclusive named modes driven by triggers; active mode referenced in combiners (M0, M1, ...)
+12. **Global Key Triggers**: Any keyboard key can be a trigger input, monitored system-wide regardless of focused window
+13. **Xbox Axis Enable Switch**: Axis bindings can be gated by any global status or mode entry
 
 ## Installation
 
@@ -103,6 +107,147 @@ Controller families allow treating different physical controllers as functionall
 - Group "Logitech F310" and "Xbox 360 Controller" in a "Gamepad" family
 - Triggers recorded on F310 will now also accept input from Xbox 360 Controller
 
+### Global Statuses
+
+**Global Statuses** are named boolean values that persist for the lifetime of a profile and can be referenced by ID in any combiner expression. They centralise stateful logic — such as "Walk Mode is active" or "Combat Mode is on" — so that many events and bindings can all react to the same state without duplicating conditions.
+
+**Global Status List** (main window, **Global Statuses** tab):
+
+| Column | Description |
+|--------|-------------|
+| **Name** | User-defined status name |
+| **ID** | Auto-assigned identifier (G0, G1, ...) used in combiner expressions |
+| **Mode** | How the status value is determined |
+| **Active** | Live value: **True** / **False**, or **Suspended** |
+
+#### Global Status Modes
+
+| Mode | Description |
+|------|-------------|
+| **Always True** | Permanently active; useful as a constant or placeholder |
+| **Always False** | Permanently inactive |
+| **True if Combiner** | Active whenever the trigger combiner evaluates to true |
+| **False if Combiner** | Active whenever the trigger combiner evaluates to false (inverted) |
+| **Toggle (Start Inactive)** | Starts inactive; flips state on each rising edge of the combiner (false → true transition) |
+| **Toggle (Start Active)** | Starts active; flips state on each rising edge of the combiner |
+
+Toggle modes reset to their initial state each time the profile is loaded.
+
+#### Creating/Editing a Global Status
+
+**Dialog Sections:**
+
+1. **Name**: Display name for this status
+2. **Mode**: How the value is determined (see table above)
+3. **Combiner** *(Combiner and Toggle modes only)*: Expression that drives the status — may reference local triggers (T0, T1, ...), other global statuses (G0, G1, ...), and mode entries (M0, M1, ...)
+4. **Triggers** *(Combiner and Toggle modes only)*: Local trigger inputs available as T0, T1, ... in the combiner
+
+**Adding Triggers:**
+- **Right-click** → **Pick/Add...**: Record a joystick/gamepad input
+- **Right-click** → **Add Key Trigger...**: Use a keyboard key as input (see [Key Triggers](#key-triggers))
+
+**Context Menu (Global Status List):**
+- **New...**: Create a new global status
+- **Edit Selected...** (or double-click): Modify the selected status
+- **Copy/Paste**: Clipboard operations
+- **Delete**: Remove the selected status
+
+#### Referencing Global Statuses
+
+Reference a status in any combiner expression by its ID:
+
+```
+G0            Active when global status G0 is true
+G0 && T0      Active when G0 is true AND trigger T0 fires
+!G0           Active when G0 is false
+G0 || G1      Active when either G0 or G1 is true
+```
+
+Global statuses are evaluated in declaration order; a status may reference statuses and mode entries declared before it, as well as all mode entries.
+
+### Mode Groups
+
+A **Mode Group** is a mutually exclusive set of named modes. Exactly one mode per group is active at any time. Activating a mode entry immediately deactivates all others in the same group. Mode entries are identified as M0, M1, ... and can be referenced in any combiner expression.
+
+**Mode Group List** (main window, **Mode Groups** tab):
+
+| Column | Description |
+|--------|-------------|
+| **Name** | User-defined group name |
+| **ID** | Auto-assigned group identifier (MG0, MG1, ...) |
+| **Active Mode** | Name of the currently active mode entry |
+
+#### Creating/Editing a Mode Group
+
+**Dialog Sections:**
+
+1. **Name**: Display name for this group
+2. **Mode Entries**: List of all modes in this group
+3. **Default Mode**: Which entry is active when the profile first loads
+
+**Mode Entry List Columns:**
+
+| Column | Description |
+|--------|-------------|
+| **ID** | Auto-assigned identifier (M0, M1, ...) used in combiner expressions |
+| **Name** | User-defined mode name |
+| **Trigger** | Summary of the trigger(s) that activate this mode |
+
+**Context Menu (Mode Entry List):**
+- **New Entry...**: Create a new mode entry
+- **Edit...** (or double-click): Modify the selected entry
+- **Delete**: Remove the entry
+- **Set as Default**: Make this entry the startup default
+
+#### Mode Entry Dialog
+
+Each mode entry requires:
+- **Name**: Display name
+- **Triggers**: Physical or keyboard inputs that can activate this mode
+- **Combiner**: Expression combining the triggers (same syntax as event combiners; supports T0, T1, ..., G0, G1, ...)
+
+**Activation Rule:** A mode entry becomes active on each rising edge of its combiner (inactive → active transition). It stays active until another entry in the same group fires. The active mode is shown in the Mode Group list's **Active Mode** column.
+
+#### How Mode Switching Works
+
+1. On profile load the **Default Mode** becomes active
+2. Each polling cycle all entry combiners are evaluated
+3. The first entry whose combiner transitions false → true becomes the new active mode
+4. The previously active mode deactivates immediately
+
+#### Referencing Modes in Expressions
+
+Reference a mode entry by its numeric ID in any combiner expression:
+
+```
+M0              Active when mode entry M0 is the current active mode
+M0 && T0        Active when mode 0 is active AND trigger T0 fires
+M0 || M1        Active when either mode 0 or mode 1 is active
+!M0             Active when mode 0 is NOT the active mode
+G0 && M1        Active when global status G0 is true and mode M1 is active
+```
+
+Mode entries (M0, M1, ...) are available in all combiner expressions — event triggers, global status triggers, and other mode entry triggers. Mode group IDs (MG0, MG1, ...) are not used in expressions; always reference the individual entries.
+
+#### Key Triggers
+
+Any trigger list in JoyMap — event triggers, global status triggers, and mode entry triggers — can include a **keyboard key** as an input source in addition to joystick/gamepad inputs.
+
+**Adding a Key Trigger:**
+1. Right-click the trigger list → **Add Key Trigger...**
+2. Press the desired key in the key picker dialog
+3. The trigger appears with **Device = Key** and the key name as the Input
+
+**How It Works:**
+- JoyMap installs a global low-level keyboard hook (WH_KEYBOARD_LL) that tracks physical key state system-wide, regardless of which window is focused
+- Key is active (100%) while held, inactive (0%) when released; threshold is 50% so key held = trigger active
+- Injected/synthetic key events are filtered out — only physical key presses are detected
+
+**Use Cases:**
+- Press a keyboard key to toggle a global status (e.g., F5 switches Walk ↔ Run mode)
+- Combine a keyboard key with a joystick axis: `T0 && T1` where T0 is a stick tilt and T1 is a keyboard modifier
+- Use a keyboard key as the sole trigger for an event when no joystick button is convenient
+
 ### Xbox Controller Emulation
 
 JoyMap creates a **virtual Xbox 360 controller** that games see as a real gamepad.
@@ -118,7 +263,8 @@ The **Xbox Axis Binding** tab maps physical joystick inputs to virtual Xbox 360 
 **Binding List Columns:**
 - **Xbox Axis**: Target virtual axis (see list below)
 - **Input**: Physical joystick axis/button(s) bound to this axis
-- **Output**: Real-time output value (only updates when JoyMap is focused)
+- **Output**: Real-time output value; shows **0** when gated off by an enable switch, or **Suspended** if manually suspended
+- **Enable Status**: Global status or mode entry gating this binding (empty = always active)
 
 **Available Xbox Axes:**
 | Xbox Axis | Description | Range |
@@ -177,6 +323,23 @@ Example: With DeadZone=10% and Scale=100%:
 - **Multiple axes can feed one Xbox axis**
 - Output uses the **largest absolute value** (preserving sign)
 - Example: Bind throttle (0→1) and slider (-1→1) to Trigger Left; stronger input wins
+
+#### Enable Switch
+
+The **Enable Status** dropdown gates the entire binding through a global status or mode entry.
+
+| Setting | Behaviour |
+|---------|-----------|
+| **(none)** | Binding is always active (default) |
+| **G0 … Gn** | Binding outputs its value only while the selected global status is true; outputs 0 otherwise |
+| **M0 … Mn** | Binding outputs its value only while the selected mode entry is the active mode; outputs 0 otherwise |
+
+**Use Cases:**
+- Bind a joystick axis to the virtual left stick, but only when "Flight Mode" (M0) is active; in all other modes the axis is ignored
+- Gate a throttle binding on a global status toggle so it can be disabled with a key press
+- Use the same physical axis for different virtual axes depending on the active mode by creating one binding per mode, each gated on a different mode entry
+
+The **Output** column in the main window shows **0** when the enable switch is currently blocking the binding, making it easy to verify gating at a glance.
 
 **Common Configurations:**
 
@@ -290,7 +453,8 @@ Defines how multiple triggers combine:
 **Custom Expression Syntax:**
 - **Operators**: `AND`/`&&`, `OR`/`||`, `NOT`/`!`
 - **Grouping**: `(` `)` parentheses
-- **Identifiers**: T0, T1, T2, ... (trigger labels)
+- **Local identifiers**: T0, T1, T2, ... (trigger labels for this event/status/mode entry)
+- **Global identifiers**: G0, G1, ... (global status IDs), M0, M1, ... (mode entry IDs)
 - **Keywords**: `TRUE`, `FALSE` (always on/off)
 
 **Examples:**
@@ -299,6 +463,26 @@ Defines how multiple triggers combine:
 - `(T0 && T1) || T2`: (T0 and T1) or T2
 - `!(T0 || T1)`: Neither T0 nor T1 active
 - `T0 AND NOT T1`: T0 active but not T1
+- `M0 && T0`: Only fires in mode M0 and when T0 is active
+- `G0 || T0`: Fires when global status G0 is true, or when T0 triggers
+
+#### Combiner Help Dialog (? Button)
+
+Every combiner field has a **?** button that opens the **Combiner Help Dialog** — an interactive reference and editor.
+
+**Dialog Contents:**
+
+1. **Local Inputs table** — The local triggers for this event/status/mode entry (T0, T1, ...) with Device, Axis/Key, and a live active indicator (●)
+2. **Global Inputs table** — All global statuses (G0, G1, ...) and mode entries (M0, M1, ...) with their names and live active indicators (●)
+3. **Expression editor** — Edit and validate the combiner expression with real-time error feedback
+4. **Syntax reference** — Full operator and shorthand reference shown in the dialog
+
+**Interacting with the dialog:**
+- **Double-click** any row in either table to insert that identifier at the cursor position in the expression
+- **Right-click** the local or global table for a quick-insert context menu
+- **OK** applies the validated expression back to the combiner field; the button is only enabled when the expression is valid
+
+The live active indicators update on a timer so you can watch inputs change while the dialog is open, making it easy to verify which identifiers to use.
 
 #### Trigger Dialog
 
