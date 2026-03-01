@@ -1,6 +1,4 @@
-using JoyMap.Extensions;
 using JoyMap.Profile;
-using JoyMap.Profile.Processing;
 
 namespace JoyMap.Forms
 {
@@ -85,7 +83,7 @@ namespace JoyMap.Forms
 
             if (string.IsNullOrWhiteSpace(textName.Text))
             {
-                labelCombinerError.Text = "";
+                SetStatus("A name is required.");
                 return;
             }
 
@@ -93,7 +91,7 @@ namespace JoyMap.Forms
             {
                 if (Triggers.Count == 0)
                 {
-                    labelCombinerError.Text = "";
+                    SetStatus("Add at least one trigger.");
                     return;
                 }
 
@@ -104,11 +102,11 @@ namespace JoyMap.Forms
                 var combiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, triggerInstances, globalResolvers, out var combinerError);
                 if (combiner is null)
                 {
-                    labelCombinerError.Text = combinerError ?? "Invalid expression.";
+                    SetStatus(combinerError ?? "Invalid combiner expression.");
                     return;
                 }
 
-                labelCombinerError.Text = "";
+                SetStatus("");
                 var status = new GlobalStatus(
                     StatusId,
                     textName.Text.Trim(),
@@ -120,12 +118,17 @@ namespace JoyMap.Forms
             }
             else
             {
-                labelCombinerError.Text = "";
+                SetStatus("");
                 var status = new GlobalStatus(StatusId, textName.Text.Trim(), SelectedMode, "", []);
                 Result = new GlobalStatusInstance(status, [], () => false);
             }
 
             btnOk.Enabled = true;
+        }
+
+        private void SetStatus(string message)
+        {
+            statusLabel.Text = message;
         }
 
         private void AnyChanged(object sender, EventArgs e) => Rebuild();
