@@ -13,15 +13,22 @@ namespace JoyMap.Forms
             lId.Text = $"ID: {id}";
 
             foreach (GlobalStatusMode mode in Enum.GetValues<GlobalStatusMode>())
-                cbMode.Items.Add(mode);
+                cbMode.Items.Add(new ModeItem(mode));
+
+            triggerCombiner.Items.Add("Or");
+            triggerCombiner.Items.Add("And");
 
             if (instance is not null)
             {
                 textName.Text = instance.Status.Name;
-                cbMode.SelectedItem = instance.Status.Mode;
-                if (!triggerCombiner.Items.Contains(instance.Status.TriggerCombiner))
-                    triggerCombiner.Items.Add(instance.Status.TriggerCombiner);
-                triggerCombiner.Text = instance.Status.TriggerCombiner;
+                cbMode.SelectedItem = cbMode.Items.OfType<ModeItem>().First(x => x.Mode == instance.Status.Mode);
+                var savedCombiner = instance.Status.TriggerCombiner;
+                if (!string.IsNullOrEmpty(savedCombiner) && !triggerCombiner.Items.Contains(savedCombiner))
+                    triggerCombiner.Items.Add(savedCombiner);
+                if (!string.IsNullOrEmpty(savedCombiner))
+                    triggerCombiner.SelectedItem = savedCombiner;
+                else
+                    triggerCombiner.SelectedIndex = 0;
                 foreach (var (t, idx) in instance.TriggerInstances.Select((t, i) => (t, i)))
                 {
                     var row = triggerListView.Items.Add($"T{idx}");
@@ -35,8 +42,6 @@ namespace JoyMap.Forms
             else
             {
                 cbMode.SelectedIndex = 0;
-                triggerCombiner.Items.Add("Or");
-                triggerCombiner.Items.Add("And");
                 triggerCombiner.SelectedIndex = 0;
             }
 
@@ -50,7 +55,7 @@ namespace JoyMap.Forms
         private List<(TriggerInstance Trigger, ListViewItem Row)> Triggers { get; } = [];
 
         private GlobalStatusMode SelectedMode =>
-            cbMode.SelectedItem is GlobalStatusMode m ? m : GlobalStatusMode.AlwaysTrue;
+            cbMode.SelectedItem is ModeItem { Mode: var m } ? m : GlobalStatusMode.AlwaysTrue;
 
         private bool NeedsCombiner => SelectedMode is
             GlobalStatusMode.TrueIfCombiner or
@@ -186,6 +191,20 @@ namespace JoyMap.Forms
         private void editSelectedToolStripMenuItem_Click(object sender, EventArgs e)
         {
             triggerListView_DoubleClick(sender, e);
+        }
+
+        private sealed record ModeItem(GlobalStatusMode Mode)
+        {
+            public override string ToString() => Mode switch
+            {
+                GlobalStatusMode.AlwaysTrue => "Always True",
+                GlobalStatusMode.AlwaysFalse => "Always False",
+                GlobalStatusMode.TrueIfCombiner => "True if Combiner",
+                GlobalStatusMode.FalseIfCombiner => "False if Combiner",
+                GlobalStatusMode.ToggleOffInitially => "Toggle (Start Inactive)",
+                GlobalStatusMode.ToggleOnInitially => "Toggle (Start Active)",
+                _ => Mode.ToString()
+            };
         }
     }
 }
