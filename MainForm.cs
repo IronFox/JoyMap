@@ -229,7 +229,7 @@ namespace JoyMap
 
             public void Bind(XBoxAxisBindingInstance? b, bool updateCurrentProfile = true)
             {
-                AxisUpdateItemTo(Row, Axis, b, Form.ActiveProfile?.GlobalStatuses);
+                AxisUpdateItemTo(Row, Axis, b, Form.BuildGlobalStatusRefs());
                 if (updateCurrentProfile && Form.ActiveProfile is not null)
                 {
                     if (b is not null)
@@ -357,7 +357,7 @@ namespace JoyMap
                 foreach (ListViewItem row in bindingListView.Items)
                 {
                     if (row.Tag is not XBoxAxisBindingInstance map) continue;
-                    row.SubItems[2].Text = GetGatedOutput(map, ActiveProfile.GlobalStatuses);
+                    row.SubItems[2].Text = GetGatedOutput(map, BuildGlobalStatusRefs());
                 }
             }
 
@@ -896,7 +896,7 @@ namespace JoyMap
             throw new InvalidOperationException($"Row has neither axis nor binding as tag");
         }
 
-        internal static void AxisUpdateItemTo(ListViewItem item, XBoxAxis outAxis, XBoxAxisBindingInstance? b, IReadOnlyList<GlobalStatusInstance>? globalStatuses = null)
+        internal static void AxisUpdateItemTo(ListViewItem item, XBoxAxis outAxis, XBoxAxisBindingInstance? b, IReadOnlyList<GlobalStatusRef>? globalStatuses = null)
         {
             if (b is null)
             {
@@ -914,25 +914,25 @@ namespace JoyMap
             }
         }
 
-        private static string GetGatedOutput(XBoxAxisBindingInstance b, IReadOnlyList<GlobalStatusInstance>? globalStatuses)
+        private static string GetGatedOutput(XBoxAxisBindingInstance b, IReadOnlyList<GlobalStatusRef>? globalStatuses)
         {
             if (b.IsSuspended)
                 return "Suspended";
             if (b.Binding.EnableStatusId is string sid)
             {
                 var status = globalStatuses?.FirstOrDefault(g => g.Id == sid);
-                if (status is not null && !status.CurrentValue)
+                if (status is not null && !status.IsActive())
                     return (0f).ToStr();
             }
             return b.GetValue().ToStr();
         }
 
-        private static string GetEnableStatusText(string? enableStatusId, IReadOnlyList<GlobalStatusInstance>? globalStatuses)
+        private static string GetEnableStatusText(string? enableStatusId, IReadOnlyList<GlobalStatusRef>? globalStatuses)
         {
             if (enableStatusId is null)
                 return "";
             var status = globalStatuses?.FirstOrDefault(g => g.Id == enableStatusId);
-            return status is not null ? $"{enableStatusId}: {status.Status.Name}" : enableStatusId;
+            return status is not null ? $"{enableStatusId}: {status.Name}" : enableStatusId;
         }
 
         private void bindingListView_DoubleClick(object sender, EventArgs e)
