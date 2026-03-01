@@ -37,8 +37,8 @@ namespace JoyMap
                     row.SubItems.Add(a.Action);
                     row.Tag = a;
                 }
-                Rebuild();
             }
+            Rebuild();
         }
 
         private bool Suspended { get; set; } = false;
@@ -219,7 +219,10 @@ namespace JoyMap
 
         private void Rebuild()
         {
-            btnOk.Enabled = Triggers.Count > 0 && actionListView.Items.Count > 0 && !string.IsNullOrWhiteSpace(textName.Text);
+            var hasName = !string.IsNullOrWhiteSpace(textName.Text);
+            var hasTriggers = Triggers.Count > 0;
+            var hasActions = actionListView.Items.Count > 0;
+            btnOk.Enabled = hasName && hasTriggers && hasActions;
             if (btnOk.Enabled)
             {
                 var actions = actionListView.Items.ToEnumerable()
@@ -228,13 +231,13 @@ namespace JoyMap
                 var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, this.Triggers.Select(x => x.Trigger).ToList(), GlobalResolvers, out var combinerError);
                 if (tCombiner is null)
                 {
-                    labelCombinerError.Text = combinerError ?? "Invalid expression.";
+                    SetStatus(combinerError ?? "Invalid combiner expression.", isError: true);
                     btnOk.Enabled = false;
                     Result = null;
                     return;
                 }
 
-                labelCombinerError.Text = "";
+                SetStatus("");
                 var eventObj = new EventInstance(
                     Event: new(
                         TriggerCombiner: triggerCombiner.Text,
@@ -252,9 +255,17 @@ namespace JoyMap
             }
             else
             {
-                labelCombinerError.Text = "";
+                var reason = !hasName ? "A name is required."
+                    : !hasTriggers ? "Add at least one trigger."
+                    : "Add at least one action.";
+                SetStatus(reason);
                 Result = null;
             }
+        }
+
+        private void SetStatus(string message, bool isError = false)
+        {
+            statusLabel.Text = message;
         }
 
         private void AnyChanged(object sender, EventArgs e)

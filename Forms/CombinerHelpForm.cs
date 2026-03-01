@@ -109,7 +109,7 @@ namespace JoyMap.Forms
             var text = txtExpression.Text.Trim();
             if (string.IsNullOrWhiteSpace(text))
             {
-                labelError.Text = "Expression is empty.";
+                SetStatus("Enter an expression.");
                 btnOk.Enabled = false;
                 ResultExpression = null;
                 return;
@@ -119,7 +119,7 @@ namespace JoyMap.Forms
             if (text.Equals("or", StringComparison.OrdinalIgnoreCase) ||
                 text.Equals("and", StringComparison.OrdinalIgnoreCase))
             {
-                labelError.Text = "";
+                SetStatus("");
                 btnOk.Enabled = true;
                 ResultExpression = text;
                 return;
@@ -136,16 +136,21 @@ namespace JoyMap.Forms
             var func = EventProcessor.BuildTriggerCombiner(text, [], identifiers, out var error);
             if (func is null)
             {
-                labelError.Text = error ?? "Invalid expression.";
+                SetStatus(error ?? "Invalid expression.", isError: true);
                 btnOk.Enabled = false;
                 ResultExpression = null;
             }
             else
             {
-                labelError.Text = "";
+                SetStatus("");
                 btnOk.Enabled = true;
                 ResultExpression = text;
             }
+        }
+
+        private void SetStatus(string message, bool isError = false)
+        {
+            statusLabel.Text = message;
         }
 
         // ── Expression TextBox ───────────────────────────────────────────────

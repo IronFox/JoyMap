@@ -31,7 +31,8 @@ namespace JoyMap.Forms
             setOrMenuItem = new ToolStripMenuItem();
             setAndMenuItem = new ToolStripMenuItem();
             txtHelpText = new TextBox();
-            labelError = new Label();
+            statusStrip = new StatusStrip();
+            statusLabel = new ToolStripStatusLabel();
             splitMain = new SplitContainer();
             panelLocal = new Panel();
             labelLocal = new Label();
@@ -56,6 +57,7 @@ namespace JoyMap.Forms
             splitMain.SuspendLayout();
             panelLocal.SuspendLayout();
             panelGlobal.SuspendLayout();
+            statusStrip.SuspendLayout();
             SuspendLayout();
             // 
             // labelExpr
@@ -164,28 +166,19 @@ namespace JoyMap.Forms
             txtHelpText.BorderStyle = BorderStyle.None;
             txtHelpText.Font = new Font("Segoe UI", 8.5F);
             txtHelpText.ForeColor = SystemColors.ControlText;
-            txtHelpText.Location = new Point(12, 332);
+            txtHelpText.Location = new Point(12, 310);
             txtHelpText.Multiline = true;
             txtHelpText.Name = "txtHelpText";
             txtHelpText.ReadOnly = true;
             txtHelpText.ScrollBars = ScrollBars.Vertical;
-            txtHelpText.Size = new Size(926, 222);
+            txtHelpText.Size = new Size(926, 218);
             txtHelpText.TabIndex = 7;
             txtHelpText.TabStop = false;
-            // 
-            // labelError
-            // 
-            labelError.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            labelError.ForeColor = Color.Firebrick;
-            labelError.Location = new Point(112, 46);
-            labelError.Name = "labelError";
-            labelError.Size = new Size(826, 22);
-            labelError.TabIndex = 2;
             // 
             // splitMain
             // 
             splitMain.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            splitMain.Location = new Point(12, 72);
+            splitMain.Location = new Point(12, 50);
             splitMain.Name = "splitMain";
             // 
             // splitMain.Panel1
@@ -301,7 +294,7 @@ namespace JoyMap.Forms
             btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnOk.DialogResult = DialogResult.OK;
             btnOk.Enabled = false;
-            btnOk.Location = new Point(362, 560);
+            btnOk.Location = new Point(362, 534);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(282, 34);
             btnOk.TabIndex = 4;
@@ -312,7 +305,7 @@ namespace JoyMap.Forms
             // 
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(656, 560);
+            btnCancel.Location = new Point(656, 534);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(282, 34);
             btnCancel.TabIndex = 5;
@@ -325,6 +318,20 @@ namespace JoyMap.Forms
             liveTimer.Interval = 200;
             liveTimer.Tick += liveTimer_Tick;
             // 
+            // statusStrip
+            // 
+            statusStrip.Dock = DockStyle.Bottom;
+            statusStrip.ImageScalingSize = new Size(24, 24);
+            statusStrip.Items.AddRange(new ToolStripItem[] { statusLabel });
+            statusStrip.Name = "statusStrip";
+            statusStrip.Size = new Size(950, 32);
+            statusStrip.TabIndex = 8;
+            // 
+            // statusLabel
+            // 
+            statusLabel.Name = "statusLabel";
+            statusLabel.Text = "";
+            // 
             // CombinerHelpForm
             // 
             AcceptButton = btnOk;
@@ -334,11 +341,11 @@ namespace JoyMap.Forms
             ClientSize = new Size(950, 606);
             Controls.Add(labelExpr);
             Controls.Add(txtExpression);
-            Controls.Add(labelError);
             Controls.Add(splitMain);
             Controls.Add(txtHelpText);
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
+            Controls.Add(statusStrip);
             MinimumSize = new Size(750, 500);
             Name = "CombinerHelpForm";
             Text = "Combiner Expression";
@@ -351,6 +358,8 @@ namespace JoyMap.Forms
             panelLocal.PerformLayout();
             panelGlobal.ResumeLayout(false);
             panelGlobal.PerformLayout();
+            statusStrip.ResumeLayout(false);
+            statusStrip.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -371,7 +380,8 @@ namespace JoyMap.Forms
         private ToolStripSeparator exprSep3;
         private ToolStripMenuItem setOrMenuItem;
         private ToolStripMenuItem setAndMenuItem;
-        private Label labelError;
+        private StatusStrip statusStrip;
+        private ToolStripStatusLabel statusLabel;
         private TextBox txtHelpText;
         private SplitContainer splitMain;
         private Panel panelLocal;

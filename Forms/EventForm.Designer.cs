@@ -47,12 +47,13 @@
             deleteToolStripMenuItem = new ToolStripMenuItem();
             btnCancel = new Button();
             btnOk = new Button();
+            statusStrip = new StatusStrip();
+            statusLabel = new ToolStripStatusLabel();
             statusUpdateTimer = new System.Windows.Forms.Timer(components);
             splitContainer1 = new SplitContainer();
             label4 = new Label();
             triggerCombiner = new ComboBox();
             btnCombinerHelp = new Button();
-            labelCombinerError = new Label();
             triggerListView = new ListView();
             columnHeader6 = new ColumnHeader();
             columnHeader1 = new ColumnHeader();
@@ -65,6 +66,7 @@
             columnHeader7 = new ColumnHeader();
             triggerMenu.SuspendLayout();
             actionMenu.SuspendLayout();
+            statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -85,7 +87,7 @@
             textName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             textName.Location = new Point(81, 12);
             textName.Name = "textName";
-            textName.Size = new Size(831, 31);
+            textName.Size = new Size(830, 31);
             textName.TabIndex = 1;
             textName.TextChanged += AnyChanged;
             // 
@@ -180,7 +182,7 @@
             // 
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(630, 724);
+            btnCancel.Location = new Point(629, 686);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(282, 34);
             btnCancel.TabIndex = 6;
@@ -192,12 +194,26 @@
             btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnOk.DialogResult = DialogResult.OK;
             btnOk.Enabled = false;
-            btnOk.Location = new Point(342, 724);
+            btnOk.Location = new Point(341, 686);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(282, 34);
             btnOk.TabIndex = 7;
             btnOk.Text = "Update / Create";
             btnOk.UseVisualStyleBackColor = true;
+            // 
+            // statusStrip
+            // 
+            statusStrip.ImageScalingSize = new Size(24, 24);
+            statusStrip.Items.AddRange(new ToolStripItem[] { statusLabel });
+            statusStrip.Location = new Point(0, 744);
+            statusStrip.Name = "statusStrip";
+            statusStrip.Size = new Size(923, 22);
+            statusStrip.TabIndex = 11;
+            // 
+            // statusLabel
+            // 
+            statusLabel.Name = "statusLabel";
+            statusLabel.Size = new Size(908, 15);
             // 
             // statusUpdateTimer
             // 
@@ -217,7 +233,6 @@
             splitContainer1.Panel1.Controls.Add(label4);
             splitContainer1.Panel1.Controls.Add(triggerCombiner);
             splitContainer1.Panel1.Controls.Add(btnCombinerHelp);
-            splitContainer1.Panel1.Controls.Add(labelCombinerError);
             splitContainer1.Panel1.Controls.Add(triggerListView);
             splitContainer1.Panel1.Controls.Add(label2);
             splitContainer1.Panel1MinSize = 75;
@@ -226,8 +241,8 @@
             // 
             splitContainer1.Panel2.Controls.Add(actionListView);
             splitContainer1.Panel2MinSize = 75;
-            splitContainer1.Size = new Size(900, 669);
-            splitContainer1.SplitterDistance = 297;
+            splitContainer1.Size = new Size(899, 631);
+            splitContainer1.SplitterDistance = 294;
             splitContainer1.TabIndex = 10;
             // 
             // label4
@@ -246,7 +261,7 @@
             triggerCombiner.Items.AddRange(new object[] { "Or", "And" });
             triggerCombiner.Location = new Point(362, 7);
             triggerCombiner.Name = "triggerCombiner";
-            triggerCombiner.Size = new Size(491, 33);
+            triggerCombiner.Size = new Size(490, 33);
             triggerCombiner.TabIndex = 12;
             triggerCombiner.Text = "Or";
             triggerCombiner.TextChanged += AnyChanged;
@@ -254,7 +269,7 @@
             // btnCombinerHelp
             // 
             btnCombinerHelp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnCombinerHelp.Location = new Point(861, 7);
+            btnCombinerHelp.Location = new Point(860, 7);
             btnCombinerHelp.Name = "btnCombinerHelp";
             btnCombinerHelp.Size = new Size(36, 33);
             btnCombinerHelp.TabIndex = 14;
@@ -262,25 +277,15 @@
             btnCombinerHelp.UseVisualStyleBackColor = true;
             btnCombinerHelp.Click += btnCombinerHelp_Click;
             // 
-            // labelCombinerError
-            // 
-            labelCombinerError.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            labelCombinerError.ForeColor = Color.Firebrick;
-            labelCombinerError.Location = new Point(362, 44);
-            labelCombinerError.Name = "labelCombinerError";
-            labelCombinerError.Size = new Size(535, 22);
-            labelCombinerError.TabIndex = 15;
-            labelCombinerError.Text = "";
-            // 
             // triggerListView
             // 
             triggerListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             triggerListView.Columns.AddRange(new ColumnHeader[] { columnHeader6, columnHeader1, columnHeader2, columnHeader3 });
             triggerListView.ContextMenuStrip = triggerMenu;
             triggerListView.FullRowSelect = true;
-            triggerListView.Location = new Point(3, 70);
+            triggerListView.Location = new Point(3, 44);
             triggerListView.Name = "triggerListView";
-            triggerListView.Size = new Size(894, 224);
+            triggerListView.Size = new Size(893, 247);
             triggerListView.TabIndex = 11;
             triggerListView.UseCompatibleStateImageBehavior = false;
             triggerListView.View = View.Details;
@@ -316,13 +321,13 @@
             // 
             // actionListView
             // 
-            actionListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             actionListView.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader5, columnHeader7 });
             actionListView.ContextMenuStrip = actionMenu;
+            actionListView.Dock = DockStyle.Fill;
             actionListView.FullRowSelect = true;
-            actionListView.Location = new Point(3, 3);
+            actionListView.Location = new Point(0, 0);
             actionListView.Name = "actionListView";
-            actionListView.Size = new Size(894, 362);
+            actionListView.Size = new Size(899, 333);
             actionListView.TabIndex = 6;
             actionListView.UseCompatibleStateImageBehavior = false;
             actionListView.View = View.Details;
@@ -349,19 +354,22 @@
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
-            ClientSize = new Size(924, 770);
+            ClientSize = new Size(923, 766);
             Controls.Add(splitContainer1);
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
             Controls.Add(label3);
             Controls.Add(textName);
             Controls.Add(label1);
+            Controls.Add(statusStrip);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MinimumSize = new Size(946, 826);
+            MinimumSize = new Size(945, 822);
             Name = "EventForm";
             Text = "Event";
             triggerMenu.ResumeLayout(false);
             actionMenu.ResumeLayout(false);
+            statusStrip.ResumeLayout(false);
+            statusStrip.PerformLayout();
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel1.PerformLayout();
             splitContainer1.Panel2.ResumeLayout(false);
@@ -395,7 +403,8 @@
         private Label label4;
         private ComboBox triggerCombiner;
         private Button btnCombinerHelp;
-        private Label labelCombinerError;
+        private StatusStrip statusStrip;
+        private ToolStripStatusLabel statusLabel;
         private ListView triggerListView;
         private ColumnHeader columnHeader6;
         private ColumnHeader columnHeader1;
