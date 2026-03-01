@@ -45,6 +45,8 @@
             btnCancel = new Button();
             btnOk = new Button();
             lOutput = new Label();
+            lEnableStatus = new Label();
+            cbEnableStatus = new ComboBox();
             timer1 = new System.Windows.Forms.Timer(components);
             contextMenuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
@@ -67,7 +69,7 @@
             axisListView.FullRowSelect = true;
             axisListView.Location = new Point(12, 37);
             axisListView.Name = "axisListView";
-            axisListView.Size = new Size(776, 338);
+            axisListView.Size = new Size(776, 295);
             axisListView.TabIndex = 1;
             axisListView.UseCompatibleStateImageBehavior = false;
             axisListView.View = View.Details;
@@ -174,6 +176,26 @@
             timer1.Enabled = true;
             timer1.Tick += timer1_Tick;
             // 
+            // lEnableStatus
+            // 
+            lEnableStatus.AutoSize = true;
+            lEnableStatus.Location = new Point(12, 345);
+            lEnableStatus.Name = "lEnableStatus";
+            lEnableStatus.Size = new Size(130, 25);
+            lEnableStatus.TabIndex = 24;
+            lEnableStatus.Text = "Enable Status:";
+            // 
+            // cbEnableStatus
+            // 
+            cbEnableStatus.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            cbEnableStatus.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbEnableStatus.FormattingEnabled = true;
+            cbEnableStatus.Location = new Point(148, 342);
+            cbEnableStatus.Name = "cbEnableStatus";
+            cbEnableStatus.Size = new Size(640, 33);
+            cbEnableStatus.TabIndex = 25;
+            cbEnableStatus.SelectedIndexChanged += RebuildResult;
+            // 
             // XBoxAxisBindingForm
             // 
             AcceptButton = btnOk;
@@ -185,6 +207,8 @@
             Controls.Add(btnCancel);
             Controls.Add(btnOk);
             Controls.Add(lOutput);
+            Controls.Add(cbEnableStatus);
+            Controls.Add(lEnableStatus);
             Controls.Add(axisListView);
             Controls.Add(lAxis);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -210,6 +234,8 @@
         private Button btnCancel;
         private Button btnOk;
         private Label lOutput;
+        private Label lEnableStatus;
+        private ComboBox cbEnableStatus;
         private ContextMenuStrip contextMenuStrip1;
         private ToolStripMenuItem addToolStripMenuItem;
         private ToolStripMenuItem editToolStripMenuItem;

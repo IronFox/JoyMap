@@ -6,16 +6,34 @@ namespace JoyMap.Forms
 {
     public partial class XBoxAxisBindingForm : Form
     {
-        public XBoxAxisBindingForm(XBoxAxis axis, XBoxAxisBindingInstance? instance = null)
+        private record StatusItem(GlobalStatusInstance? Status)
+        {
+            public override string ToString() =>
+                Status is null ? "(none)" : $"{Status.Id}: {Status.Status.Name}";
+        }
+
+        public XBoxAxisBindingForm(XBoxAxis axis, XBoxAxisBindingInstance? instance = null, IReadOnlyList<GlobalStatusInstance>? globalStatuses = null)
         {
             InitializeComponent();
             Axis = axis;
             Text = lAxis.Text = $"Axis: {axis}";
+
+            cbEnableStatus.Items.Add(new StatusItem(null));
+            foreach (var gs in globalStatuses ?? [])
+                cbEnableStatus.Items.Add(new StatusItem(gs));
+            cbEnableStatus.SelectedIndex = 0;
+
             if (instance != null)
             {
                 foreach (var input in instance.InputInstances)
-                {
                     Add(input);
+
+                if (instance.Binding.EnableStatusId is not null)
+                {
+                    var match = cbEnableStatus.Items.OfType<StatusItem>()
+                        .FirstOrDefault(x => x.Status?.Id == instance.Binding.EnableStatusId);
+                    if (match is not null)
+                        cbEnableStatus.SelectedItem = match;
                 }
             }
             RebuildResult(null, null);
@@ -70,9 +88,21 @@ namespace JoyMap.Forms
                 return;
             }
             var axes = axisListView.Items.ToEnumerable().Select(x => (AxisInput)x.Tag!).ToList();
-            Result = new(new XBoxAxisBinding(axes.Select(x => x.Input).ToList(), Axis),
+            var enableStatusItem = cbEnableStatus.SelectedItem as StatusItem;
+            var enableStatusId = enableStatusItem?.Status?.Id;
+
+            Func<float?> baseGet = XBoxAxisBindingInstance.CombineAxisInputs(axes);
+            Func<float?> getValueFn = baseGet;
+            if (enableStatusItem?.Status is { } statusInst)
+            {
+                var cap = statusInst;
+                getValueFn = () => cap.CurrentValue ? baseGet() : 0f;
+            }
+
+            Result = new(
+                new XBoxAxisBinding(axes.Select(x => x.Input).ToList(), Axis, enableStatusId),
                 axes,
-                XBoxAxisBindingInstance.CombineAxisInputs(axes));
+                getValueFn);
             btnOk.Enabled = true;
             statusLabel.Text = "Ok";
         }

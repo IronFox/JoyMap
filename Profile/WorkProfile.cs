@@ -12,6 +12,8 @@ namespace JoyMap.Profile
         public string? Notes { get; set; }
         public List<EventInstance> Events { get; init; } = [];
         public Dictionary<XBoxAxis, XBoxAxisBindingInstance> AxisBindings { get; init; } = [];
+        public List<GlobalStatusInstance> GlobalStatuses { get; init; } = [];
+        public int NextGlobalStatusId { get; set; }
 
         public bool Exists { get; set; }
         public bool HasChanged { get; set; }
@@ -20,6 +22,7 @@ namespace JoyMap.Profile
 
         public IReadOnlyList<EventInstance> EventInstances => Events;
         public IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindings => [.. AxisBindings.Values];
+        public IReadOnlyList<GlobalStatusInstance> GlobalStatusInstances => GlobalStatuses;
 
         public ProfileInstance ToProfileInstance()
         {
@@ -28,7 +31,8 @@ namespace JoyMap.Profile
                 Profile: ToProfile(),
                 ProcessNameRegex: new(ProcessNameRegex, WindowNameRegex),
                 EventInstances: Events,
-                XBoxAxisBindingInstances: XBoxAxisBindings
+                XBoxAxisBindingInstances: XBoxAxisBindings,
+                GlobalStatusInstances: GlobalStatuses
             );
         }
 
@@ -42,10 +46,22 @@ namespace JoyMap.Profile
                 ProcessNameRegex: ProcessNameRegex,
                 WindowNameRegex: WindowNameRegex,
                 Events: Events.Select(x => x.Event).ToList(),
-                XBoxAxisBindings: AxisBindings.Values.Select(x => x.Binding).ToList()
+                XBoxAxisBindings: AxisBindings.Values.Select(x => x.Binding).ToList(),
+                GlobalStatuses: GlobalStatuses.Select(x => x.Status).ToList(),
+                NextGlobalStatusId: NextGlobalStatusId
             );
-
         }
 
+        public string AllocateNextGlobalStatusId()
+        {
+            while (GlobalStatuses.Any(g => g.Id == $"G{NextGlobalStatusId}"))
+                NextGlobalStatusId++;
+            return $"G{NextGlobalStatusId}";
+        }
+
+        public void CommitNextGlobalStatusId()
+        {
+            NextGlobalStatusId++;
+        }
     }
 }

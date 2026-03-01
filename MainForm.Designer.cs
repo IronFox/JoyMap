@@ -92,11 +92,33 @@
             label5 = new Label();
             tabControl = new TabControl();
             tabEvents = new TabPage();
+            tabGlobalStatuses = new TabPage();
+            globalStatusListView = new ListView();
+            columnHeaderGsName = new ColumnHeader();
+            columnHeaderGsId = new ColumnHeader();
+            columnHeaderGsMode = new ColumnHeader();
+            columnHeaderGsActive = new ColumnHeader();
+            gsContextMenu = new ContextMenuStrip(components);
+            gsNewMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem13 = new ToolStripSeparator();
+            gsEditMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem14 = new ToolStripSeparator();
+            gsDeleteMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem15 = new ToolStripSeparator();
+            gsResetCounterMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem17 = new ToolStripSeparator();
+            gsCopySelectedMenuItem = new ToolStripMenuItem();
+            gsCopyAllMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem18 = new ToolStripSeparator();
+            gsPasteOverMenuItem = new ToolStripMenuItem();
+            gsPasteInsertMenuItem = new ToolStripMenuItem();
+            labelGlobalStatuses = new Label();
             tabXBox = new TabPage();
             bindingListView = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader7 = new ColumnHeader();
             columnHeader6 = new ColumnHeader();
+            columnHeader8 = new ColumnHeader();
             bindingContextMenu = new ContextMenuStrip(components);
             tsmEditBinding = new ToolStripMenuItem();
             toolStripMenuItem12 = new ToolStripSeparator();
@@ -118,8 +140,10 @@
             eventContextMenu.SuspendLayout();
             tabControl.SuspendLayout();
             tabEvents.SuspendLayout();
+            tabGlobalStatuses.SuspendLayout();
             tabXBox.SuspendLayout();
             bindingContextMenu.SuspendLayout();
+            gsContextMenu.SuspendLayout();
             tabNotes.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
@@ -554,6 +578,7 @@
             // 
             tabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl.Controls.Add(tabEvents);
+            tabControl.Controls.Add(tabGlobalStatuses);
             tabControl.Controls.Add(tabXBox);
             tabControl.Controls.Add(tabNotes);
             tabControl.Location = new Point(0, 179);
@@ -576,6 +601,153 @@
             tabEvents.TabIndex = 0;
             tabEvents.Text = "Events";
             // 
+            // tabGlobalStatuses
+            // 
+            tabGlobalStatuses.Controls.Add(labelGlobalStatuses);
+            tabGlobalStatuses.Controls.Add(globalStatusListView);
+            tabGlobalStatuses.Location = new Point(4, 34);
+            tabGlobalStatuses.Name = "tabGlobalStatuses";
+            tabGlobalStatuses.Padding = new Padding(3);
+            tabGlobalStatuses.Size = new Size(1215, 598);
+            tabGlobalStatuses.TabIndex = 3;
+            tabGlobalStatuses.Text = "Global Statuses";
+            // 
+            // globalStatusListView
+            // 
+            globalStatusListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            globalStatusListView.Columns.AddRange(new ColumnHeader[] { columnHeaderGsName, columnHeaderGsId, columnHeaderGsMode, columnHeaderGsActive });
+            globalStatusListView.ContextMenuStrip = gsContextMenu;
+            globalStatusListView.FullRowSelect = true;
+            globalStatusListView.Location = new Point(6, 33);
+            globalStatusListView.Name = "globalStatusListView";
+            globalStatusListView.Size = new Size(1199, 559);
+            globalStatusListView.TabIndex = 0;
+            globalStatusListView.UseCompatibleStateImageBehavior = false;
+            globalStatusListView.View = View.Details;
+            globalStatusListView.DoubleClick += globalStatusListView_DoubleClick;
+            globalStatusListView.KeyDown += GlobalShortcuts;
+            // 
+            // columnHeaderGsName
+            // 
+            columnHeaderGsName.Text = "Name";
+            columnHeaderGsName.Width = 400;
+            // 
+            // columnHeaderGsId
+            // 
+            columnHeaderGsId.Text = "ID";
+            columnHeaderGsId.Width = 80;
+            // 
+            // columnHeaderGsMode
+            // 
+            columnHeaderGsMode.Text = "Mode";
+            columnHeaderGsMode.Width = 300;
+            // 
+            // columnHeaderGsActive
+            // 
+            columnHeaderGsActive.Text = "Active";
+            columnHeaderGsActive.Width = 100;
+            // 
+            // gsContextMenu
+            // 
+            gsContextMenu.ImageScalingSize = new Size(24, 24);
+            gsContextMenu.Items.AddRange(new ToolStripItem[] { gsNewMenuItem, toolStripMenuItem13, gsEditMenuItem, toolStripMenuItem14, gsDeleteMenuItem, toolStripMenuItem15, gsResetCounterMenuItem, toolStripMenuItem17, gsCopySelectedMenuItem, gsCopyAllMenuItem, toolStripMenuItem18, gsPasteOverMenuItem, gsPasteInsertMenuItem });
+            gsContextMenu.Name = "gsContextMenu";
+            gsContextMenu.Size = new Size(220, 160);
+            gsContextMenu.Opening += gsContextMenu_Opening;
+            // 
+            // gsNewMenuItem
+            // 
+            gsNewMenuItem.Name = "gsNewMenuItem";
+            gsNewMenuItem.Size = new Size(219, 32);
+            gsNewMenuItem.Text = "New ...";
+            gsNewMenuItem.Click += gsNewMenuItem_Click;
+            // 
+            // toolStripMenuItem13
+            // 
+            toolStripMenuItem13.Name = "toolStripMenuItem13";
+            toolStripMenuItem13.Size = new Size(216, 6);
+            // 
+            // gsEditMenuItem
+            // 
+            gsEditMenuItem.Name = "gsEditMenuItem";
+            gsEditMenuItem.Size = new Size(219, 32);
+            gsEditMenuItem.Text = "Edit Selected (double click) ...";
+            gsEditMenuItem.Click += gsEditMenuItem_Click;
+            // 
+            // toolStripMenuItem14
+            // 
+            toolStripMenuItem14.Name = "toolStripMenuItem14";
+            toolStripMenuItem14.Size = new Size(216, 6);
+            // 
+            // gsDeleteMenuItem
+            // 
+            gsDeleteMenuItem.Name = "gsDeleteMenuItem";
+            gsDeleteMenuItem.ShortcutKeys = Keys.Delete;
+            gsDeleteMenuItem.Size = new Size(219, 32);
+            gsDeleteMenuItem.Text = "Delete";
+            gsDeleteMenuItem.Click += gsDeleteMenuItem_Click;
+            // 
+            // toolStripMenuItem15
+            // 
+            toolStripMenuItem15.Name = "toolStripMenuItem15";
+            toolStripMenuItem15.Size = new Size(216, 6);
+            // 
+            // gsResetCounterMenuItem
+            // 
+            gsResetCounterMenuItem.Name = "gsResetCounterMenuItem";
+            gsResetCounterMenuItem.Size = new Size(219, 32);
+            gsResetCounterMenuItem.Text = "Reset ID Counter";
+            gsResetCounterMenuItem.Click += gsResetCounterMenuItem_Click;
+            // 
+            // toolStripMenuItem17
+            // 
+            toolStripMenuItem17.Name = "toolStripMenuItem17";
+            toolStripMenuItem17.Size = new Size(216, 6);
+            // 
+            // gsCopySelectedMenuItem
+            // 
+            gsCopySelectedMenuItem.Name = "gsCopySelectedMenuItem";
+            gsCopySelectedMenuItem.ShortcutKeys = Keys.Control | Keys.C;
+            gsCopySelectedMenuItem.Size = new Size(219, 32);
+            gsCopySelectedMenuItem.Text = "Copy Selected";
+            gsCopySelectedMenuItem.Click += gsCopySelectedMenuItem_Click;
+            // 
+            // gsCopyAllMenuItem
+            // 
+            gsCopyAllMenuItem.Name = "gsCopyAllMenuItem";
+            gsCopyAllMenuItem.Size = new Size(219, 32);
+            gsCopyAllMenuItem.Text = "Copy All";
+            gsCopyAllMenuItem.Click += gsCopyAllMenuItem_Click;
+            // 
+            // toolStripMenuItem18
+            // 
+            toolStripMenuItem18.Name = "toolStripMenuItem18";
+            toolStripMenuItem18.Size = new Size(216, 6);
+            // 
+            // gsPasteOverMenuItem
+            // 
+            gsPasteOverMenuItem.Name = "gsPasteOverMenuItem";
+            gsPasteOverMenuItem.Size = new Size(219, 32);
+            gsPasteOverMenuItem.Text = "Paste Over";
+            gsPasteOverMenuItem.Click += gsPasteOverMenuItem_Click;
+            // 
+            // gsPasteInsertMenuItem
+            // 
+            gsPasteInsertMenuItem.Name = "gsPasteInsertMenuItem";
+            gsPasteInsertMenuItem.ShortcutKeys = Keys.Control | Keys.V;
+            gsPasteInsertMenuItem.Size = new Size(219, 32);
+            gsPasteInsertMenuItem.Text = "Paste Insert";
+            gsPasteInsertMenuItem.Click += gsPasteInsertMenuItem_Click;
+            // 
+            // labelGlobalStatuses
+            // 
+            labelGlobalStatuses.AutoSize = true;
+            labelGlobalStatuses.Location = new Point(6, 5);
+            labelGlobalStatuses.Name = "labelGlobalStatuses";
+            labelGlobalStatuses.Size = new Size(130, 25);
+            labelGlobalStatuses.TabIndex = 1;
+            labelGlobalStatuses.Text = "Global Statuses:";
+            // 
             // tabXBox
             // 
             tabXBox.Controls.Add(bindingListView);
@@ -585,12 +757,11 @@
             tabXBox.Padding = new Padding(3);
             tabXBox.Size = new Size(1215, 598);
             tabXBox.TabIndex = 1;
-            tabXBox.Text = "XBox Axis Binding";
-            // 
+            tabXBox.Text = "XBox Axis Binding";            // 
             // bindingListView
             // 
             bindingListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            bindingListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader7, columnHeader6 });
+            bindingListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader7, columnHeader6, columnHeader8 });
             bindingListView.ContextMenuStrip = bindingContextMenu;
             bindingListView.FullRowSelect = true;
             listViewItem1.Tag = "0";
@@ -623,6 +794,11 @@
             // 
             columnHeader6.Text = "Output";
             columnHeader6.Width = 300;
+            // 
+            // columnHeader8
+            // 
+            columnHeader8.Text = "Enable Status";
+            columnHeader8.Width = 200;
             // 
             // bindingContextMenu
             // 
@@ -782,9 +958,12 @@
             tabControl.ResumeLayout(false);
             tabEvents.ResumeLayout(false);
             tabEvents.PerformLayout();
+            tabGlobalStatuses.ResumeLayout(false);
+            tabGlobalStatuses.PerformLayout();
             tabXBox.ResumeLayout(false);
             tabXBox.PerformLayout();
             bindingContextMenu.ResumeLayout(false);
+            gsContextMenu.ResumeLayout(false);
             tabNotes.ResumeLayout(false);
             tabNotes.PerformLayout();
             statusStrip1.ResumeLayout(false);
@@ -851,6 +1030,27 @@
         private ToolStripSeparator toolStripMenuItem8;
         private TabControl tabControl;
         private TabPage tabEvents;
+        private TabPage tabGlobalStatuses;
+        private ListView globalStatusListView;
+        private ColumnHeader columnHeaderGsName;
+        private ColumnHeader columnHeaderGsId;
+        private ColumnHeader columnHeaderGsMode;
+        private ColumnHeader columnHeaderGsActive;
+        private ContextMenuStrip gsContextMenu;
+        private ToolStripMenuItem gsNewMenuItem;
+        private ToolStripSeparator toolStripMenuItem13;
+        private ToolStripMenuItem gsEditMenuItem;
+        private ToolStripSeparator toolStripMenuItem14;
+        private ToolStripMenuItem gsDeleteMenuItem;
+        private ToolStripSeparator toolStripMenuItem15;
+        private ToolStripMenuItem gsResetCounterMenuItem;
+        private ToolStripSeparator toolStripMenuItem17;
+        private ToolStripMenuItem gsCopySelectedMenuItem;
+        private ToolStripMenuItem gsCopyAllMenuItem;
+        private ToolStripSeparator toolStripMenuItem18;
+        private ToolStripMenuItem gsPasteOverMenuItem;
+        private ToolStripMenuItem gsPasteInsertMenuItem;
+        private Label labelGlobalStatuses;
         private TabPage tabXBox;
         private StatusStrip statusStrip1;
         private ListView bindingListView;
@@ -871,6 +1071,7 @@
         private ToolStripMenuItem tsmSelectAllBindings;
         private ToolStripSeparator toolStripMenuItem9;
         private ColumnHeader columnHeader7;
+        private ColumnHeader columnHeader8;
         private TabPage tabNotes;
         private TextBox textNotes;
     }

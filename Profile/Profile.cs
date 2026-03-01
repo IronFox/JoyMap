@@ -10,7 +10,9 @@ namespace JoyMap.Profile
         string? ProcessNameRegex,
         string? WindowNameRegex,
         IReadOnlyList<Event> Events,
-        IReadOnlyList<XBoxAxisBinding>? XBoxAxisBindings
+        IReadOnlyList<XBoxAxisBinding>? XBoxAxisBindings,
+        IReadOnlyList<GlobalStatus>? GlobalStatuses = null,
+        int NextGlobalStatusId = 0
         );
 
 
@@ -18,7 +20,8 @@ namespace JoyMap.Profile
         Profile Profile,
         ProcessRegex ProcessNameRegex,
         IReadOnlyList<EventInstance> EventInstances,
-        IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindingInstances
+        IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindingInstances,
+        IReadOnlyList<GlobalStatusInstance> GlobalStatusInstances
         )
     {
         public bool Is(WindowReference wr)
@@ -32,17 +35,25 @@ namespace JoyMap.Profile
 
         public static ProfileInstance Load(InputMonitor monitor, Profile profile)
         {
+            var globalStatusInstances = (profile.GlobalStatuses ?? [])
+                .Select(g => GlobalStatusInstance.Load(monitor, g))
+                .ToList();
+
+            var globalResolvers = globalStatusInstances
+                .ToDictionary(g => g.Id, g => (Func<bool>)(() => g.CurrentValue));
+
             var eventInstances = profile.Events
-                .Select(e => EventInstance.Load(monitor, e))
+                .Select(e => EventInstance.Load(monitor, e, globalResolvers))
                 .ToList();
             var axisBindingInstances = (profile.XBoxAxisBindings ?? [])
-                .Select(a => XBoxAxisBindingInstance.Load(monitor, a))
+                .Select(a => XBoxAxisBindingInstance.Load(monitor, a, globalResolvers))
                 .ToList();
             return new ProfileInstance(
                 Profile: profile,
                 ProcessNameRegex: new(profile.ProcessNameRegex, profile.WindowNameRegex),
                 EventInstances: eventInstances,
-                XBoxAxisBindingInstances: axisBindingInstances
+                XBoxAxisBindingInstances: axisBindingInstances,
+                GlobalStatusInstances: globalStatusInstances
                 );
         }
     }

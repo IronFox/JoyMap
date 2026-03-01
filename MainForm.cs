@@ -5,6 +5,7 @@ using JoyMap.Profile;
 using JoyMap.Undo.Action;
 using JoyMap.Undo.Action.Binding;
 using JoyMap.Undo.Action.EventAction;
+using JoyMap.Undo.Action.GlobalStatusAction;
 using JoyMap.Util;
 using JoyMap.Windows;
 using JoyMap.XBox;
@@ -71,7 +72,7 @@ namespace JoyMap
         {
             if (ActiveProfile is null)
                 return;
-            using var form = new EventForm();
+            using var form = new EventForm(null, BuildGlobalResolvers());
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -146,11 +147,21 @@ namespace JoyMap
                     row.SubItems.Add(string.Join(", ", ev.Actions.Select(x => x.Action)));
                     row.SubItems.Add("");
                 }
+                globalStatusListView.Items.Clear();
+                foreach (var gs in profile.GlobalStatuses)
+                {
+                    var row = globalStatusListView.Items.Add(gs.Status.Name);
+                    row.SubItems.Add(gs.Id);
+                    row.SubItems.Add(gs.Status.Mode.ToString());
+                    row.SubItems.Add("");
+                    row.Tag = gs;
+                }
                 bindingListView.Items.Clear();
                 foreach (var axis in Enum.GetValues<XBoxAxis>())
                 {
                     profile.AxisBindings.TryGetValue(axis, out var bound);
                     var row = new AxisRowHandle(this, axis, bindingListView.Items.Add(axis.ToString()));
+                    row.Row.SubItems.Add("");
                     row.Row.SubItems.Add("");
                     row.Row.SubItems.Add("");
 
@@ -190,6 +201,7 @@ namespace JoyMap
 
         public ListView EventListView => eventListView;
         public ListView BindingListView => bindingListView;
+        public ListView GlobalStatusListView => globalStatusListView;
         public AxisRowHandle RequireRowOf(XBoxAxis axis)
         {
             return new AxisRowHandle(this, axis, bindingListView.Items.ToEnumerable().First(x => AxisOf(x) == axis));
@@ -205,7 +217,7 @@ namespace JoyMap
 
             public void Bind(XBoxAxisBindingInstance? b, bool updateCurrentProfile = true)
             {
-                AxisUpdateItemTo(Row, Axis, b);
+                AxisUpdateItemTo(Row, Axis, b, Form.ActiveProfile?.GlobalStatuses);
                 if (updateCurrentProfile && Form.ActiveProfile is not null)
                 {
                     if (b is not null)
@@ -228,6 +240,7 @@ namespace JoyMap
             textProfileName.Text = "";
             textProfileName.Enabled = false;
             eventListView.Items.Clear();
+            globalStatusListView.Items.Clear();
             eventListView.ContextMenuStrip = null;
             btnUp.Enabled = false;
             btnDown.Enabled = false;
@@ -295,7 +308,7 @@ namespace JoyMap
             var item = eventListView.SelectedItems[0];
             if (item.Tag is not EventInstance ev)
                 return;
-            using var form = new EventForm(ev);
+            using var form = new EventForm(ev, BuildGlobalResolvers());
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -318,10 +331,15 @@ namespace JoyMap
                     if (row.Tag is not EventInstance ev) continue;
                     row.SubItems[3].Text = ev.IsSuspended ? "Suspended" : ev.IsTriggered() ? "A" : "";
                 }
+                foreach (ListViewItem row in globalStatusListView.Items)
+                {
+                    if (row.Tag is not GlobalStatusInstance gs) continue;
+                    row.SubItems[3].Text = gs.CurrentValue ? "True" : "False";
+                }
                 foreach (ListViewItem row in bindingListView.Items)
                 {
                     if (row.Tag is not XBoxAxisBindingInstance map) continue;
-                    row.SubItems[2].Text = map.IsSuspended ? "Suspended" : map.GetValue().ToStr();
+                    row.SubItems[2].Text = GetGatedOutput(map, ActiveProfile.GlobalStatuses);
                 }
             }
 
@@ -558,6 +576,36 @@ namespace JoyMap
                 }
 
             }
+            else if (tabControl.SelectedTab == tabGlobalStatuses)
+            {
+                if (e.Control && e.KeyCode == Keys.C)
+                {
+                    gsCopySelectedMenuItem_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Control && e.KeyCode == Keys.V)
+                {
+                    gsPasteInsertMenuItem_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.KeyCode == Keys.Delete)
+                {
+                    gsDeleteMenuItem_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Control && e.KeyCode == Keys.N)
+                {
+                    gsNewMenuItem_Click(this, EventArgs.Empty);
+                    e.Handled = true;
+                    return;
+                }
+            }
             else if (tabControl.SelectedTab == tabEvents)
             {
                 if (e.Control && e.KeyCode == Keys.C)
@@ -738,7 +786,7 @@ namespace JoyMap
                 return;
             var axis = AxisOf(bindingListView.SelectedItems[0]);
             ActiveProfile.AxisBindings.TryGetValue(axis, out var binding);
-            using var form = new XBoxAxisBindingForm(axis, binding);
+            using var form = new XBoxAxisBindingForm(axis, binding, ActiveProfile?.GlobalStatuses);
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -830,20 +878,43 @@ namespace JoyMap
             throw new InvalidOperationException($"Row has neither axis nor binding as tag");
         }
 
-        internal static void AxisUpdateItemTo(ListViewItem item, XBoxAxis outAxis, XBoxAxisBindingInstance? b)
+        internal static void AxisUpdateItemTo(ListViewItem item, XBoxAxis outAxis, XBoxAxisBindingInstance? b, IReadOnlyList<GlobalStatusInstance>? globalStatuses = null)
         {
             if (b is null)
             {
                 item.Tag = outAxis;
                 item.SubItems[1].Text = "";
                 item.SubItems[2].Text = "";
+                item.SubItems[3].Text = "";
             }
             else
             {
                 item.SubItems[1].Text = string.Join(", ", b.InputInstances.Select(x => x.Input.InputId.ControllerAxisName));
-                item.SubItems[2].Text = b.GetValue().ToStr();
+                item.SubItems[2].Text = GetGatedOutput(b, globalStatuses);
+                item.SubItems[3].Text = GetEnableStatusText(b.Binding.EnableStatusId, globalStatuses);
                 item.Tag = b;
             }
+        }
+
+        private static string GetGatedOutput(XBoxAxisBindingInstance b, IReadOnlyList<GlobalStatusInstance>? globalStatuses)
+        {
+            if (b.IsSuspended)
+                return "Suspended";
+            if (b.Binding.EnableStatusId is string sid)
+            {
+                var status = globalStatuses?.FirstOrDefault(g => g.Id == sid);
+                if (status is not null && !status.CurrentValue)
+                    return (0f).ToStr();
+            }
+            return b.GetValue().ToStr();
+        }
+
+        private static string GetEnableStatusText(string? enableStatusId, IReadOnlyList<GlobalStatusInstance>? globalStatuses)
+        {
+            if (enableStatusId is null)
+                return "";
+            var status = globalStatuses?.FirstOrDefault(g => g.Id == enableStatusId);
+            return status is not null ? $"{enableStatusId}: {status.Status.Name}" : enableStatusId;
         }
 
         private void bindingListView_DoubleClick(object sender, EventArgs e)
@@ -871,5 +942,118 @@ namespace JoyMap
                 ActiveProfile.History.ExecuteAction(new SetProfileNotesAction(this, ActiveProfile, textNotes));
             }
         }
+            private IReadOnlyDictionary<string, Func<bool>> BuildGlobalResolvers()
+            {
+                return ActiveProfile?.GlobalStatuses
+                    .ToDictionary(g => g.Id, g => (Func<bool>)(() => g.CurrentValue))
+                    ?? new Dictionary<string, Func<bool>>();
+            }
+
+            private void gsNewMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                var id = ActiveProfile.AllocateNextGlobalStatusId();
+                using var form = new GlobalStatusForm(id);
+                if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
+                {
+                    ActiveProfile.CommitNextGlobalStatusId();
+                    ActiveProfile.History.ExecuteAction(new AddGlobalStatusAction(this, ActiveProfile, form.Result));
+                }
+            }
+
+            private void gsEditMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null || globalStatusListView.SelectedItems.Count != 1)
+                    return;
+                var item = globalStatusListView.SelectedItems[0];
+                if (item.Tag is not GlobalStatusInstance gs)
+                    return;
+                using var form = new GlobalStatusForm(gs.Id, gs);
+                if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
+                {
+                    ActiveProfile.History.ExecuteAction(new EditGlobalStatusAction(this, ActiveProfile, item.Index, gs, form.Result));
+                }
+            }
+
+            private void gsDeleteMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                var selected = globalStatusListView.SelectedItems.ToEnumerable().Select(x => x.Index).ToList();
+                if (selected.Count == 0)
+                    return;
+                ActiveProfile.History.ExecuteAction(new DeleteGlobalStatusAction(this, ActiveProfile, selected));
+            }
+
+            private void gsResetCounterMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                ActiveProfile.NextGlobalStatusId = 0;
+                Registry.Persist(ActiveProfile);
+            }
+
+            private void gsCopySelectedMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                globalStatusListView.SelectedItems.ToEnumerable()
+                    .Select(item => item.Tag)
+                    .OfType<GlobalStatusInstance>()
+                    .Select(inst => inst.Status)
+                    .ToList()
+                    .CopyToClipboard();
+            }
+
+            private void gsCopyAllMenuItem_Click(object sender, EventArgs e)
+            {
+                ActiveProfile?.GlobalStatuses.Select(inst => inst.Status).ToList().CopyToClipboard();
+            }
+
+            private void gsPasteOverMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                var copied = ClipboardUtil.GetCopied<GlobalStatus>();
+                if (copied is null)
+                    return;
+                if (globalStatusListView.SelectedItems.Count != copied.Count)
+                    return;
+                ActiveProfile.History.ExecuteAction(new PasteOverGlobalStatusAction(
+                    this, ActiveProfile,
+                    globalStatusListView.SelectedItems.ToEnumerable().Select(item => item.Index).ToList(),
+                    copied));
+            }
+
+            private void gsPasteInsertMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                var copied = ClipboardUtil.GetCopied<GlobalStatus>();
+                if (copied is null)
+                    return;
+                var insertIndex = globalStatusListView.SelectedItems.Count > 0
+                    ? globalStatusListView.SelectedItems[globalStatusListView.SelectedItems.Count - 1].Index + 1
+                    : globalStatusListView.Items.Count;
+                ActiveProfile.History.ExecuteAction(new PasteInsertGlobalStatusAction(
+                    this, ActiveProfile, insertIndex, copied));
+            }
+
+            private void gsContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+            {
+                gsEditMenuItem.Enabled = globalStatusListView.SelectedItems.Count == 1;
+                gsDeleteMenuItem.Enabled = globalStatusListView.SelectedItems.Count > 0;
+                gsCopySelectedMenuItem.Enabled = globalStatusListView.SelectedItems.Count > 0;
+                gsCopyAllMenuItem.Enabled = globalStatusListView.Items.Count > 0;
+                var copied = ClipboardUtil.GetCopied<GlobalStatus>();
+                gsPasteOverMenuItem.Enabled = copied?.Count == globalStatusListView.SelectedItems.Count && copied.Count > 0;
+                gsPasteInsertMenuItem.Enabled = copied is not null;
+            }
+
+            private void globalStatusListView_DoubleClick(object sender, EventArgs e)
+            {
+                gsEditMenuItem_Click(sender, e);
+            }
+        }
     }
-}

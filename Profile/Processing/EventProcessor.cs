@@ -11,7 +11,7 @@ namespace JoyMap.Profile
 
         private List<IActionProcessor> ActionProcessors { get; } = [];
 
-        public static Func<bool>? BuildTriggerCombiner(string? combiner, IReadOnlyList<TriggerInstance> triggerInstances)
+        public static Func<bool>? BuildTriggerCombiner(string? combiner, IReadOnlyList<TriggerInstance> triggerInstances, IReadOnlyDictionary<string, Func<bool>>? extra = null)
         {
             if (combiner?.ToLower() == "and")
             {
@@ -25,16 +25,22 @@ namespace JoyMap.Profile
             }
             else
             {
+                var identifiers = triggerInstances
+                    .Select((t, i) => KeyValuePair.Create($"T{i}", t.IsTriggered))
+                    .ToDictionary();
+                if (extra is not null)
+                    foreach (var kv in extra)
+                        identifiers[kv.Key] = kv.Value;
                 return ExpressionCompiler.CompileBooleanExpression(
                     combiner ?? "false",
-                    triggerInstances.Select((t, i) => KeyValuePair.Create($"T{i}", t.IsTriggered)).ToDictionary()
+                    identifiers
                 );
             }
         }
         public EventProcessor(EventInstance source)
         {
             Source = source;
-            IsTriggered = BuildTriggerCombiner(source.Event.TriggerCombiner, source.TriggerInstances) ?? (() => false);
+            IsTriggered = source.IsTriggered;
 
             foreach (var action in source.Event.Actions)
             {

@@ -5,9 +5,10 @@ namespace JoyMap
 {
     public partial class EventForm : Form
     {
-        public EventForm(EventInstance? instance = null)
+        public EventForm(EventInstance? instance = null, IReadOnlyDictionary<string, Func<bool>>? globalResolvers = null)
         {
             InitializeComponent();
+            _globalResolvers = globalResolvers;
             if (instance is not null)
             {
                 Suspended = instance.IsSuspended;
@@ -37,6 +38,8 @@ namespace JoyMap
         }
 
         private bool Suspended { get; set; } = false;
+
+        private IReadOnlyDictionary<string, Func<bool>>? _globalResolvers;
 
         private List<(TriggerInstance Trigger, ListViewItem Row)> Triggers { get; } = [];
 
@@ -217,7 +220,7 @@ namespace JoyMap
                 var actions = actionListView.Items.ToEnumerable()
                         .Select(x => x.Tag as EventAction!)
                         .Where(x => x is not null).ToList();
-                var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, this.Triggers.Select(x => x.Trigger).ToList());
+                var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, this.Triggers.Select(x => x.Trigger).ToList(), _globalResolvers);
                 if (tCombiner is null)
                 {
                     btnOk.Enabled = false;

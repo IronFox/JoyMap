@@ -18,7 +18,7 @@ namespace JoyMap.Profile
         public bool IsSuspended { get; set; }
         public IReadOnlyList<EventAction> Actions => Event.Actions;
 
-        internal static EventInstance Load(InputMonitor monitor, Event e)
+        internal static EventInstance Load(InputMonitor monitor, Event e, IReadOnlyDictionary<string, Func<bool>>? globalResolvers = null)
         {
             var triggerInstances = e.Triggers
                 .Select(t => TriggerInstance.Load(monitor, t))
@@ -28,7 +28,8 @@ namespace JoyMap.Profile
                 TriggerInstances: triggerInstances,
                 IsTriggered: EventProcessor.BuildTriggerCombiner(
                     e.TriggerCombiner,
-                    triggerInstances
+                    triggerInstances,
+                    globalResolvers
                     ) ?? (() => false)
                 );
         }

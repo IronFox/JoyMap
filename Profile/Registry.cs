@@ -194,7 +194,9 @@ namespace JoyMap.Profile
                 ProcessNameRegex = profile.Profile.ProcessNameRegex ?? "",
                 WindowNameRegex = profile.Profile.WindowNameRegex ?? "",
                 Events = [.. profile.EventInstances],
-                AxisBindings = profile.XBoxAxisBindingInstances.ToDictionary(x => x.OutAxis)
+                AxisBindings = profile.XBoxAxisBindingInstances.ToDictionary(x => x.OutAxis),
+                GlobalStatuses = [.. profile.GlobalStatusInstances],
+                NextGlobalStatusId = profile.Profile.NextGlobalStatusId
             };
             if (slot is not null)
                 slot.WorkProfile = workProfile;

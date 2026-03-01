@@ -37,19 +37,21 @@ namespace JoyMap.Profile
         {
             Events = profileInstance.EventInstances;
             Mappings = profileInstance.XBoxAxisBindings;
+            GlobalStatuses = profileInstance.GlobalStatusInstances;
             MainForm.Log($"Profile execution started with {Events.Count} events");
 
 
             ListenCancel = new CancellationTokenSource();
             var cancel = ListenCancel.Token;
-            var processors = Events
+            IEnumerable<IProcessor> processors = Events
                 .Select(ev => ev.ToProcessor())
                 .OfType<IProcessor>();
 
+            if (GlobalStatuses.Count > 0)
+                processors = processors.Prepend(new GlobalStatusProcessor(GlobalStatuses));
+
             if (Mappings.Count > 0)
-            {
                 processors = processors.Append(new XBoxAxisProcessor(Mappings));
-            }
 
             Task.Run(() => ListenLoop([.. processors], cancel), cancel);
         }
@@ -57,7 +59,7 @@ namespace JoyMap.Profile
 
         public IReadOnlyList<EventInstance> Events { get; }
         public IReadOnlyList<XBoxAxisBindingInstance> Mappings { get; }
-
+        public IReadOnlyList<GlobalStatusInstance> GlobalStatuses { get; }
 
         private CancellationTokenSource ListenCancel { get; } = new();
 

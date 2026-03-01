@@ -18,7 +18,8 @@ namespace JoyMap.Profile
 
     public record XBoxAxisBinding(
         IReadOnlyList<XBoxInputAxis> InAxes,
-        XBoxAxis OutAxis
+        XBoxAxis OutAxis,
+        string? EnableStatusId = null
         ) : IJsonCompatible;
 
     public readonly record struct AxisInput(
@@ -74,15 +75,25 @@ namespace JoyMap.Profile
         public bool IsSuspended { get; set; }
         public XBoxAxis OutAxis => Binding.OutAxis;
 
-        internal static XBoxAxisBindingInstance Load(InputMonitor monitor, XBoxAxisBinding e)
+        internal static XBoxAxisBindingInstance Load(InputMonitor monitor, XBoxAxisBinding e, IReadOnlyDictionary<string, Func<bool>>? globalResolvers = null)
         {
             var axes = e.InAxes
                 .Select(t => AxisInput.Load(monitor, t))
                 .ToList();
+            var baseGetValue = CombineAxisInputs(axes);
+            Func<float?> getValueWithStatus = baseGetValue;
+
+            if (e.EnableStatusId is not null
+                && globalResolvers?.TryGetValue(e.EnableStatusId, out var statusFunc) == true)
+            {
+                var cap = statusFunc!;
+                getValueWithStatus = () => cap() ? baseGetValue() : 0f;
+            }
+
             return new XBoxAxisBindingInstance(
                 Binding: e,
                 InputInstances: axes,
-                GetValue: CombineAxisInputs(axes)
+                GetValue: getValueWithStatus
                 );
         }
 
