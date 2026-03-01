@@ -29,8 +29,8 @@ namespace JoyMap.Profile
         private Func<bool> CombinerResult { get; }
         public bool IsSuspended { get; set; }
 
-        private bool _toggleState;
-        private bool _lastCombiner;
+        private bool ToggleState { get; set; }
+        private bool LastCombiner { get; set; }
 
         public string Id => Status.Id;
 
@@ -40,7 +40,7 @@ namespace JoyMap.Profile
             GlobalStatusMode.AlwaysFalse => false,
             GlobalStatusMode.TrueIfCombiner => CombinerResult(),
             GlobalStatusMode.FalseIfCombiner => !CombinerResult(),
-            GlobalStatusMode.ToggleOffInitially or GlobalStatusMode.ToggleOnInitially => _toggleState,
+            GlobalStatusMode.ToggleOffInitially or GlobalStatusMode.ToggleOnInitially => ToggleState,
             _ => false
         };
 
@@ -49,7 +49,7 @@ namespace JoyMap.Profile
             Status = status;
             TriggerInstances = triggerInstances;
             CombinerResult = combinerResult;
-            _toggleState = status.Mode == GlobalStatusMode.ToggleOnInitially;
+            ToggleState = status.Mode == GlobalStatusMode.ToggleOnInitially;
         }
 
         public void Update()
@@ -57,9 +57,9 @@ namespace JoyMap.Profile
             if (Status.Mode is GlobalStatusMode.ToggleOffInitially or GlobalStatusMode.ToggleOnInitially)
             {
                 var current = CombinerResult();
-                if (current && !_lastCombiner)
-                    _toggleState = !_toggleState;
-                _lastCombiner = current;
+                if (current && !LastCombiner)
+                    ToggleState = !ToggleState;
+                LastCombiner = current;
             }
         }
 

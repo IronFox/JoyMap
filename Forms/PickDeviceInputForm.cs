@@ -29,7 +29,7 @@ namespace JoyMap
 
         }
 
-        private readonly HashSet<EventKey> includedInputs = new();
+        private HashSet<EventKey> IncludedInputs { get; } = new();
 
         private void updateDeviceListTimer_Tick(object sender, EventArgs e)
         {
@@ -37,7 +37,7 @@ namespace JoyMap
             foreach (var ev in EventRecorder.GetAll())
             {
                 var key = new EventKey(ev);
-                if (includedInputs.Add(key))
+                if (IncludedInputs.Add(key))
                 {
                     var row = inputList.Items.Add(ev.DeviceName);
                     row.SubItems.Add(ev.InputId.Axis.ToString());

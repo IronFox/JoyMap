@@ -7,14 +7,14 @@ namespace JoyMap.XBox
 {
     public class VirtualController : IDisposable
     {
-        private readonly ViGEmClient _client;
-        private readonly IXbox360Controller _controller;
+        private ViGEmClient Client { get; }
+        private IXbox360Controller Controller { get; }
 
         public VirtualController()
         {
-            _client = new ViGEmClient();
-            _controller = _client.CreateXbox360Controller();
-            _controller.Connect();
+            Client = new ViGEmClient();
+            Controller = Client.CreateXbox360Controller();
+            Controller.Connect();
         }
 
         public void ChangeButtonState(XBoxButton button, bool pressed)
@@ -34,7 +34,7 @@ namespace JoyMap.XBox
                 XBoxButton.ThumbRight => Xbox360Button.RightThumb,
                 _ => throw new ArgumentOutOfRangeException(nameof(button), $"Unhandled button: {button}"),
             };
-            _controller.SetButtonState(xboxButton, pressed);
+            Controller.SetButtonState(xboxButton, pressed);
             SubmitSafe();
         }
 
@@ -60,7 +60,7 @@ namespace JoyMap.XBox
             {
                 var v = get();
                 if (v.HasValue)
-                    _controller.SetSliderValue(outSlider, (byte)Math.Clamp(v.Value * 255, 0, 255));
+                    Controller.SetSliderValue(outSlider, (byte)Math.Clamp(v.Value * 255, 0, 255));
             }
         }
 
@@ -70,7 +70,7 @@ namespace JoyMap.XBox
             {
                 var v = get();
                 if (v.HasValue)
-                    _controller.SetAxisValue(outAxis, NormalizeAxis(v.Value));
+                    Controller.SetAxisValue(outAxis, NormalizeAxis(v.Value));
             }
         }
 
@@ -81,7 +81,7 @@ namespace JoyMap.XBox
             var start = Stopwatch.GetTimestamp();
             try
             {
-                _controller.SubmitReport();
+                Controller.SubmitReport();
                 var elapsed = Stopwatch.GetElapsedTime(start);
                 if (elapsed.TotalMilliseconds >= SlowSubmitThresholdMs)
                     MainForm.Log($"XBox SubmitReport slow: {elapsed.TotalMilliseconds:F0}ms");
@@ -100,13 +100,13 @@ namespace JoyMap.XBox
 
         private void SetButton(Xbox360Button button, bool pressed)
         {
-            _controller.SetButtonState(button, pressed);
+            Controller.SetButtonState(button, pressed);
         }
 
         public void Dispose()
         {
-            _controller?.Disconnect();
-            _client?.Dispose();
+            Controller?.Disconnect();
+            Client?.Dispose();
         }
     }
 }

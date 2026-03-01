@@ -6,20 +6,20 @@ namespace JoyMap.ControllerTracking
 {
     public class DevicePoller : IDisposable, IEnumerable<Product>
     {
-        private readonly CancellationTokenSource cancel = new();
+        private CancellationTokenSource Cancel { get; } = new();
         private ConcurrentDictionary<Guid, Product> Products { get; } = [];
 
 
         public DevicePoller()
         {
             var di = new DirectInput();
-            Task.Run(() => RunAsync(di, cancel.Token));
+            Task.Run(() => RunAsync(di, Cancel.Token));
 
         }
 
         public void Dispose()
         {
-            cancel.Cancel();
+            Cancel.Cancel();
         }
 
         private async Task RunAsync(DirectInput di, CancellationToken cancel)

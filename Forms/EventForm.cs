@@ -9,9 +9,9 @@ namespace JoyMap
         public EventForm(EventInstance? instance = null, IReadOnlyList<GlobalStatusRef>? globalStatuses = null)
         {
             InitializeComponent();
-            _globalStatuses = globalStatuses ?? [];
-            _globalResolvers = _globalStatuses.Count > 0
-                ? _globalStatuses.ToDictionary(g => g.Id, g => (Func<bool>)g.IsActive)
+            GlobalStatuses = globalStatuses ?? [];
+            GlobalResolvers = GlobalStatuses.Count > 0
+                ? GlobalStatuses.ToDictionary(g => g.Id, g => (Func<bool>)g.IsActive)
                 : null;
             if (instance is not null)
             {
@@ -43,8 +43,8 @@ namespace JoyMap
 
         private bool Suspended { get; set; } = false;
 
-        private IReadOnlyList<GlobalStatusRef> _globalStatuses;
-        private IReadOnlyDictionary<string, Func<bool>>? _globalResolvers;
+        private IReadOnlyList<GlobalStatusRef> GlobalStatuses { get; }
+        private IReadOnlyDictionary<string, Func<bool>>? GlobalResolvers { get; }
 
         private List<(TriggerInstance Trigger, ListViewItem Row)> Triggers { get; } = [];
 
@@ -225,7 +225,7 @@ namespace JoyMap
                 var actions = actionListView.Items.ToEnumerable()
                         .Select(x => x.Tag as EventAction!)
                         .Where(x => x is not null).ToList();
-                var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, this.Triggers.Select(x => x.Trigger).ToList(), _globalResolvers, out var combinerError);
+                var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, this.Triggers.Select(x => x.Trigger).ToList(), GlobalResolvers, out var combinerError);
                 if (tCombiner is null)
                 {
                     labelCombinerError.Text = combinerError ?? "Invalid expression.";
@@ -272,7 +272,7 @@ namespace JoyMap
                     t.Trigger.IsTriggered))
                 .ToList();
 
-            using var form = new CombinerHelpForm(triggerCombiner.Text, localInputs, _globalStatuses);
+            using var form = new CombinerHelpForm(triggerCombiner.Text, localInputs, GlobalStatuses);
             if (form.ShowDialog(this) == DialogResult.OK && form.ResultExpression is not null)
             {
                 triggerCombiner.Text = form.ResultExpression;

@@ -6,12 +6,12 @@ namespace JoyMap.Forms
 {
     public partial class GlobalStatusForm : Form
     {
-        private readonly IReadOnlyList<GlobalStatusRef> _globalStatuses;
+        private IReadOnlyList<GlobalStatusRef> GlobalStatuses { get; }
 
         public GlobalStatusForm(string id, GlobalStatusInstance? instance = null, IReadOnlyList<GlobalStatusRef>? globalStatuses = null)
         {
             InitializeComponent();
-            _globalStatuses = globalStatuses ?? [];
+            GlobalStatuses = globalStatuses ?? [];
             StatusId = id;
             lId.Text = $"ID: {id}";
 
@@ -98,8 +98,8 @@ namespace JoyMap.Forms
                 }
 
                 var triggerInstances = Triggers.Select(x => x.Trigger).ToList();
-                var globalResolvers = _globalStatuses.Count > 0
-                    ? _globalStatuses.ToDictionary(g => g.Id, g => g.IsActive)
+                var globalResolvers = GlobalStatuses.Count > 0
+                    ? GlobalStatuses.ToDictionary(g => g.Id, g => g.IsActive)
                     : null;
                 var combiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, triggerInstances, globalResolvers, out var combinerError);
                 if (combiner is null)
@@ -140,7 +140,7 @@ namespace JoyMap.Forms
                     t.Trigger.IsTriggered))
                 .ToList();
 
-            using var form = new CombinerHelpForm(triggerCombiner.Text, localInputs, _globalStatuses);
+            using var form = new CombinerHelpForm(triggerCombiner.Text, localInputs, GlobalStatuses);
             if (form.ShowDialog(this) == DialogResult.OK && form.ResultExpression is not null)
             {
                 triggerCombiner.Text = form.ResultExpression;

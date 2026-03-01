@@ -16,7 +16,7 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
-                dp.Dispose();
+                DevicePoller.Dispose();
             }
             base.Dispose(disposing);
         }

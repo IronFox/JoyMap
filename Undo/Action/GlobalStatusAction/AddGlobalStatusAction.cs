@@ -11,7 +11,7 @@ namespace JoyMap.Undo.Action.GlobalStatusAction
         }
 
         public GlobalStatusInstance NewInstance { get; }
-        private ListViewItem? _addedRow;
+        private ListViewItem? AddedRow { get; set; }
 
         public string Name => "Add Global Status";
 
@@ -24,21 +24,21 @@ namespace JoyMap.Undo.Action.GlobalStatusAction
                 int.Parse(NewInstance.Id[1..]) + 1
             );
             TargetProfile.GlobalStatuses.Add(NewInstance);
-            _addedRow = Form.GlobalStatusListView.Items.Add(NewInstance.Status.Name);
-            _addedRow.SubItems.Add(NewInstance.Id);
-            _addedRow.SubItems.Add(NewInstance.Status.Mode.ToString());
-            _addedRow.SubItems.Add("");
-            _addedRow.Tag = NewInstance;
+            AddedRow = Form.GlobalStatusListView.Items.Add(NewInstance.Status.Name);
+            AddedRow.SubItems.Add(NewInstance.Id);
+            AddedRow.SubItems.Add(NewInstance.Status.Mode.ToString());
+            AddedRow.SubItems.Add("");
+            AddedRow.Tag = NewInstance;
             Registry.Persist(TargetProfile);
         }
 
         public void Undo()
         {
-            if (!IsValid || _addedRow is null)
+            if (!IsValid || AddedRow is null)
                 return;
             TargetProfile.GlobalStatuses.Remove(NewInstance);
-            Form.GlobalStatusListView.Items.Remove(_addedRow);
-            _addedRow = null;
+            Form.GlobalStatusListView.Items.Remove(AddedRow);
+            AddedRow = null;
             Registry.Persist(TargetProfile);
         }
     }

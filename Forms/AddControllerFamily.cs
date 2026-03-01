@@ -4,10 +4,10 @@ namespace JoyMap
 {
     public partial class AddControllerFamily : Form
     {
-        private DevicePoller dp;
+        private DevicePoller DevicePoller { get; }
         public AddControllerFamily(JsonControllerFamily? load)
         {
-            dp = new DevicePoller();
+            DevicePoller = new DevicePoller();
 
 
             InitializeComponent();
@@ -27,7 +27,7 @@ namespace JoyMap
         {
             try
             {
-                foreach (var dev in dp)
+                foreach (var dev in DevicePoller)
                 {
                     bool found = false;
                     foreach (Product item in listDevices.Items)

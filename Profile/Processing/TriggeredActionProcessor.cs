@@ -11,14 +11,14 @@ namespace JoyMap.Profile.Processing
             Key = new KeyHandle(changeTriggeredInputEffect.Keys, false);
         }
 
-        private readonly TimeSpan HoldDelay = TimeSpan.FromMilliseconds(100);
+        private TimeSpan HoldDelay { get; } = TimeSpan.FromMilliseconds(100);
         public EventAction Action { get; }
         public ChangeTriggerInputEffect ChangeTriggeredInputEffect { get; }
         public KeyHandle Key { get; }
 
-        private bool haveStarted;
+        private bool HaveStarted { get; set; }
 
-        private DateTime started;
+        private DateTime Started { get; set; }
 
         public void Dispose()
         {
@@ -29,7 +29,7 @@ namespace JoyMap.Profile.Processing
         {
             if (!triggerStatus)
             {
-                if (haveStarted)
+                if (HaveStarted)
                 {
                     Key.Press();
                 }
@@ -37,20 +37,20 @@ namespace JoyMap.Profile.Processing
             else
             {
                 Key.Release();
-                started = DateTime.UtcNow;
-                haveStarted = false;
+                Started = DateTime.UtcNow;
+                HaveStarted = false;
             }
         }
 
         public void UpdateTriggered()
         {
-            if (!haveStarted)
+            if (!HaveStarted)
             {
-                var elapsed = DateTime.UtcNow - started;
+                var elapsed = DateTime.UtcNow - Started;
                 if (elapsed.TotalMilliseconds >= Action.DelayMs)
                 {
                     Key.Press();
-                    haveStarted = true;
+                    HaveStarted = true;
                 }
             }
             else if (Key.IsPressed)

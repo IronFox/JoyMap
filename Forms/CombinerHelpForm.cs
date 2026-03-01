@@ -7,15 +7,15 @@ namespace JoyMap.Forms
     {
         public record LocalInputInfo(string Label, string Device, string Axis, Func<bool> IsActive);
 
-        private readonly IReadOnlyList<LocalInputInfo> _localInputs;
-        private readonly IReadOnlyList<GlobalStatusRef> _globalInputs;
-        private readonly IReadOnlyDictionary<string, Func<bool>>? _globalResolvers;
+        private IReadOnlyList<LocalInputInfo> LocalInputs { get; }
+        private IReadOnlyList<GlobalStatusRef> GlobalInputs { get; }
+        private IReadOnlyDictionary<string, Func<bool>>? GlobalResolvers { get; }
 
         // Rows in the live list views — kept for fast timer updates
-        private readonly List<(ListViewItem Row, Func<bool> IsActive)> _localRows = [];
-        private readonly List<(ListViewItem Row, Func<bool> IsActive)> _globalRows = [];
+        private List<(ListViewItem Row, Func<bool> IsActive)> LocalRows { get; } = [];
+        private List<(ListViewItem Row, Func<bool> IsActive)> GlobalRows { get; } = [];
         // Dynamic insert menu items rebuilt on each context-menu open
-        private readonly List<ToolStripItem> _dynamicMenuItems = [];
+        private List<ToolStripItem> DynamicMenuItems { get; } = [];
 
         public string? ResultExpression { get; private set; }
 
@@ -26,10 +26,10 @@ namespace JoyMap.Forms
         {
             InitializeComponent();
 
-            _localInputs = localInputs;
-            _globalInputs = globalInputs ?? [];
-            _globalResolvers = _globalInputs.Count > 0
-                ? _globalInputs.ToDictionary(g => g.Id, g => g.IsActive)
+            LocalInputs = localInputs;
+            GlobalInputs = globalInputs ?? [];
+            GlobalResolvers = GlobalInputs.Count > 0
+                ? GlobalInputs.ToDictionary(g => g.Id, g => g.IsActive)
                 : null;
 
             txtExpression.Text = currentExpression;
@@ -37,7 +37,7 @@ namespace JoyMap.Forms
             PopulateLocalList();
             PopulateGlobalList();
 
-            if (_globalInputs.Count == 0)
+            if (GlobalInputs.Count == 0)
             {
                 labelGlobal.Text = "Global Inputs  (none declared)";
                 globalInsertHeader.Visible = false;
@@ -52,27 +52,27 @@ namespace JoyMap.Forms
         private void PopulateLocalList()
         {
             localListView.Items.Clear();
-            _localRows.Clear();
-            foreach (var inp in _localInputs)
+            LocalRows.Clear();
+            foreach (var inp in LocalInputs)
             {
                 var row = localListView.Items.Add(inp.Label);
                 row.SubItems.Add(inp.Device);
                 row.SubItems.Add(inp.Axis);
                 row.SubItems.Add(inp.IsActive() ? "●" : "");
-                _localRows.Add((row, inp.IsActive));
+                LocalRows.Add((row, inp.IsActive));
             }
         }
 
         private void PopulateGlobalList()
         {
             globalListView.Items.Clear();
-            _globalRows.Clear();
-            foreach (var gs in _globalInputs)
+            GlobalRows.Clear();
+            foreach (var gs in GlobalInputs)
             {
                 var row = globalListView.Items.Add(gs.Id);
                 row.SubItems.Add(gs.Name);
                 row.SubItems.Add(gs.IsActive() ? "●" : "");
-                _globalRows.Add((row, gs.IsActive));
+                GlobalRows.Add((row, gs.IsActive));
             }
         }
 
@@ -100,11 +100,11 @@ namespace JoyMap.Forms
             }
 
             // Build resolver dictionary: local T0..Tn + optional globals
-            var identifiers = _localInputs
+            var identifiers = LocalInputs
                 .Select((inp, i) => KeyValuePair.Create(inp.Label, inp.IsActive))
                 .ToDictionary(StringComparer.OrdinalIgnoreCase);
-            if (_globalResolvers is not null)
-                foreach (var kv in _globalResolvers)
+            if (GlobalResolvers is not null)
+                foreach (var kv in GlobalResolvers)
                     identifiers[kv.Key] = kv.Value;
 
             var func = EventProcessor.BuildTriggerCombiner(text, [], identifiers, out var error);
@@ -161,9 +161,9 @@ namespace JoyMap.Forms
         private void exprContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // Remove previously generated dynamic items
-            foreach (var item in _dynamicMenuItems)
+            foreach (var item in DynamicMenuItems)
                 exprContextMenu.Items.Remove(item);
-            _dynamicMenuItems.Clear();
+            DynamicMenuItems.Clear();
 
             // Find insertion indices (just after the static header items)
             int localHeaderIdx = exprContextMenu.Items.IndexOf(localInsertHeader);
@@ -171,43 +171,43 @@ namespace JoyMap.Forms
 
             // Insert local trigger items after localInsertHeader
             int insertAt = localHeaderIdx + 1;
-            foreach (var inp in _localInputs)
+            foreach (var inp in LocalInputs)
             {
                 var label = inp.Label;
                 var item = new ToolStripMenuItem($"Insert {label}  ({inp.Device} / {inp.Axis})");
                 item.Click += (s, ev) => InsertText(label);
                 exprContextMenu.Items.Insert(insertAt++, item);
-                _dynamicMenuItems.Add(item);
+                DynamicMenuItems.Add(item);
                 globalHeaderIdx++; // shift index as we insert before it
             }
 
             // Insert global status items after globalInsertHeader
-            if (_globalInputs.Count > 0)
+            if (GlobalInputs.Count > 0)
             {
                 insertAt = globalHeaderIdx + 1;
-                foreach (var gs in _globalInputs)
+                foreach (var gs in GlobalInputs)
                 {
                     var id = gs.Id;
                     var item = new ToolStripMenuItem($"Insert {id}  ({gs.Name})");
                     item.Click += (s, ev) => InsertText(id);
                     exprContextMenu.Items.Insert(insertAt++, item);
-                    _dynamicMenuItems.Add(item);
+                    DynamicMenuItems.Add(item);
                 }
             }
 
-            localInsertHeader.Visible = _localInputs.Count > 0;
-            exprSep1.Visible = _localInputs.Count > 0;
-            globalInsertHeader.Visible = _globalInputs.Count > 0;
-            exprSep2.Visible = _globalInputs.Count > 0;
+            localInsertHeader.Visible = LocalInputs.Count > 0;
+            exprSep1.Visible = LocalInputs.Count > 0;
+            globalInsertHeader.Visible = GlobalInputs.Count > 0;
+            exprSep2.Visible = GlobalInputs.Count > 0;
         }
 
         // ── Live status timer ────────────────────────────────────────────────
 
         private void liveTimer_Tick(object sender, EventArgs e)
         {
-            foreach (var (row, isActive) in _localRows)
+            foreach (var (row, isActive) in LocalRows)
                 row.SubItems[3].Text = isActive() ? "●" : "";
-            foreach (var (row, isActive) in _globalRows)
+            foreach (var (row, isActive) in GlobalRows)
                 row.SubItems[2].Text = isActive() ? "●" : "";
         }
 

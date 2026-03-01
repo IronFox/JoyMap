@@ -227,7 +227,7 @@ namespace JoyMap
             AnyInputChanged(sender, e);
         }
 
-        private bool _updatingAutoTriggerCheckboxes;
+        private bool UpdatingAutoTriggerCheckboxes { get; set; }
 
         private void UpdateAutoTriggerDependents()
         {
@@ -242,8 +242,8 @@ namespace JoyMap
 
         private void cbSimpleAutoTriggerFrequency_CheckedChanged(object sender, EventArgs e)
         {
-            if (_updatingAutoTriggerCheckboxes) return;
-            _updatingAutoTriggerCheckboxes = true;
+            if (UpdatingAutoTriggerCheckboxes) return;
+            UpdatingAutoTriggerCheckboxes = true;
             try
             {
                 if (cbSimpleAutoTriggerFrequency.Checked)
@@ -252,15 +252,15 @@ namespace JoyMap
             }
             finally
             {
-                _updatingAutoTriggerCheckboxes = false;
+                UpdatingAutoTriggerCheckboxes = false;
             }
             AnyInputChanged(sender, e);
         }
 
         private void cbSimpleAutoTriggerTiming_CheckedChanged(object sender, EventArgs e)
         {
-            if (_updatingAutoTriggerCheckboxes) return;
-            _updatingAutoTriggerCheckboxes = true;
+            if (UpdatingAutoTriggerCheckboxes) return;
+            UpdatingAutoTriggerCheckboxes = true;
             try
             {
                 if (cbSimpleAutoTriggerTiming.Checked)
@@ -269,7 +269,7 @@ namespace JoyMap
             }
             finally
             {
-                _updatingAutoTriggerCheckboxes = false;
+                UpdatingAutoTriggerCheckboxes = false;
             }
             AnyInputChanged(sender, e);
         }

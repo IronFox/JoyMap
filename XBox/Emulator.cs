@@ -4,15 +4,15 @@ namespace JoyMap.XBox
 {
     internal static class Emulator
     {
-        private static VirtualController? _controller;
-        private static bool _triedCreate;
-        private static object _lock = new();
+        private static VirtualController? Controller { get; set; }
+        private static bool TriedCreate { get; set; }
+        private static object Lock { get; } = new();
         public static void Destroy()
         {
             try
             {
-                _controller?.Dispose();
-                _controller = null;
+                Controller?.Dispose();
+                Controller = null;
             }
             catch { }   //dont care
         }
@@ -25,16 +25,16 @@ namespace JoyMap.XBox
 
         internal static void SignalStart()
         {
-            if (_controller is null && !_triedCreate)
+            if (Controller is null && !TriedCreate)
             {
-                lock (_lock)
+                lock (Lock)
                 {
-                    if (_controller is null && !_triedCreate)
+                    if (Controller is null && !TriedCreate)
                     {
-                        _triedCreate = true;
+                        TriedCreate = true;
                         try
                         {
-                            _controller = new VirtualController();
+                            Controller = new VirtualController();
                             MainForm.Log("XBox controller created");
                         }
                         catch (Exception ex)
@@ -48,13 +48,13 @@ namespace JoyMap.XBox
 
         internal static void UpdateAxisState(IReadOnlyDictionary<XBoxAxis, Func<float?>> feed)
         {
-            _controller?.UpdateFromInputState(feed);
+            Controller?.UpdateFromInputState(feed);
         }
 
         internal static void UpdateButtonState(XBoxButton value, bool nowDown)
         {
             SignalStart();
-            _controller?.ChangeButtonState(value, nowDown);
+            Controller?.ChangeButtonState(value, nowDown);
         }
     }
 }

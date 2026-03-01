@@ -4,8 +4,8 @@ namespace JoyMap.Util
 {
     public class LockedList<T> : IList<T>
     {
-        private readonly List<T> list = [];
-        private readonly object sync = new();
+        private List<T> List { get; } = [];
+        private object Sync { get; } = new();
 
         public T this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
@@ -15,39 +15,39 @@ namespace JoyMap.Util
 
         public void Add(T item)
         {
-            lock (sync)
+            lock (Sync)
             {
-                list.Add(item);
+                List.Add(item);
             }
         }
         public void Clear()
         {
-            lock (sync)
+            lock (Sync)
             {
-                list.Clear();
+                List.Clear();
             }
         }
         public bool Contains(T item)
         {
-            lock (sync)
+            lock (Sync)
             {
-                return list.Contains(item);
+                return List.Contains(item);
             }
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            lock (sync)
+            lock (Sync)
             {
-                list.CopyTo(array, arrayIndex);
+                List.CopyTo(array, arrayIndex);
             }
         }
 
         public IEnumerable<T1> Select<T1>(Func<T, T1> selector)
         {
-            lock (sync)
+            lock (Sync)
             {
-                foreach (var item in list)
+                foreach (var item in List)
                 {
                     yield return selector(item);
                 }
@@ -56,41 +56,41 @@ namespace JoyMap.Util
 
         public IEnumerator<T> GetEnumerator()
         {
-            lock (sync)
+            lock (Sync)
             {
                 // Create a copy to avoid issues with modification during enumeration
-                return new List<T>(list).GetEnumerator();
+                return new List<T>(List).GetEnumerator();
             }
         }
 
         public int IndexOf(T item)
         {
-            lock (sync)
+            lock (Sync)
             {
-                return list.IndexOf(item);
+                return List.IndexOf(item);
             }
         }
 
         public void Insert(int index, T item)
         {
-            lock (sync)
+            lock (Sync)
             {
-                list.Insert(index, item);
+                List.Insert(index, item);
             }
         }
 
         public bool Remove(T item)
         {
-            lock (sync)
+            lock (Sync)
             {
-                return list.Remove(item);
+                return List.Remove(item);
             }
         }
 
         public void RemoveAt(int index)
         {
-            lock (sync)
-            { list.RemoveAt(index); }
+            lock (Sync)
+            { List.RemoveAt(index); }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

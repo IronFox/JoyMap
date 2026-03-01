@@ -178,7 +178,7 @@ namespace JoyMap.ControllerTracking
 
     public class InputMonitor : IDisposable
     {
-        private readonly CancellationTokenSource cancel = new();
+        private CancellationTokenSource Cancel { get; } = new();
         public InputMonitor(IntPtr windowHandle, IReadOnlyCollection<JsonControllerFamily> controllerFamilies)
         {
             var di = new DirectInput();
@@ -190,11 +190,11 @@ namespace JoyMap.ControllerTracking
                     ProductToFamilyMap[pg.Guid] = family;
             }
 
-            Task.Run(() => RunAsync(di, windowHandle, cancel.Token));
+            Task.Run(() => RunAsync(di, windowHandle, Cancel.Token));
         }
         public void Dispose()
         {
-            cancel.Cancel();
+            Cancel.Cancel();
         }
 
         private ConcurrentDictionary<Guid, TrackedInput> TrackedInputs { get; } = new();
