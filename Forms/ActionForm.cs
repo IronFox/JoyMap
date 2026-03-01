@@ -38,7 +38,7 @@ namespace JoyMap
                     if (effect.SimpleInputEffect.AutoTriggerLimit is not null)
                     {
                         cbSimpleAutoTriggerLimit.Checked = true;
-                        textSimpleAutoTriggerLimit.Text = effect.SimpleInputEffect.AutoTriggerLimit.Value.ToString();
+                        numericSimpleAutoTriggerLimit.Value = Math.Max(2, effect.SimpleInputEffect.AutoTriggerLimit.Value);
                     }
                     if (effect.SimpleInputEffect.AutoTriggerDelayMs is not null)
                     {
@@ -109,7 +109,7 @@ namespace JoyMap
 
                 var autoTriggerDelayedStartMs = textSimpleAutoTriggerDelayedStartMs.GetFloat(false);
                 var triggerFrequency = textSimpleAutoTriggerFrequency.GetFloat(false);
-                var autoTriggerLimit = textSimpleAutoTriggerLimit.GetInt();
+                int? autoTriggerLimit = cbSimpleAutoTriggerLimit.Checked ? (int)numericSimpleAutoTriggerLimit.Value : null;
                 var autoTriggerHoldMs = textSimpleAutoTriggerHoldMs.GetFloat(false);
                 var autoTriggerReleaseMs = textSimpleAutoTriggerReleaseMs.GetFloat(false);
                 AutoTriggerTiming? autoTriggerTiming = null;
@@ -138,13 +138,6 @@ namespace JoyMap
                 else if ((triggerFrequency is null || triggerFrequency.Value <= 0) && autoTriggerTiming is null)
                 {
                     toolStripStatusLabel.Text = $"Unable to parse trigger frequency or timing";
-                    return;
-                }
-                if (!cbSimpleAutoTriggerLimit.Checked || !cbSimpleAutoTriggerLimit.Checked)
-                    autoTriggerLimit = null;
-                else if (autoTriggerLimit is null)
-                {
-                    toolStripStatusLabel.Text = $"Trigger limit is enabled but limit is not set";
                     return;
                 }
 
@@ -228,7 +221,7 @@ namespace JoyMap
             AnyInputChanged(sender, e);
         }
 
-        private void textAutoTriggerLimit_TextChanged(object sender, EventArgs e)
+        private void numericSimpleAutoTriggerLimit_ValueChanged(object sender, EventArgs e)
         {
             cbSimpleAutoTriggerLimit.Checked = true;
             AnyInputChanged(sender, e);
@@ -241,7 +234,7 @@ namespace JoyMap
             bool anyAutoMode = cbSimpleAutoTriggerFrequency.Checked || cbSimpleAutoTriggerTiming.Checked;
             cbSimpleAutoTriggerDelayedStart.Enabled =
                 cbSimpleAutoTriggerLimit.Enabled =
-                textSimpleAutoTriggerLimit.Enabled =
+                numericSimpleAutoTriggerLimit.Enabled =
                 textSimpleAutoTriggerDelayedStartMs.Enabled = anyAutoMode;
             textSimpleAutoTriggerHoldMs.Enabled =
                 textSimpleAutoTriggerReleaseMs.Enabled = cbSimpleAutoTriggerTiming.Checked;
