@@ -6,5 +6,6 @@ namespace JoyMap.Profile
         IReadOnlyList<EventInstance> EventInstances { get; }
         IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindings { get; }
         IReadOnlyList<GlobalStatusInstance> GlobalStatusInstances { get; }
+        IReadOnlyList<ModeGroupInstance> ModeGroupInstances { get; }
     }
 }

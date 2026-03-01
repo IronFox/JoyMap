@@ -63,12 +63,12 @@ namespace JoyMap.Profile
             }
         }
 
-        internal static GlobalStatusInstance Load(InputMonitor monitor, GlobalStatus gs)
+        internal static GlobalStatusInstance Load(InputMonitor monitor, GlobalStatus gs, IReadOnlyDictionary<string, Func<bool>>? globalResolvers = null)
         {
             var triggerInstances = gs.Triggers
                 .Select(t => TriggerInstance.Load(monitor, t))
                 .ToList();
-            var combiner = EventProcessor.BuildTriggerCombiner(gs.TriggerCombiner, triggerInstances) ?? (() => false);
+            var combiner = EventProcessor.BuildTriggerCombiner(gs.TriggerCombiner, triggerInstances, globalResolvers) ?? (() => false);
             return new GlobalStatusInstance(gs, triggerInstances, combiner);
         }
     }

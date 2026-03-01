@@ -6,6 +6,7 @@ using JoyMap.Undo.Action;
 using JoyMap.Undo.Action.Binding;
 using JoyMap.Undo.Action.EventAction;
 using JoyMap.Undo.Action.GlobalStatusAction;
+using JoyMap.Undo.Action.ModeGroupAction;
 using JoyMap.Util;
 using JoyMap.Windows;
 using JoyMap.XBox;
@@ -51,8 +52,9 @@ namespace JoyMap
             Instance = this;
             InitializeComponent();
             var families = Registry.LoadAll();
-            InputMonitor = new InputMonitor(Handle, families);
-            RefreshProfileList();
+                InputMonitor = new InputMonitor(Handle, families);
+                GlobalKeyboardHook.Install();
+                RefreshProfileList();
 #if !DEBUG
             saveDebugOnlyToolStripMenuItem.Enabled = false;
 #endif
@@ -65,6 +67,7 @@ namespace JoyMap
         protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e)
         {
             base.OnFormClosed(e);
+            GlobalKeyboardHook.Uninstall();
             InputMonitor.Dispose();
         }
 
@@ -156,6 +159,14 @@ namespace JoyMap
                     row.SubItems.Add("");
                     row.Tag = gs;
                 }
+                modeGroupListView.Items.Clear();
+                foreach (var mg in profile.ModeGroups)
+                {
+                    var row = modeGroupListView.Items.Add(mg.Group.Name);
+                    row.SubItems.Add(mg.Id);
+                    row.SubItems.Add(mg.ActiveModeName);
+                    row.Tag = mg;
+                }
                 bindingListView.Items.Clear();
                 foreach (var axis in Enum.GetValues<XBoxAxis>())
                 {
@@ -202,6 +213,7 @@ namespace JoyMap
         public ListView EventListView => eventListView;
         public ListView BindingListView => bindingListView;
         public ListView GlobalStatusListView => globalStatusListView;
+        public ListView ModeGroupListView => modeGroupListView;
         public AxisRowHandle RequireRowOf(XBoxAxis axis)
         {
             return new AxisRowHandle(this, axis, bindingListView.Items.ToEnumerable().First(x => AxisOf(x) == axis));
@@ -241,6 +253,7 @@ namespace JoyMap
             textProfileName.Enabled = false;
             eventListView.Items.Clear();
             globalStatusListView.Items.Clear();
+            modeGroupListView.Items.Clear();
             eventListView.ContextMenuStrip = null;
             btnUp.Enabled = false;
             btnDown.Enabled = false;
@@ -335,6 +348,11 @@ namespace JoyMap
                 {
                     if (row.Tag is not GlobalStatusInstance gs) continue;
                     row.SubItems[3].Text = gs.CurrentValue ? "True" : "False";
+                }
+                foreach (ListViewItem row in modeGroupListView.Items)
+                {
+                    if (row.Tag is not ModeGroupInstance mg) continue;
+                    row.SubItems[2].Text = mg.ActiveModeName;
                 }
                 foreach (ListViewItem row in bindingListView.Items)
                 {
@@ -944,10 +962,14 @@ namespace JoyMap
         }
             private IReadOnlyList<JoyMap.Forms.GlobalStatusRef> BuildGlobalStatusRefs()
             {
-                return ActiveProfile?.GlobalStatuses
-                    .Select(g => new JoyMap.Forms.GlobalStatusRef(g.Id, g.Status.Name, () => g.CurrentValue))
-                    .ToList()
-                    ?? [];
+                if (ActiveProfile is null)
+                    return [];
+                var gsRefs = ActiveProfile.GlobalStatuses
+                    .Select(g => new JoyMap.Forms.GlobalStatusRef(g.Id, g.Status.Name, () => g.CurrentValue));
+                var modeRefs = ActiveProfile.ModeGroups
+                    .SelectMany(mg => mg.EntryInstances.Select(e =>
+                        new JoyMap.Forms.GlobalStatusRef(e.Id, $"{mg.Group.Name}: {e.Entry.Name}", () => mg.IsModeActive(e.Id))));
+                return [.. gsRefs, .. modeRefs];
             }
 
             private void gsNewMenuItem_Click(object sender, EventArgs e)
@@ -1039,6 +1061,67 @@ namespace JoyMap
                     : globalStatusListView.Items.Count;
                 ActiveProfile.History.ExecuteAction(new PasteInsertGlobalStatusAction(
                     this, ActiveProfile, insertIndex, copied));
+            }
+
+            private void mgNewMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                var groupId = ActiveProfile.AllocateNextModeGroupId();
+                using var form = new ModeGroupForm(
+                    groupId,
+                    allocateEntryId: () =>
+                    {
+                        var id = ActiveProfile.AllocateNextModeEntryId();
+                        ActiveProfile.CommitNextModeEntryId();
+                        return id;
+                    },
+                    null,
+                    BuildGlobalStatusRefs());
+                if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
+                {
+                    ActiveProfile.CommitNextModeGroupId();
+                    ActiveProfile.History.ExecuteAction(new AddModeGroupAction(this, ActiveProfile, form.Result));
+                }
+            }
+
+            private void mgEditMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null || modeGroupListView.SelectedItems.Count != 1)
+                    return;
+                var item = modeGroupListView.SelectedItems[0];
+                if (item.Tag is not ModeGroupInstance mg)
+                    return;
+                using var form = new ModeGroupForm(
+                    mg.Id,
+                    allocateEntryId: () =>
+                    {
+                        var id = ActiveProfile.AllocateNextModeEntryId();
+                        ActiveProfile.CommitNextModeEntryId();
+                        return id;
+                    },
+                    mg,
+                    BuildGlobalStatusRefs());
+                if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
+                    ActiveProfile.History.ExecuteAction(new EditModeGroupAction(this, ActiveProfile, item.Index, mg, form.Result));
+            }
+
+            private void mgDeleteMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                var selected = modeGroupListView.SelectedItems.ToEnumerable().Select(x => x.Index).ToList();
+                if (selected.Count == 0)
+                    return;
+                ActiveProfile.History.ExecuteAction(new DeleteModeGroupAction(this, ActiveProfile, selected));
+            }
+
+            private void modeGroupListView_DoubleClick(object sender, EventArgs e) => mgEditMenuItem_Click(sender, e);
+
+            private void mgContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+            {
+                mgEditMenuItem.Enabled = modeGroupListView.SelectedItems.Count == 1;
+                mgDeleteMenuItem.Enabled = modeGroupListView.SelectedItems.Count > 0;
             }
 
             private void gsContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)

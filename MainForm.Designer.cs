@@ -93,6 +93,18 @@
             tabControl = new TabControl();
             tabEvents = new TabPage();
             tabGlobalStatuses = new TabPage();
+            tabModes = new TabPage();
+            modeGroupListView = new ListView();
+            columnHeaderMgName = new ColumnHeader();
+            columnHeaderMgId = new ColumnHeader();
+            columnHeaderMgActive = new ColumnHeader();
+            mgContextMenu = new ContextMenuStrip(components);
+            mgNewMenuItem = new ToolStripMenuItem();
+            toolStripMgSep1 = new ToolStripSeparator();
+            mgEditMenuItem = new ToolStripMenuItem();
+            toolStripMgSep2 = new ToolStripSeparator();
+            mgDeleteMenuItem = new ToolStripMenuItem();
+            labelModeGroups = new Label();
             globalStatusListView = new ListView();
             columnHeaderGsName = new ColumnHeader();
             columnHeaderGsId = new ColumnHeader();
@@ -141,6 +153,7 @@
             tabControl.SuspendLayout();
             tabEvents.SuspendLayout();
             tabGlobalStatuses.SuspendLayout();
+            tabModes.SuspendLayout();
             tabXBox.SuspendLayout();
             bindingContextMenu.SuspendLayout();
             gsContextMenu.SuspendLayout();
@@ -579,6 +592,7 @@
             tabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl.Controls.Add(tabEvents);
             tabControl.Controls.Add(tabGlobalStatuses);
+            tabControl.Controls.Add(tabModes);
             tabControl.Controls.Add(tabXBox);
             tabControl.Controls.Add(tabNotes);
             tabControl.Location = new Point(0, 179);
@@ -611,6 +625,96 @@
             tabGlobalStatuses.Size = new Size(1215, 598);
             tabGlobalStatuses.TabIndex = 3;
             tabGlobalStatuses.Text = "Global Statuses";
+            // 
+            // tabModes
+            // 
+            tabModes.Controls.Add(labelModeGroups);
+            tabModes.Controls.Add(modeGroupListView);
+            tabModes.Location = new Point(4, 34);
+            tabModes.Name = "tabModes";
+            tabModes.Padding = new Padding(3);
+            tabModes.Size = new Size(1215, 598);
+            tabModes.TabIndex = 4;
+            tabModes.Text = "Modes";
+            // 
+            // modeGroupListView
+            // 
+            modeGroupListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            modeGroupListView.Columns.AddRange(new ColumnHeader[] { columnHeaderMgName, columnHeaderMgId, columnHeaderMgActive });
+            modeGroupListView.ContextMenuStrip = mgContextMenu;
+            modeGroupListView.FullRowSelect = true;
+            modeGroupListView.Location = new Point(6, 33);
+            modeGroupListView.Name = "modeGroupListView";
+            modeGroupListView.Size = new Size(1199, 559);
+            modeGroupListView.TabIndex = 0;
+            modeGroupListView.UseCompatibleStateImageBehavior = false;
+            modeGroupListView.View = View.Details;
+            modeGroupListView.DoubleClick += modeGroupListView_DoubleClick;
+            modeGroupListView.KeyDown += GlobalShortcuts;
+            // 
+            // columnHeaderMgName
+            // 
+            columnHeaderMgName.Text = "Name";
+            columnHeaderMgName.Width = 400;
+            // 
+            // columnHeaderMgId
+            // 
+            columnHeaderMgId.Text = "ID";
+            columnHeaderMgId.Width = 80;
+            // 
+            // columnHeaderMgActive
+            // 
+            columnHeaderMgActive.Text = "Active Mode";
+            columnHeaderMgActive.Width = 300;
+            // 
+            // mgContextMenu
+            // 
+            mgContextMenu.ImageScalingSize = new Size(24, 24);
+            mgContextMenu.Items.AddRange(new ToolStripItem[] { mgNewMenuItem, toolStripMgSep1, mgEditMenuItem, toolStripMgSep2, mgDeleteMenuItem });
+            mgContextMenu.Name = "mgContextMenu";
+            mgContextMenu.Size = new Size(220, 120);
+            mgContextMenu.Opening += mgContextMenu_Opening;
+            // 
+            // mgNewMenuItem
+            // 
+            mgNewMenuItem.Name = "mgNewMenuItem";
+            mgNewMenuItem.Size = new Size(219, 32);
+            mgNewMenuItem.Text = "New ...";
+            mgNewMenuItem.Click += mgNewMenuItem_Click;
+            // 
+            // toolStripMgSep1
+            // 
+            toolStripMgSep1.Name = "toolStripMgSep1";
+            toolStripMgSep1.Size = new Size(216, 6);
+            // 
+            // mgEditMenuItem
+            // 
+            mgEditMenuItem.Name = "mgEditMenuItem";
+            mgEditMenuItem.Size = new Size(219, 32);
+            mgEditMenuItem.Text = "Edit Selected (double click) ...";
+            mgEditMenuItem.Click += mgEditMenuItem_Click;
+            // 
+            // toolStripMgSep2
+            // 
+            toolStripMgSep2.Name = "toolStripMgSep2";
+            toolStripMgSep2.Size = new Size(216, 6);
+            // 
+            // mgDeleteMenuItem
+            // 
+            mgDeleteMenuItem.Name = "mgDeleteMenuItem";
+            mgDeleteMenuItem.ShortcutKeys = Keys.Delete;
+            mgDeleteMenuItem.Size = new Size(219, 32);
+            mgDeleteMenuItem.Text = "Delete";
+            mgDeleteMenuItem.Click += mgDeleteMenuItem_Click;
+            // 
+            // labelModeGroups
+            // 
+            labelModeGroups.AutoSize = true;
+            labelModeGroups.Location = new Point(6, 5);
+            labelModeGroups.Name = "labelModeGroups";
+            labelModeGroups.Size = new Size(120, 25);
+            labelModeGroups.TabIndex = 1;
+            labelModeGroups.Text = "Mode Groups:";
             // 
             // globalStatusListView
             // 
@@ -960,6 +1064,8 @@
             tabEvents.PerformLayout();
             tabGlobalStatuses.ResumeLayout(false);
             tabGlobalStatuses.PerformLayout();
+            tabModes.ResumeLayout(false);
+            tabModes.PerformLayout();
             tabXBox.ResumeLayout(false);
             tabXBox.PerformLayout();
             bindingContextMenu.ResumeLayout(false);
@@ -1031,6 +1137,18 @@
         private TabControl tabControl;
         private TabPage tabEvents;
         private TabPage tabGlobalStatuses;
+        private TabPage tabModes;
+        private ListView modeGroupListView;
+        private ColumnHeader columnHeaderMgName;
+        private ColumnHeader columnHeaderMgId;
+        private ColumnHeader columnHeaderMgActive;
+        private ContextMenuStrip mgContextMenu;
+        private ToolStripMenuItem mgNewMenuItem;
+        private ToolStripSeparator toolStripMgSep1;
+        private ToolStripMenuItem mgEditMenuItem;
+        private ToolStripSeparator toolStripMgSep2;
+        private ToolStripMenuItem mgDeleteMenuItem;
+        private Label labelModeGroups;
         private ListView globalStatusListView;
         private ColumnHeader columnHeaderGsName;
         private ColumnHeader columnHeaderGsId;

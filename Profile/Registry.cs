@@ -196,7 +196,10 @@ namespace JoyMap.Profile
                 Events = [.. profile.EventInstances],
                 AxisBindings = profile.XBoxAxisBindingInstances.ToDictionary(x => x.OutAxis),
                 GlobalStatuses = [.. profile.GlobalStatusInstances],
-                NextGlobalStatusId = profile.Profile.NextGlobalStatusId
+                NextGlobalStatusId = profile.Profile.NextGlobalStatusId,
+                ModeGroups = [.. profile.ModeGroupInstances],
+                NextModeGroupId = profile.Profile.NextModeGroupId,
+                NextModeEntryId = profile.Profile.NextModeEntryId
             };
             if (slot is not null)
                 slot.WorkProfile = workProfile;

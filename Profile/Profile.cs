@@ -12,7 +12,10 @@ namespace JoyMap.Profile
         IReadOnlyList<Event> Events,
         IReadOnlyList<XBoxAxisBinding>? XBoxAxisBindings,
         IReadOnlyList<GlobalStatus>? GlobalStatuses = null,
-        int NextGlobalStatusId = 0
+        int NextGlobalStatusId = 0,
+        IReadOnlyList<ModeGroup>? ModeGroups = null,
+        int NextModeGroupId = 0,
+        int NextModeEntryId = 0
         );
 
 
@@ -21,7 +24,8 @@ namespace JoyMap.Profile
         ProcessRegex ProcessNameRegex,
         IReadOnlyList<EventInstance> EventInstances,
         IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindingInstances,
-        IReadOnlyList<GlobalStatusInstance> GlobalStatusInstances
+        IReadOnlyList<GlobalStatusInstance> GlobalStatusInstances,
+        IReadOnlyList<ModeGroupInstance> ModeGroupInstances
         )
     {
         public bool Is(WindowReference wr)
@@ -35,12 +39,23 @@ namespace JoyMap.Profile
 
         public static ProfileInstance Load(InputMonitor monitor, Profile profile)
         {
-            var globalStatusInstances = (profile.GlobalStatuses ?? [])
-                .Select(g => GlobalStatusInstance.Load(monitor, g))
+            var globalResolvers = new Dictionary<string, Func<bool>>();
+
+            var modeGroupInstances = (profile.ModeGroups ?? [])
+                .Select(mg => ModeGroupInstance.Load(monitor, mg, globalResolvers))
                 .ToList();
 
-            var globalResolvers = globalStatusInstances
-                .ToDictionary(g => g.Id, g => (Func<bool>)(() => g.CurrentValue));
+            foreach (var mg in modeGroupInstances)
+                foreach (var kv in mg.BuildResolvers())
+                    globalResolvers[kv.Key] = kv.Value;
+
+            var globalStatusInstances = new List<GlobalStatusInstance>();
+            foreach (var gs in profile.GlobalStatuses ?? [])
+            {
+                var inst = GlobalStatusInstance.Load(monitor, gs, globalResolvers);
+                globalStatusInstances.Add(inst);
+                globalResolvers[inst.Id] = () => inst.CurrentValue;
+            }
 
             var eventInstances = profile.Events
                 .Select(e => EventInstance.Load(monitor, e, globalResolvers))
@@ -53,7 +68,8 @@ namespace JoyMap.Profile
                 ProcessNameRegex: new(profile.ProcessNameRegex, profile.WindowNameRegex),
                 EventInstances: eventInstances,
                 XBoxAxisBindingInstances: axisBindingInstances,
-                GlobalStatusInstances: globalStatusInstances
+                GlobalStatusInstances: globalStatusInstances,
+                ModeGroupInstances: modeGroupInstances
                 );
         }
     }

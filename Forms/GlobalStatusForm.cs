@@ -1,4 +1,5 @@
 using JoyMap.Profile;
+using JoyMap.Windows;
 
 namespace JoyMap.Forms
 {
@@ -33,8 +34,9 @@ namespace JoyMap.Forms
                 foreach (var (t, idx) in instance.TriggerInstances.Select((t, i) => (t, i)))
                 {
                     var row = triggerListView.Items.Add($"T{idx}");
-                    row.SubItems.Add(t.Trigger.InputId.ControllerName);
-                    row.SubItems.Add(t.Trigger.InputId.AxisName);
+                    var (device, input) = GetTriggerDisplay(t);
+                    row.SubItems.Add(device);
+                    row.SubItems.Add(input);
                     row.SubItems.Add(t.IsTriggered() ? "A" : "");
                     row.Tag = t;
                     Triggers.Add((t, row));
@@ -196,6 +198,31 @@ namespace JoyMap.Forms
             Rebuild();
         }
 
+        private void addKeyTriggerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using var form = new PickKeyForm();
+            if (form.ShowDialog(this) == DialogResult.OK && form.Result != Keys.None)
+            {
+                var keyInput = KeyOrButton.From(form.Result);
+                var t = TriggerInstance.BuildKeyTrigger(keyInput);
+                var idx = Triggers.Count;
+                var row = triggerListView.Items.Add($"T{idx}");
+                row.SubItems.Add("Key");
+                row.SubItems.Add(keyInput.ToString());
+                row.SubItems.Add(t.IsTriggered() ? "A" : "");
+                row.Tag = t;
+                Triggers.Add((t, row));
+                Rebuild();
+            }
+        }
+
+        private static (string device, string input) GetTriggerDisplay(TriggerInstance t)
+        {
+            if (t.Trigger.KeyInput is { } ki && ki != KeyOrButton.None)
+                return ("Key", ki.ToString());
+            return (t.Trigger.InputId.ControllerName, t.Trigger.InputId.AxisName);
+        }
+
         private void triggerListView_DoubleClick(object sender, EventArgs e)
         {
             if (triggerListView.SelectedItems.Count == 1)
@@ -203,17 +230,36 @@ namespace JoyMap.Forms
                 var item = triggerListView.SelectedItems[0];
                 if (item.Tag is TriggerInstance t)
                 {
-                    using var form = new TriggerForm(t);
-                    if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
+                    if (t.Trigger.KeyInput is { } ki && ki != KeyOrButton.None)
                     {
-                        var updated = form.Result;
-                        item.SubItems[1].Text = updated.Trigger.InputId.ControllerName;
-                        item.SubItems[2].Text = updated.Trigger.InputId.AxisName;
-                        item.Tag = updated;
-                        var idx = Triggers.FindIndex(x => x.Trigger == t);
-                        if (idx >= 0)
-                            Triggers[idx] = (updated, item);
-                        Rebuild();
+                        using var form = new PickKeyForm();
+                        if (form.ShowDialog(this) == DialogResult.OK && form.Result != Keys.None)
+                        {
+                            var keyInput = KeyOrButton.From(form.Result);
+                            var updated = TriggerInstance.BuildKeyTrigger(keyInput);
+                            item.SubItems[1].Text = "Key";
+                            item.SubItems[2].Text = keyInput.ToString();
+                            item.Tag = updated;
+                            var idx = Triggers.FindIndex(x => x.Trigger == t);
+                            if (idx >= 0)
+                                Triggers[idx] = (updated, item);
+                            Rebuild();
+                        }
+                    }
+                    else
+                    {
+                        using var form = new TriggerForm(t);
+                        if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
+                        {
+                            var updated = form.Result;
+                            item.SubItems[1].Text = updated.Trigger.InputId.ControllerName;
+                            item.SubItems[2].Text = updated.Trigger.InputId.AxisName;
+                            item.Tag = updated;
+                            var idx = Triggers.FindIndex(x => x.Trigger == t);
+                            if (idx >= 0)
+                                Triggers[idx] = (updated, item);
+                            Rebuild();
+                        }
                     }
                 }
             }

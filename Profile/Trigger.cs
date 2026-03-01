@@ -1,13 +1,15 @@
 ﻿using JoyMap.ControllerTracking;
 using JoyMap.Profile.Processing;
 using JoyMap.Util;
+using JoyMap.Windows;
 
 namespace JoyMap.Profile
 {
     public readonly record struct Trigger(
         ControllerInputId InputId,
         RangeConfig? Range = null,
-        DitherConfig? Dither = null
+        DitherConfig? Dither = null,
+        KeyOrButton? KeyInput = null
         ) : IJsonCompatible;
 
     public readonly record struct RangeConfig(
@@ -94,8 +96,33 @@ namespace JoyMap.Profile
                 );
         }
 
+        internal static TriggerInstance BuildKeyTrigger(KeyOrButton keyInput)
+        {
+            var key = keyInput.Key;
+            Func<float?> getValue = key is not null
+                ? () => GlobalKeyboardHook.IsKeyDown(key.Value) ? 1f : 0f
+                : () => null;
+            var trigger = new Trigger(
+                InputId: default,
+                Range: new RangeConfig(0.5f, 1f, null, null),
+                KeyInput: keyInput
+            );
+            return Build(getValue, trigger);
+        }
+
         internal static TriggerInstance Load(InputMonitor monitor, Trigger t)
         {
+            if (t.KeyInput is { } keyInput && keyInput != KeyOrButton.None)
+            {
+                var key = keyInput.Key;
+                Func<float?> getValue = key is not null
+                    ? () => GlobalKeyboardHook.IsKeyDown(key.Value) ? 1f : 0f
+                    : () => null;
+                var effective = (t.Range is null && t.Dither is null)
+                    ? t with { Range = new RangeConfig(0.5f, 1f, null, null) }
+                    : t;
+                return Build(getValue, effective);
+            }
             var f = monitor.GetFunction(t.InputId);
             return Build(f, t);
         }

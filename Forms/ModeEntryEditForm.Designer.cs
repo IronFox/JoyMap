@@ -1,6 +1,6 @@
 namespace JoyMap.Forms
 {
-    partial class GlobalStatusForm
+    partial class ModeEntryEditForm
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -20,12 +20,9 @@ namespace JoyMap.Forms
             label1 = new Label();
             textName = new TextBox();
             label2 = new Label();
-            cbMode = new ComboBox();
-            panelCombiner = new Panel();
-            label3 = new Label();
             triggerCombiner = new ComboBox();
             btnCombinerHelp = new Button();
-            label4 = new Label();
+            label3 = new Label();
             triggerListView = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
@@ -43,7 +40,6 @@ namespace JoyMap.Forms
             statusStrip = new StatusStrip();
             statusLabel = new ToolStripStatusLabel();
             statusUpdateTimer = new System.Windows.Forms.Timer(components);
-            panelCombiner.SuspendLayout();
             triggerMenu.SuspendLayout();
             statusStrip.SuspendLayout();
             SuspendLayout();
@@ -56,7 +52,7 @@ namespace JoyMap.Forms
             lId.Name = "lId";
             lId.Size = new Size(64, 25);
             lId.TabIndex = 0;
-            lId.Text = "ID: G0";
+            lId.Text = "ID: M0";
             // 
             // label1
             // 
@@ -81,56 +77,24 @@ namespace JoyMap.Forms
             label2.AutoSize = true;
             label2.Location = new Point(12, 92);
             label2.Name = "label2";
-            label2.Size = new Size(63, 25);
+            label2.Size = new Size(94, 25);
             label2.TabIndex = 3;
-            label2.Text = "Mode:";
-            // 
-            // cbMode
-            // 
-            cbMode.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbMode.FormattingEnabled = true;
-            cbMode.Location = new Point(85, 89);
-            cbMode.Name = "cbMode";
-            cbMode.Size = new Size(350, 33);
-            cbMode.TabIndex = 4;
-            cbMode.SelectedIndexChanged += cbMode_SelectedIndexChanged;
-            // 
-            // panelCombiner
-            // 
-            panelCombiner.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panelCombiner.Controls.Add(label3);
-            panelCombiner.Controls.Add(triggerCombiner);
-            panelCombiner.Controls.Add(btnCombinerHelp);
-            panelCombiner.Controls.Add(label4);
-            panelCombiner.Controls.Add(triggerListView);
-            panelCombiner.Location = new Point(0, 135);
-            panelCombiner.Name = "panelCombiner";
-            panelCombiner.Size = new Size(924, 468);
-            panelCombiner.TabIndex = 5;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(12, 12);
-            label3.Name = "label3";
-            label3.Size = new Size(94, 25);
-            label3.TabIndex = 0;
-            label3.Text = "Combiner:";
+            label2.Text = "Combiner:";
             // 
             // triggerCombiner
             // 
             triggerCombiner.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             triggerCombiner.FormattingEnabled = true;
-            triggerCombiner.Location = new Point(115, 9);
+            triggerCombiner.Location = new Point(115, 89);
             triggerCombiner.Name = "triggerCombiner";
             triggerCombiner.Size = new Size(751, 33);
-            triggerCombiner.TabIndex = 1;
+            triggerCombiner.TabIndex = 4;
             triggerCombiner.TextChanged += AnyChanged;
             // 
             // btnCombinerHelp
             // 
             btnCombinerHelp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnCombinerHelp.Location = new Point(874, 9);
+            btnCombinerHelp.Location = new Point(874, 89);
             btnCombinerHelp.Name = "btnCombinerHelp";
             btnCombinerHelp.Size = new Size(38, 33);
             btnCombinerHelp.TabIndex = 5;
@@ -138,25 +102,25 @@ namespace JoyMap.Forms
             btnCombinerHelp.UseVisualStyleBackColor = true;
             btnCombinerHelp.Click += btnCombinerHelp_Click;
             // 
-            // label4
+            // label3
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(12, 41);
-            label4.Name = "label4";
-            label4.Size = new Size(74, 25);
-            label4.TabIndex = 2;
-            label4.Text = "Triggers";
+            label3.AutoSize = true;
+            label3.Location = new Point(12, 136);
+            label3.Name = "label3";
+            label3.Size = new Size(74, 25);
+            label3.TabIndex = 6;
+            label3.Text = "Triggers:";
             // 
             // triggerListView
             // 
+            triggerListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             triggerListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4 });
             triggerListView.ContextMenuStrip = triggerMenu;
-            triggerListView.Dock = DockStyle.Bottom;
             triggerListView.FullRowSelect = true;
-            triggerListView.Location = new Point(0, 69);
+            triggerListView.Location = new Point(6, 162);
             triggerListView.Name = "triggerListView";
-            triggerListView.Size = new Size(924, 399);
-            triggerListView.TabIndex = 3;
+            triggerListView.Size = new Size(912, 416);
+            triggerListView.TabIndex = 7;
             triggerListView.UseCompatibleStateImageBehavior = false;
             triggerListView.View = View.Details;
             triggerListView.DoubleClick += triggerListView_DoubleClick;
@@ -186,7 +150,7 @@ namespace JoyMap.Forms
             triggerMenu.ImageScalingSize = new Size(24, 24);
             triggerMenu.Items.AddRange(new ToolStripItem[] { pickAddToolStripMenuItem, addKeyTriggerToolStripMenuItem, toolStripSeparator1, editSelectedToolStripMenuItem, toolStripSeparator2, deleteToolStripMenuItem });
             triggerMenu.Name = "triggerMenu";
-            triggerMenu.Size = new Size(312, 112);
+            triggerMenu.Size = new Size(312, 142);
             triggerMenu.Opening += triggerMenu_Opening;
             // 
             // pickAddToolStripMenuItem
@@ -235,8 +199,8 @@ namespace JoyMap.Forms
             btnOk.Location = new Point(342, 616);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(282, 34);
-            btnOk.TabIndex = 6;
-            btnOk.Text = "Update / Create";
+            btnOk.TabIndex = 8;
+            btnOk.Text = "OK";
             btnOk.UseVisualStyleBackColor = true;
             // 
             // btnCancel
@@ -246,7 +210,7 @@ namespace JoyMap.Forms
             btnCancel.Location = new Point(630, 616);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(282, 34);
-            btnCancel.TabIndex = 7;
+            btnCancel.TabIndex = 9;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             // 
@@ -257,7 +221,7 @@ namespace JoyMap.Forms
             statusStrip.Location = new Point(0, 658);
             statusStrip.Name = "statusStrip";
             statusStrip.Size = new Size(924, 22);
-            statusStrip.TabIndex = 8;
+            statusStrip.TabIndex = 10;
             // 
             // statusLabel
             // 
@@ -270,7 +234,7 @@ namespace JoyMap.Forms
             statusUpdateTimer.Interval = 200;
             statusUpdateTimer.Tick += statusUpdateTimer_Tick;
             // 
-            // GlobalStatusForm
+            // ModeEntryEditForm
             // 
             AcceptButton = btnOk;
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -281,16 +245,16 @@ namespace JoyMap.Forms
             Controls.Add(label1);
             Controls.Add(textName);
             Controls.Add(label2);
-            Controls.Add(cbMode);
-            Controls.Add(panelCombiner);
+            Controls.Add(triggerCombiner);
+            Controls.Add(btnCombinerHelp);
+            Controls.Add(label3);
+            Controls.Add(triggerListView);
             Controls.Add(btnOk);
             Controls.Add(btnCancel);
             Controls.Add(statusStrip);
-            MinimumSize = new Size(750, 250);
-            Name = "GlobalStatusForm";
-            Text = "Global Status";
-            panelCombiner.ResumeLayout(false);
-            panelCombiner.PerformLayout();
+            MinimumSize = new Size(750, 400);
+            Name = "ModeEntryEditForm";
+            Text = "Mode Entry";
             triggerMenu.ResumeLayout(false);
             statusStrip.ResumeLayout(false);
             statusStrip.PerformLayout();
@@ -304,14 +268,9 @@ namespace JoyMap.Forms
         private Label label1;
         private TextBox textName;
         private Label label2;
-        private ComboBox cbMode;
-        private Panel panelCombiner;
-        private Label label3;
         private ComboBox triggerCombiner;
         private Button btnCombinerHelp;
-        private StatusStrip statusStrip;
-        private ToolStripStatusLabel statusLabel;
-        private Label label4;
+        private Label label3;
         private ListView triggerListView;
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader2;
@@ -326,6 +285,8 @@ namespace JoyMap.Forms
         private ToolStripMenuItem deleteToolStripMenuItem;
         private Button btnOk;
         private Button btnCancel;
+        private StatusStrip statusStrip;
+        private ToolStripStatusLabel statusLabel;
         private System.Windows.Forms.Timer statusUpdateTimer;
     }
 }

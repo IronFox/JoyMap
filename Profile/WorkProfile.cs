@@ -14,6 +14,9 @@ namespace JoyMap.Profile
         public Dictionary<XBoxAxis, XBoxAxisBindingInstance> AxisBindings { get; init; } = [];
         public List<GlobalStatusInstance> GlobalStatuses { get; init; } = [];
         public int NextGlobalStatusId { get; set; }
+        public List<ModeGroupInstance> ModeGroups { get; init; } = [];
+        public int NextModeGroupId { get; set; }
+        public int NextModeEntryId { get; set; }
 
         public bool Exists { get; set; }
         public bool HasChanged { get; set; }
@@ -23,6 +26,7 @@ namespace JoyMap.Profile
         public IReadOnlyList<EventInstance> EventInstances => Events;
         public IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindings => [.. AxisBindings.Values];
         public IReadOnlyList<GlobalStatusInstance> GlobalStatusInstances => GlobalStatuses;
+        public IReadOnlyList<ModeGroupInstance> ModeGroupInstances => ModeGroups;
 
         public ProfileInstance ToProfileInstance()
         {
@@ -32,7 +36,8 @@ namespace JoyMap.Profile
                 ProcessNameRegex: new(ProcessNameRegex, WindowNameRegex),
                 EventInstances: Events,
                 XBoxAxisBindingInstances: XBoxAxisBindings,
-                GlobalStatusInstances: GlobalStatuses
+                GlobalStatusInstances: GlobalStatuses,
+                ModeGroupInstances: ModeGroups
             );
         }
 
@@ -48,7 +53,10 @@ namespace JoyMap.Profile
                 Events: Events.Select(x => x.Event).ToList(),
                 XBoxAxisBindings: AxisBindings.Values.Select(x => x.Binding).ToList(),
                 GlobalStatuses: GlobalStatuses.Select(x => x.Status).ToList(),
-                NextGlobalStatusId: NextGlobalStatusId
+                NextGlobalStatusId: NextGlobalStatusId,
+                ModeGroups: ModeGroups.Select(x => x.Group).ToList(),
+                NextModeGroupId: NextModeGroupId,
+                NextModeEntryId: NextModeEntryId
             );
         }
 
@@ -63,5 +71,23 @@ namespace JoyMap.Profile
         {
             NextGlobalStatusId++;
         }
+
+        public string AllocateNextModeGroupId()
+        {
+            while (ModeGroups.Any(g => g.Id == $"MG{NextModeGroupId}"))
+                NextModeGroupId++;
+            return $"MG{NextModeGroupId}";
+        }
+
+        public void CommitNextModeGroupId() => NextModeGroupId++;
+
+        public string AllocateNextModeEntryId()
+        {
+            while (ModeGroups.SelectMany(g => g.EntryInstances).Any(e => e.Id == $"M{NextModeEntryId}"))
+                NextModeEntryId++;
+            return $"M{NextModeEntryId}";
+        }
+
+        public void CommitNextModeEntryId() => NextModeEntryId++;
     }
 }

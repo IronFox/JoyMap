@@ -38,6 +38,7 @@ namespace JoyMap.Profile
             Events = profileInstance.EventInstances;
             Mappings = profileInstance.XBoxAxisBindings;
             GlobalStatuses = profileInstance.GlobalStatusInstances;
+            ModeGroups = profileInstance.ModeGroupInstances;
             MainForm.Log($"Profile execution started with {Events.Count} events");
 
 
@@ -50,6 +51,9 @@ namespace JoyMap.Profile
             if (GlobalStatuses.Count > 0)
                 processors = processors.Prepend(new GlobalStatusProcessor(GlobalStatuses));
 
+            if (ModeGroups.Count > 0)
+                processors = processors.Prepend(new ModeGroupProcessor(ModeGroups));
+
             if (Mappings.Count > 0)
                 processors = processors.Append(new XBoxAxisProcessor(Mappings));
 
@@ -60,6 +64,7 @@ namespace JoyMap.Profile
         public IReadOnlyList<EventInstance> Events { get; }
         public IReadOnlyList<XBoxAxisBindingInstance> Mappings { get; }
         public IReadOnlyList<GlobalStatusInstance> GlobalStatuses { get; }
+        public IReadOnlyList<ModeGroupInstance> ModeGroups { get; }
 
         private CancellationTokenSource ListenCancel { get; } = new();
 
