@@ -804,7 +804,7 @@ namespace JoyMap
                 return;
             var axis = AxisOf(bindingListView.SelectedItems[0]);
             ActiveProfile.AxisBindings.TryGetValue(axis, out var binding);
-            using var form = new XBoxAxisBindingForm(axis, binding, ActiveProfile.GlobalStatuses);
+            using var form = new XBoxAxisBindingForm(axis, binding, BuildGlobalStatusRefs());
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null && ActiveProfile is not null)
             {

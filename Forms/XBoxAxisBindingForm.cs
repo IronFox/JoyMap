@@ -6,13 +6,13 @@ namespace JoyMap.Forms
 {
     public partial class XBoxAxisBindingForm : Form
     {
-        private record StatusItem(GlobalStatusInstance? Status)
+        private record StatusItem(GlobalStatusRef? Status)
         {
             public override string ToString() =>
-                Status is null ? "(none)" : $"{Status.Id}: {Status.Status.Name}";
+                Status is null ? "(none)" : $"{Status.Id}: {Status.Name}";
         }
 
-        public XBoxAxisBindingForm(XBoxAxis axis, XBoxAxisBindingInstance? instance = null, IReadOnlyList<GlobalStatusInstance>? globalStatuses = null)
+        public XBoxAxisBindingForm(XBoxAxis axis, XBoxAxisBindingInstance? instance = null, IReadOnlyList<GlobalStatusRef>? globalStatuses = null)
         {
             InitializeComponent();
             Axis = axis;
@@ -93,10 +93,10 @@ namespace JoyMap.Forms
 
             Func<float?> baseGet = XBoxAxisBindingInstance.CombineAxisInputs(axes);
             Func<float?> getValueFn = baseGet;
-            if (enableStatusItem?.Status is { } statusInst)
+            if (enableStatusItem?.Status is { } statusRef)
             {
-                var cap = statusInst;
-                getValueFn = () => cap.CurrentValue ? baseGet() : 0f;
+                var cap = statusRef;
+                getValueFn = () => cap.IsActive() ? baseGet() : 0f;
             }
 
             Result = new(
