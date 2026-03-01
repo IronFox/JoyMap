@@ -1,14 +1,18 @@
 ﻿using JoyMap.Extensions;
+using JoyMap.Forms;
 using JoyMap.Profile;
 
 namespace JoyMap
 {
     public partial class EventForm : Form
     {
-        public EventForm(EventInstance? instance = null, IReadOnlyDictionary<string, Func<bool>>? globalResolvers = null)
+        public EventForm(EventInstance? instance = null, IReadOnlyList<GlobalStatusRef>? globalStatuses = null)
         {
             InitializeComponent();
-            _globalResolvers = globalResolvers;
+            _globalStatuses = globalStatuses ?? [];
+            _globalResolvers = _globalStatuses.Count > 0
+                ? _globalStatuses.ToDictionary(g => g.Id, g => (Func<bool>)g.IsActive)
+                : null;
             if (instance is not null)
             {
                 Suspended = instance.IsSuspended;
@@ -39,6 +43,7 @@ namespace JoyMap
 
         private bool Suspended { get; set; } = false;
 
+        private IReadOnlyList<GlobalStatusRef> _globalStatuses;
         private IReadOnlyDictionary<string, Func<bool>>? _globalResolvers;
 
         private List<(TriggerInstance Trigger, ListViewItem Row)> Triggers { get; } = [];
@@ -220,14 +225,16 @@ namespace JoyMap
                 var actions = actionListView.Items.ToEnumerable()
                         .Select(x => x.Tag as EventAction!)
                         .Where(x => x is not null).ToList();
-                var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, this.Triggers.Select(x => x.Trigger).ToList(), _globalResolvers);
+                var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, this.Triggers.Select(x => x.Trigger).ToList(), _globalResolvers, out var combinerError);
                 if (tCombiner is null)
                 {
+                    labelCombinerError.Text = combinerError ?? "Invalid expression.";
                     btnOk.Enabled = false;
                     Result = null;
                     return;
                 }
 
+                labelCombinerError.Text = "";
                 var eventObj = new EventInstance(
                     Event: new(
                         TriggerCombiner: triggerCombiner.Text,
@@ -245,6 +252,7 @@ namespace JoyMap
             }
             else
             {
+                labelCombinerError.Text = "";
                 Result = null;
             }
         }
@@ -252,6 +260,23 @@ namespace JoyMap
         private void AnyChanged(object sender, EventArgs e)
         {
             Rebuild();
+        }
+
+        private void btnCombinerHelp_Click(object sender, EventArgs e)
+        {
+            var localInputs = Triggers
+                .Select(t => new CombinerHelpForm.LocalInputInfo(
+                    t.Row.SubItems[0].Text,
+                    t.Trigger.Trigger.InputId.ControllerName,
+                    t.Trigger.Trigger.InputId.AxisName,
+                    t.Trigger.IsTriggered))
+                .ToList();
+
+            using var form = new CombinerHelpForm(triggerCombiner.Text, localInputs, _globalStatuses);
+            if (form.ShowDialog(this) == DialogResult.OK && form.ResultExpression is not null)
+            {
+                triggerCombiner.Text = form.ResultExpression;
+            }
         }
 
         private void editSelectedToolStripMenuItem_Click(object sender, EventArgs e)

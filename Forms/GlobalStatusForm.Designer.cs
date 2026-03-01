@@ -24,6 +24,8 @@ namespace JoyMap.Forms
             panelCombiner = new Panel();
             label3 = new Label();
             triggerCombiner = new ComboBox();
+            btnCombinerHelp = new Button();
+            labelCombinerError = new Label();
             label4 = new Label();
             triggerListView = new ListView();
             columnHeader1 = new ColumnHeader();
@@ -95,6 +97,8 @@ namespace JoyMap.Forms
             panelCombiner.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panelCombiner.Controls.Add(label3);
             panelCombiner.Controls.Add(triggerCombiner);
+            panelCombiner.Controls.Add(btnCombinerHelp);
+            panelCombiner.Controls.Add(labelCombinerError);
             panelCombiner.Controls.Add(label4);
             panelCombiner.Controls.Add(triggerListView);
             panelCombiner.Location = new Point(0, 135);
@@ -117,14 +121,35 @@ namespace JoyMap.Forms
             triggerCombiner.FormattingEnabled = true;
             triggerCombiner.Location = new Point(115, 9);
             triggerCombiner.Name = "triggerCombiner";
-            triggerCombiner.Size = new Size(795, 33);
+            triggerCombiner.Size = new Size(751, 33);
             triggerCombiner.TabIndex = 1;
             triggerCombiner.TextChanged += AnyChanged;
+            // 
+            // btnCombinerHelp
+            // 
+            btnCombinerHelp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnCombinerHelp.Location = new Point(874, 9);
+            btnCombinerHelp.Name = "btnCombinerHelp";
+            btnCombinerHelp.Size = new Size(38, 33);
+            btnCombinerHelp.TabIndex = 5;
+            btnCombinerHelp.Text = "?";
+            btnCombinerHelp.UseVisualStyleBackColor = true;
+            btnCombinerHelp.Click += btnCombinerHelp_Click;
+            // 
+            // labelCombinerError
+            // 
+            labelCombinerError.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            labelCombinerError.ForeColor = Color.Firebrick;
+            labelCombinerError.Location = new Point(115, 46);
+            labelCombinerError.Name = "labelCombinerError";
+            labelCombinerError.Size = new Size(797, 22);
+            labelCombinerError.TabIndex = 6;
+            labelCombinerError.Text = "";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(12, 52);
+            label4.Location = new Point(12, 74);
             label4.Name = "label4";
             label4.Size = new Size(74, 25);
             label4.TabIndex = 2;
@@ -136,9 +161,9 @@ namespace JoyMap.Forms
             triggerListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4 });
             triggerListView.ContextMenuStrip = triggerMenu;
             triggerListView.FullRowSelect = true;
-            triggerListView.Location = new Point(12, 80);
+            triggerListView.Location = new Point(12, 102);
             triggerListView.Name = "triggerListView";
-            triggerListView.Size = new Size(898, 395);
+            triggerListView.Size = new Size(898, 373);
             triggerListView.TabIndex = 3;
             triggerListView.UseCompatibleStateImageBehavior = false;
             triggerListView.View = View.Details;
@@ -267,6 +292,8 @@ namespace JoyMap.Forms
         private Panel panelCombiner;
         private Label label3;
         private ComboBox triggerCombiner;
+        private Button btnCombinerHelp;
+        private Label labelCombinerError;
         private Label label4;
         private ListView triggerListView;
         private ColumnHeader columnHeader1;

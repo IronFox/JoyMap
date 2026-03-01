@@ -15,20 +15,33 @@
         ///   Primary:= IDENT | '(' Expr ')' | TRUE | FALSE
         /// </summary>
         public static Func<bool>? CompileBooleanExpression(string expression, IReadOnlyDictionary<string, Func<bool>> dictionary)
+            => CompileBooleanExpression(expression, dictionary, out _);
+
+        /// <summary>
+        /// Compiles a boolean expression and also returns a human-readable error message on failure.
+        /// </summary>
+        public static Func<bool>? CompileBooleanExpression(string expression, IReadOnlyDictionary<string, Func<bool>> dictionary, out string? error)
         {
+            error = null;
             if (string.IsNullOrWhiteSpace(expression))
+            {
+                error = "Expression is empty.";
                 return null;
+            }
             if (expression.StartsWith('"') && expression.EndsWith('"') && expression.Length >= 2)
                 expression = expression[1..^1];
             if (string.IsNullOrWhiteSpace(expression))
+            {
+                error = "Expression is empty.";
                 return null;
+            }
 
             try
             {
                 var tokens = Tokenize(expression);
                 int index = 0;
+                string? parseError = null;
 
-                // Local helper for safe current-kind lookup
                 TokenKind CurrentKind() => index < tokens.Count ? tokens[index].Kind : TokenKind.EOF;
 
                 Func<bool>? ParseExpr() => ParseOr();
@@ -79,7 +92,12 @@
                     if (Match(TokenKind.LeftParen))
                     {
                         var exprFunc = ParseExpr();
-                        if (!Match(TokenKind.RightParen) || exprFunc == null) return null;
+                        if (exprFunc == null) return null;
+                        if (!Match(TokenKind.RightParen))
+                        {
+                            parseError ??= "Expected closing ')'.";
+                            return null;
+                        }
                         return exprFunc;
                     }
 
@@ -88,10 +106,18 @@
                         var ident = tokens[index].Text;
                         index++;
                         var resolver = ResolveIdentifier(dictionary, ident);
-                        if (resolver == null) return null; // unknown identifier
+                        if (resolver == null)
+                        {
+                            parseError ??= $"Unknown identifier '{ident}'.";
+                            return null;
+                        }
                         return resolver;
                     }
 
+                    if (CurrentKind() != TokenKind.EOF)
+                        parseError ??= $"Unexpected token '{tokens[index].Text}'.";
+                    else
+                        parseError ??= "Unexpected end of expression.";
                     return null;
                 }
 
@@ -106,13 +132,21 @@
                 }
 
                 var func = ParseExpr();
-                // Ensure all tokens consumed
-                if (func == null || CurrentKind() != TokenKind.EOF)
+                if (func == null)
+                {
+                    error = parseError ?? "Invalid expression.";
                     return null;
+                }
+                if (CurrentKind() != TokenKind.EOF)
+                {
+                    error = $"Unexpected tokens after expression (near '{tokens[index].Text}').";
+                    return null;
+                }
                 return func;
             }
-            catch
+            catch (Exception ex)
             {
+                error = $"Parse error: {ex.Message}";
                 return null;
             }
         }

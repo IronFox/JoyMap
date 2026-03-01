@@ -12,16 +12,18 @@ namespace JoyMap.Profile
         private List<IActionProcessor> ActionProcessors { get; } = [];
 
         public static Func<bool>? BuildTriggerCombiner(string? combiner, IReadOnlyList<TriggerInstance> triggerInstances, IReadOnlyDictionary<string, Func<bool>>? extra = null)
+            => BuildTriggerCombiner(combiner, triggerInstances, extra, out _);
+
+        public static Func<bool>? BuildTriggerCombiner(string? combiner, IReadOnlyList<TriggerInstance> triggerInstances, IReadOnlyDictionary<string, Func<bool>>? extra, out string? error)
         {
+            error = null;
             if (combiner?.ToLower() == "and")
             {
-                return () => triggerInstances
-                    .All(t => t.IsTriggered());
+                return () => triggerInstances.All(t => t.IsTriggered());
             }
             else if (combiner?.ToLower() == "or")
             {
-                return () => triggerInstances
-                    .Any(t => t.IsTriggered());
+                return () => triggerInstances.Any(t => t.IsTriggered());
             }
             else
             {
@@ -33,7 +35,8 @@ namespace JoyMap.Profile
                         identifiers[kv.Key] = kv.Value;
                 return ExpressionCompiler.CompileBooleanExpression(
                     combiner ?? "false",
-                    identifiers
+                    identifiers,
+                    out error
                 );
             }
         }

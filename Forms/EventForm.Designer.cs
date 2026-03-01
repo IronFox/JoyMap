@@ -51,6 +51,8 @@
             splitContainer1 = new SplitContainer();
             label4 = new Label();
             triggerCombiner = new ComboBox();
+            btnCombinerHelp = new Button();
+            labelCombinerError = new Label();
             triggerListView = new ListView();
             columnHeader6 = new ColumnHeader();
             columnHeader1 = new ColumnHeader();
@@ -214,6 +216,8 @@
             // 
             splitContainer1.Panel1.Controls.Add(label4);
             splitContainer1.Panel1.Controls.Add(triggerCombiner);
+            splitContainer1.Panel1.Controls.Add(btnCombinerHelp);
+            splitContainer1.Panel1.Controls.Add(labelCombinerError);
             splitContainer1.Panel1.Controls.Add(triggerListView);
             splitContainer1.Panel1.Controls.Add(label2);
             splitContainer1.Panel1MinSize = 75;
@@ -242,10 +246,31 @@
             triggerCombiner.Items.AddRange(new object[] { "Or", "And" });
             triggerCombiner.Location = new Point(362, 7);
             triggerCombiner.Name = "triggerCombiner";
-            triggerCombiner.Size = new Size(535, 33);
+            triggerCombiner.Size = new Size(491, 33);
             triggerCombiner.TabIndex = 12;
             triggerCombiner.Text = "Or";
             triggerCombiner.TextChanged += AnyChanged;
+            // 
+            // btnCombinerHelp
+            // 
+            btnCombinerHelp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnCombinerHelp.Location = new Point(861, 7);
+            btnCombinerHelp.Name = "btnCombinerHelp";
+            btnCombinerHelp.Size = new Size(36, 33);
+            btnCombinerHelp.TabIndex = 14;
+            btnCombinerHelp.Text = "?";
+            btnCombinerHelp.UseVisualStyleBackColor = true;
+            btnCombinerHelp.Click += btnCombinerHelp_Click;
+            // 
+            // labelCombinerError
+            // 
+            labelCombinerError.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            labelCombinerError.ForeColor = Color.Firebrick;
+            labelCombinerError.Location = new Point(362, 44);
+            labelCombinerError.Name = "labelCombinerError";
+            labelCombinerError.Size = new Size(535, 22);
+            labelCombinerError.TabIndex = 15;
+            labelCombinerError.Text = "";
             // 
             // triggerListView
             // 
@@ -253,9 +278,9 @@
             triggerListView.Columns.AddRange(new ColumnHeader[] { columnHeader6, columnHeader1, columnHeader2, columnHeader3 });
             triggerListView.ContextMenuStrip = triggerMenu;
             triggerListView.FullRowSelect = true;
-            triggerListView.Location = new Point(3, 46);
+            triggerListView.Location = new Point(3, 70);
             triggerListView.Name = "triggerListView";
-            triggerListView.Size = new Size(894, 248);
+            triggerListView.Size = new Size(894, 224);
             triggerListView.TabIndex = 11;
             triggerListView.UseCompatibleStateImageBehavior = false;
             triggerListView.View = View.Details;
@@ -369,6 +394,8 @@
         private SplitContainer splitContainer1;
         private Label label4;
         private ComboBox triggerCombiner;
+        private Button btnCombinerHelp;
+        private Label labelCombinerError;
         private ListView triggerListView;
         private ColumnHeader columnHeader6;
         private ColumnHeader columnHeader1;

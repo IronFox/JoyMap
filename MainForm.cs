@@ -72,7 +72,7 @@ namespace JoyMap
         {
             if (ActiveProfile is null)
                 return;
-            using var form = new EventForm(null, BuildGlobalResolvers());
+            using var form = new EventForm(null, BuildGlobalStatusRefs());
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -308,7 +308,7 @@ namespace JoyMap
             var item = eventListView.SelectedItems[0];
             if (item.Tag is not EventInstance ev)
                 return;
-            using var form = new EventForm(ev, BuildGlobalResolvers());
+            using var form = new EventForm(ev, BuildGlobalStatusRefs());
             var result = form.ShowDialog(this);
             if (result == DialogResult.OK && form.Result is not null)
             {
@@ -942,11 +942,12 @@ namespace JoyMap
                 ActiveProfile.History.ExecuteAction(new SetProfileNotesAction(this, ActiveProfile, textNotes));
             }
         }
-            private IReadOnlyDictionary<string, Func<bool>> BuildGlobalResolvers()
+            private IReadOnlyList<JoyMap.Forms.GlobalStatusRef> BuildGlobalStatusRefs()
             {
                 return ActiveProfile?.GlobalStatuses
-                    .ToDictionary(g => g.Id, g => (Func<bool>)(() => g.CurrentValue))
-                    ?? new Dictionary<string, Func<bool>>();
+                    .Select(g => new JoyMap.Forms.GlobalStatusRef(g.Id, g.Status.Name, () => g.CurrentValue))
+                    .ToList()
+                    ?? [];
             }
 
             private void gsNewMenuItem_Click(object sender, EventArgs e)
@@ -954,7 +955,7 @@ namespace JoyMap
                 if (ActiveProfile is null)
                     return;
                 var id = ActiveProfile.AllocateNextGlobalStatusId();
-                using var form = new GlobalStatusForm(id);
+                using var form = new GlobalStatusForm(id, null, BuildGlobalStatusRefs());
                 if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
                 {
                     ActiveProfile.CommitNextGlobalStatusId();
@@ -969,7 +970,7 @@ namespace JoyMap
                 var item = globalStatusListView.SelectedItems[0];
                 if (item.Tag is not GlobalStatusInstance gs)
                     return;
-                using var form = new GlobalStatusForm(gs.Id, gs);
+                using var form = new GlobalStatusForm(gs.Id, gs, BuildGlobalStatusRefs());
                 if (form.ShowDialog(this) == DialogResult.OK && form.Result is not null)
                 {
                     ActiveProfile.History.ExecuteAction(new EditGlobalStatusAction(this, ActiveProfile, item.Index, gs, form.Result));

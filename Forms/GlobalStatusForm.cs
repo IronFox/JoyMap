@@ -6,9 +6,12 @@ namespace JoyMap.Forms
 {
     public partial class GlobalStatusForm : Form
     {
-        public GlobalStatusForm(string id, GlobalStatusInstance? instance = null)
+        private readonly IReadOnlyList<GlobalStatusRef> _globalStatuses;
+
+        public GlobalStatusForm(string id, GlobalStatusInstance? instance = null, IReadOnlyList<GlobalStatusRef>? globalStatuses = null)
         {
             InitializeComponent();
+            _globalStatuses = globalStatuses ?? [];
             StatusId = id;
             lId.Text = $"ID: {id}";
 
@@ -81,18 +84,31 @@ namespace JoyMap.Forms
             Result = null;
 
             if (string.IsNullOrWhiteSpace(textName.Text))
+            {
+                labelCombinerError.Text = "";
                 return;
+            }
 
             if (NeedsCombiner)
             {
                 if (Triggers.Count == 0)
+                {
+                    labelCombinerError.Text = "";
                     return;
+                }
 
                 var triggerInstances = Triggers.Select(x => x.Trigger).ToList();
-                var combiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, triggerInstances);
+                var globalResolvers = _globalStatuses.Count > 0
+                    ? _globalStatuses.ToDictionary(g => g.Id, g => g.IsActive)
+                    : null;
+                var combiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, triggerInstances, globalResolvers, out var combinerError);
                 if (combiner is null)
+                {
+                    labelCombinerError.Text = combinerError ?? "Invalid expression.";
                     return;
+                }
 
+                labelCombinerError.Text = "";
                 var status = new GlobalStatus(
                     StatusId,
                     textName.Text.Trim(),
@@ -104,6 +120,7 @@ namespace JoyMap.Forms
             }
             else
             {
+                labelCombinerError.Text = "";
                 var status = new GlobalStatus(StatusId, textName.Text.Trim(), SelectedMode, "", []);
                 Result = new GlobalStatusInstance(status, [], () => false);
             }
@@ -112,6 +129,23 @@ namespace JoyMap.Forms
         }
 
         private void AnyChanged(object sender, EventArgs e) => Rebuild();
+
+        private void btnCombinerHelp_Click(object sender, EventArgs e)
+        {
+            var localInputs = Triggers
+                .Select(t => new CombinerHelpForm.LocalInputInfo(
+                    t.Row.SubItems[0].Text,
+                    t.Trigger.Trigger.InputId.ControllerName,
+                    t.Trigger.Trigger.InputId.AxisName,
+                    t.Trigger.IsTriggered))
+                .ToList();
+
+            using var form = new CombinerHelpForm(triggerCombiner.Text, localInputs, _globalStatuses);
+            if (form.ShowDialog(this) == DialogResult.OK && form.ResultExpression is not null)
+            {
+                triggerCombiner.Text = form.ResultExpression;
+            }
+        }
 
         private void pickAddToolStripMenuItem_Click(object sender, EventArgs e)
         {
