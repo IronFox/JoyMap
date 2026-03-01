@@ -44,7 +44,7 @@ namespace JoyMap.Forms
                 exprSep2.Visible = false;
             }
 
-            Validate();
+            ValidateExpression();
         }
 
         // ── List population ──────────────────────────────────────────────────
@@ -78,7 +78,7 @@ namespace JoyMap.Forms
 
         // ── Validation ───────────────────────────────────────────────────────
 
-        private void Validate()
+        private void ValidateExpression()
         {
             var text = txtExpression.Text.Trim();
             if (string.IsNullOrWhiteSpace(text))
@@ -124,7 +124,7 @@ namespace JoyMap.Forms
 
         // ── Expression TextBox ───────────────────────────────────────────────
 
-        private void txtExpression_TextChanged(object sender, EventArgs e) => Validate();
+        private void txtExpression_TextChanged(object sender, EventArgs e) => ValidateExpression();
 
         private void InsertText(string text)
         {
