@@ -89,12 +89,6 @@ namespace JoyMap.Forms
 
             if (NeedsCombiner)
             {
-                if (Triggers.Count == 0)
-                {
-                    SetStatus("Add at least one trigger.");
-                    return;
-                }
-
                 var triggerInstances = Triggers.Select(x => x.Trigger).ToList();
                 var globalResolvers = GlobalStatuses.Count > 0
                     ? GlobalStatuses.ToDictionary(g => g.Id, g => g.IsActive)
