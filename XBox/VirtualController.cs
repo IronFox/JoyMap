@@ -50,6 +50,7 @@ namespace JoyMap.XBox
 
             // Triggers (0-255)
             ApplySlider(XBoxAxis.TriggerLeft, Xbox360Slider.LeftTrigger, analogFeed);
+            ApplySlider(XBoxAxis.TriggerRight, Xbox360Slider.RightTrigger, analogFeed);
 
             SubmitSafe();
         }
