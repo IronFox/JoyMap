@@ -41,6 +41,7 @@
             saveDebugOnlyToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem6 = new ToolStripSeparator();
             editControllerFamiliesToolStripMenuItem = new ToolStripMenuItem();
+            hideDevicesToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem8 = new ToolStripSeparator();
             quitToolStripMenuItem = new ToolStripMenuItem();
             profilesToolStripMenuItem = new ToolStripMenuItem();
@@ -173,7 +174,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveDebugOnlyToolStripMenuItem, toolStripMenuItem6, editControllerFamiliesToolStripMenuItem, toolStripMenuItem8, quitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveDebugOnlyToolStripMenuItem, toolStripMenuItem6, editControllerFamiliesToolStripMenuItem, hideDevicesToolStripMenuItem, toolStripMenuItem8, quitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(54, 29);
             fileToolStripMenuItem.Text = "File";
@@ -196,6 +197,13 @@
             editControllerFamiliesToolStripMenuItem.Size = new Size(311, 34);
             editControllerFamiliesToolStripMenuItem.Text = "Edit Controller Families ...";
             editControllerFamiliesToolStripMenuItem.Click += editControllerFamiliesToolStripMenuItem_Click;
+            // 
+            // hideDevicesToolStripMenuItem
+            // 
+            hideDevicesToolStripMenuItem.Name = "hideDevicesToolStripMenuItem";
+            hideDevicesToolStripMenuItem.Size = new Size(311, 34);
+            hideDevicesToolStripMenuItem.Text = "Hide Devices from Games ...";
+            hideDevicesToolStripMenuItem.Click += hideDevicesToolStripMenuItem_Click;
             // 
             // toolStripMenuItem8
             // 
@@ -1133,6 +1141,7 @@
         private ToolStripMenuItem suspendSelectedToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem7;
         private ToolStripMenuItem editControllerFamiliesToolStripMenuItem;
+        private ToolStripMenuItem hideDevicesToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem8;
         private TabControl tabControl;
         private TabPage tabEvents;

@@ -63,6 +63,9 @@ namespace JoyMap.Profile
             }
         }
 
+        internal GlobalStatusInstance WithId(string newId)
+            => new(Status with { Id = newId }, TriggerInstances, CombinerResult);
+
         internal static GlobalStatusInstance Load(InputMonitor monitor, GlobalStatus gs, IReadOnlyDictionary<string, Func<bool>>? globalResolvers = null)
         {
             var triggerInstances = gs.Triggers

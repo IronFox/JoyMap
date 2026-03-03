@@ -92,9 +92,13 @@ namespace JoyMap.Forms
             if (NeedsCombiner)
             {
                 var triggerInstances = Triggers.Select(x => x.Trigger).ToList();
-                var globalResolvers = GlobalStatuses.Count > 0
-                    ? GlobalStatuses.ToDictionary(g => g.Id, g => g.IsActive)
-                    : null;
+                Dictionary<string, Func<bool>>? globalResolvers = null;
+                if (GlobalStatuses.Count > 0)
+                {
+                    globalResolvers = new();
+                    foreach (var g in GlobalStatuses)
+                        globalResolvers.TryAdd(g.Id, g.IsActive);
+                }
                 var combiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, triggerInstances, globalResolvers, out var combinerError);
                 if (combiner is null)
                 {

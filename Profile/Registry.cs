@@ -186,6 +186,19 @@ namespace JoyMap.Profile
                 return slot.WorkProfile;
 
 
+            var seenGsIds = new HashSet<string>();
+            var nextGsId = profile.Profile.NextGlobalStatusId;
+            var globalStatuses = profile.GlobalStatusInstances.Select(gs =>
+            {
+                if (seenGsIds.Add(gs.Id))
+                    return gs;
+                while (seenGsIds.Contains($"G{nextGsId}"))
+                    nextGsId++;
+                var newId = $"G{nextGsId++}";
+                seenGsIds.Add(newId);
+                return gs.WithId(newId);
+            }).ToList();
+
             var workProfile = new WorkProfile
             {
                 Id = profile.Profile.Id,
@@ -195,7 +208,7 @@ namespace JoyMap.Profile
                 WindowNameRegex = profile.Profile.WindowNameRegex ?? "",
                 Events = [.. profile.EventInstances],
                 AxisBindings = profile.XBoxAxisBindingInstances.ToDictionary(x => x.OutAxis),
-                GlobalStatuses = [.. profile.GlobalStatusInstances],
+                GlobalStatuses = [.. globalStatuses],
                 NextGlobalStatusId = profile.Profile.NextGlobalStatusId,
                 ModeGroups = [.. profile.ModeGroupInstances],
                 NextModeGroupId = profile.Profile.NextModeGroupId,
@@ -207,6 +220,34 @@ namespace JoyMap.Profile
                 Profiles[workProfile.Id] = new() { Id = workProfile.Id, Profile = profile.Profile, Loaded = profile, WorkProfile = workProfile };
 
             return workProfile;
+        }
+
+        public static void SaveHiddenProducts(IEnumerable<ControllerTracking.Product> products)
+        {
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var dir = Path.Combine(documents, "JoyMap");
+            Directory.CreateDirectory(dir);
+            var path = Path.Combine(dir, "HiddenDevices.json");
+            var json = JsonUtil.Serialize(products);
+            File.WriteAllText(path, json);
+        }
+
+        public static IReadOnlyList<ControllerTracking.Product> LoadHiddenProducts()
+        {
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var dir = Path.Combine(documents, "JoyMap");
+            var path = Path.Combine(dir, "HiddenDevices.json");
+            if (!File.Exists(path))
+                return [];
+            var json = File.ReadAllText(path);
+            try
+            {
+                return JsonUtil.Deserialize<List<ControllerTracking.Product>>(json);
+            }
+            catch (JsonException)
+            {
+                return [];
+            }
         }
     }
 }

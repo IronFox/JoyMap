@@ -26,7 +26,8 @@ namespace JoyMap.Undo.Action.GlobalStatusAction
                 var idx = SelectedRowIndexes[i];
                 OldInstances.Add(TargetProfile.GlobalStatuses[idx]);
                 var item = Form.GlobalStatusListView.Items[idx];
-                var inst = GlobalStatusInstance.Load(Form.InputMonitor, CopiedStatuses[i]);
+                var existingId = TargetProfile.GlobalStatuses[idx].Id;
+                var inst = GlobalStatusInstance.Load(Form.InputMonitor, CopiedStatuses[i] with { Id = existingId });
                 item.Text = inst.Status.Name;
                 item.SubItems[1].Text = inst.Id;
                 item.SubItems[2].Text = inst.Status.Mode.ToString();

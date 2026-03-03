@@ -26,7 +26,9 @@ namespace JoyMap.Undo.Action.GlobalStatusAction
             CreatedRows.Clear();
             for (int i = 0; i < CopiedStatuses.Count; i++)
             {
-                var inst = GlobalStatusInstance.Load(Form.InputMonitor, CopiedStatuses[i]);
+                var newId = TargetProfile.AllocateNextGlobalStatusId();
+                TargetProfile.CommitNextGlobalStatusId();
+                var inst = GlobalStatusInstance.Load(Form.InputMonitor, CopiedStatuses[i] with { Id = newId });
                 var row = Form.GlobalStatusListView.Items.Insert(InsertIndex + i, inst.Status.Name);
                 row.SubItems.Add(inst.Id);
                 row.SubItems.Add(inst.Status.Mode.ToString());

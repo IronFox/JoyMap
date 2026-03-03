@@ -779,6 +779,12 @@ namespace JoyMap
             form.ShowDialog(this);
         }
 
+        private void hideDevicesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using var form = new HideDevicesForm();
+            form.ShowDialog(this);
+        }
+
         internal static void Log(string status, Exception? ex = null)
         {
             if (Instance is null)
