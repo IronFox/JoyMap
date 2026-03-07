@@ -15,7 +15,8 @@ namespace JoyMap.Profile
         int NextGlobalStatusId = 0,
         IReadOnlyList<ModeGroup>? ModeGroups = null,
         int NextModeGroupId = 0,
-        int NextModeEntryId = 0
+        int NextModeEntryId = 0,
+        bool HideControllers = false
         );
 
 

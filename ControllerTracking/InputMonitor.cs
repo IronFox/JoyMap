@@ -219,7 +219,17 @@ namespace JoyMap.ControllerTracking
 
                         var instance = TrackedInputs.GetOrAdd(dev.InstanceGuid, _ => instantiated = new(this, dev, instanceStatus));
                         if (instance == instantiated)
+                        {
                             instance.Begin(di, windowHandle, cancel);
+                            var form = MainForm.Instance;
+                            if (form is not null)
+                            {
+                                if (form.InvokeRequired)
+                                    form.Invoke(form.ApplyHidingForCurrentProfile);
+                                else
+                                    form.ApplyHidingForCurrentProfile();
+                            }
+                        }
                     }
                     var toRemove = TrackedInputs.Keys.Except(newGuids).ToList();
                     foreach (var guid in toRemove)

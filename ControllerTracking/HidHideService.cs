@@ -91,40 +91,44 @@ namespace JoyMap.ControllerTracking
             }
         }
 
-        internal static bool IsProductHidden(Guid productGuid, IReadOnlySet<string> blockedIds)
+        private static HashSet<string>? SessionBlockedIds { get; set; }
+
+        internal static void HideForProfile(IEnumerable<Guid> productGuids)
         {
-            var instances = FindHidInstancesForProduct(productGuid);
-            return instances.Count > 0 && instances.All(i => blockedIds.Contains(i.InstanceId));
-        }
-
-        internal static void Apply(
-            IEnumerable<Product> productsToHide,
-            IEnumerable<Product> productsToReveal,
-            IReadOnlySet<string> currentlyBlockedIds)
-        {
-            var svc = TryCreateService()
-                ?? throw new InvalidOperationException("HidHide driver is not available.");
-
-            foreach (var product in productsToReveal)
-                foreach (var instance in FindHidInstancesForProduct(product.Guid))
-                    if (currentlyBlockedIds.Contains(instance.InstanceId))
-                        svc.RemoveBlockedInstanceId(instance.InstanceId);
-
-            bool anyHiding = false;
-            foreach (var product in productsToHide)
-                foreach (var instance in FindHidInstancesForProduct(product.Guid))
+            var svc = TryCreateService();
+            if (svc is null)
+                return;
+            var currentlyBlocked = new HashSet<string>(svc.BlockedInstanceIds, StringComparer.OrdinalIgnoreCase);
+            var sessionBlocked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var guid in productGuids)
+                foreach (var instance in FindHidInstancesForProduct(guid))
                 {
-                    if (!currentlyBlockedIds.Contains(instance.InstanceId))
+                    if (!currentlyBlocked.Contains(instance.InstanceId))
                         svc.AddBlockedInstanceId(instance.InstanceId);
-                    anyHiding = true;
+                    sessionBlocked.Add(instance.InstanceId);
                 }
-
-            if (anyHiding)
+            if (sessionBlocked.Count > 0)
             {
                 EnsureAppWhitelisted(svc);
                 if (!svc.IsActive)
                     svc.IsActive = true;
             }
+            SessionBlockedIds = sessionBlocked;
+        }
+
+        internal static void RevealSessionBlocked()
+        {
+            var ids = SessionBlockedIds;
+            if (ids is null || ids.Count == 0)
+                return;
+            SessionBlockedIds = null;
+            var svc = TryCreateService();
+            if (svc is null)
+                return;
+            foreach (var id in ids)
+                try { svc.RemoveBlockedInstanceId(id); } catch { }
+            if (!svc.BlockedInstanceIds.Any() && svc.IsActive)
+                svc.IsActive = false;
         }
 
         private static void EnsureAppWhitelisted(HidHideControlService svc)

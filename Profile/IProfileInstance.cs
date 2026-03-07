@@ -7,5 +7,6 @@ namespace JoyMap.Profile
         IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindings { get; }
         IReadOnlyList<GlobalStatusInstance> GlobalStatusInstances { get; }
         IReadOnlyList<ModeGroupInstance> ModeGroupInstances { get; }
+        bool HideControllers { get; }
     }
 }

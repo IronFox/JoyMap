@@ -115,6 +115,7 @@ namespace JoyMap.Profile
         {
             ListenCancel.Cancel();
         }
+
         public async ValueTask DisposeAsync()
         {
             Dispose();

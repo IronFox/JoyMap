@@ -18,6 +18,8 @@ namespace JoyMap.Profile
         public int NextModeGroupId { get; set; }
         public int NextModeEntryId { get; set; }
 
+        public bool HideControllers { get; set; }
+
         public bool Exists { get; set; }
         public bool HasChanged { get; set; }
 
@@ -27,6 +29,7 @@ namespace JoyMap.Profile
         public IReadOnlyList<XBoxAxisBindingInstance> XBoxAxisBindings => [.. AxisBindings.Values];
         public IReadOnlyList<GlobalStatusInstance> GlobalStatusInstances => GlobalStatuses;
         public IReadOnlyList<ModeGroupInstance> ModeGroupInstances => ModeGroups;
+        bool IProfileInstance.HideControllers => HideControllers;
 
         public ProfileInstance ToProfileInstance()
         {
@@ -56,7 +59,8 @@ namespace JoyMap.Profile
                 NextGlobalStatusId: NextGlobalStatusId,
                 ModeGroups: ModeGroups.Select(x => x.Group).ToList(),
                 NextModeGroupId: NextModeGroupId,
-                NextModeEntryId: NextModeEntryId
+                NextModeEntryId: NextModeEntryId,
+                HideControllers: HideControllers
             );
         }
 

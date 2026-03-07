@@ -41,7 +41,6 @@
             saveDebugOnlyToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem6 = new ToolStripSeparator();
             editControllerFamiliesToolStripMenuItem = new ToolStripMenuItem();
-            hideDevicesToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem8 = new ToolStripSeparator();
             quitToolStripMenuItem = new ToolStripMenuItem();
             profilesToolStripMenuItem = new ToolStripMenuItem();
@@ -94,18 +93,7 @@
             tabControl = new TabControl();
             tabEvents = new TabPage();
             tabGlobalStatuses = new TabPage();
-            tabModes = new TabPage();
-            modeGroupListView = new ListView();
-            columnHeaderMgName = new ColumnHeader();
-            columnHeaderMgId = new ColumnHeader();
-            columnHeaderMgActive = new ColumnHeader();
-            mgContextMenu = new ContextMenuStrip(components);
-            mgNewMenuItem = new ToolStripMenuItem();
-            toolStripMgSep1 = new ToolStripSeparator();
-            mgEditMenuItem = new ToolStripMenuItem();
-            toolStripMgSep2 = new ToolStripSeparator();
-            mgDeleteMenuItem = new ToolStripMenuItem();
-            labelModeGroups = new Label();
+            labelGlobalStatuses = new Label();
             globalStatusListView = new ListView();
             columnHeaderGsName = new ColumnHeader();
             columnHeaderGsId = new ColumnHeader();
@@ -125,7 +113,18 @@
             toolStripMenuItem18 = new ToolStripSeparator();
             gsPasteOverMenuItem = new ToolStripMenuItem();
             gsPasteInsertMenuItem = new ToolStripMenuItem();
-            labelGlobalStatuses = new Label();
+            tabModes = new TabPage();
+            labelModeGroups = new Label();
+            modeGroupListView = new ListView();
+            columnHeaderMgName = new ColumnHeader();
+            columnHeaderMgId = new ColumnHeader();
+            columnHeaderMgActive = new ColumnHeader();
+            mgContextMenu = new ContextMenuStrip(components);
+            mgNewMenuItem = new ToolStripMenuItem();
+            toolStripMgSep1 = new ToolStripSeparator();
+            mgEditMenuItem = new ToolStripMenuItem();
+            toolStripMgSep2 = new ToolStripSeparator();
+            mgDeleteMenuItem = new ToolStripMenuItem();
             tabXBox = new TabPage();
             bindingListView = new ListView();
             columnHeader1 = new ColumnHeader();
@@ -147,6 +146,8 @@
             label6 = new Label();
             tabNotes = new TabPage();
             textNotes = new TextBox();
+            tabSettings = new TabPage();
+            chkHideControllers = new CheckBox();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             mainMenu.SuspendLayout();
@@ -154,11 +155,13 @@
             tabControl.SuspendLayout();
             tabEvents.SuspendLayout();
             tabGlobalStatuses.SuspendLayout();
+            gsContextMenu.SuspendLayout();
             tabModes.SuspendLayout();
+            mgContextMenu.SuspendLayout();
             tabXBox.SuspendLayout();
             bindingContextMenu.SuspendLayout();
-            gsContextMenu.SuspendLayout();
             tabNotes.SuspendLayout();
+            tabSettings.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -174,7 +177,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveDebugOnlyToolStripMenuItem, toolStripMenuItem6, editControllerFamiliesToolStripMenuItem, hideDevicesToolStripMenuItem, toolStripMenuItem8, quitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveDebugOnlyToolStripMenuItem, toolStripMenuItem6, editControllerFamiliesToolStripMenuItem, toolStripMenuItem8, quitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(54, 29);
             fileToolStripMenuItem.Text = "File";
@@ -197,13 +200,6 @@
             editControllerFamiliesToolStripMenuItem.Size = new Size(311, 34);
             editControllerFamiliesToolStripMenuItem.Text = "Edit Controller Families ...";
             editControllerFamiliesToolStripMenuItem.Click += editControllerFamiliesToolStripMenuItem_Click;
-            // 
-            // hideDevicesToolStripMenuItem
-            // 
-            hideDevicesToolStripMenuItem.Name = "hideDevicesToolStripMenuItem";
-            hideDevicesToolStripMenuItem.Size = new Size(311, 34);
-            hideDevicesToolStripMenuItem.Text = "Hide Devices from Games ...";
-            hideDevicesToolStripMenuItem.Click += hideDevicesToolStripMenuItem_Click;
             // 
             // toolStripMenuItem8
             // 
@@ -603,6 +599,7 @@
             tabControl.Controls.Add(tabModes);
             tabControl.Controls.Add(tabXBox);
             tabControl.Controls.Add(tabNotes);
+            tabControl.Controls.Add(tabSettings);
             tabControl.Location = new Point(0, 179);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
@@ -634,95 +631,14 @@
             tabGlobalStatuses.TabIndex = 3;
             tabGlobalStatuses.Text = "Global Statuses";
             // 
-            // tabModes
+            // labelGlobalStatuses
             // 
-            tabModes.Controls.Add(labelModeGroups);
-            tabModes.Controls.Add(modeGroupListView);
-            tabModes.Location = new Point(4, 34);
-            tabModes.Name = "tabModes";
-            tabModes.Padding = new Padding(3);
-            tabModes.Size = new Size(1215, 598);
-            tabModes.TabIndex = 4;
-            tabModes.Text = "Modes";
-            // 
-            // modeGroupListView
-            // 
-            modeGroupListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            modeGroupListView.Columns.AddRange(new ColumnHeader[] { columnHeaderMgName, columnHeaderMgId, columnHeaderMgActive });
-            modeGroupListView.ContextMenuStrip = mgContextMenu;
-            modeGroupListView.FullRowSelect = true;
-            modeGroupListView.Location = new Point(6, 33);
-            modeGroupListView.Name = "modeGroupListView";
-            modeGroupListView.Size = new Size(1199, 559);
-            modeGroupListView.TabIndex = 0;
-            modeGroupListView.UseCompatibleStateImageBehavior = false;
-            modeGroupListView.View = View.Details;
-            modeGroupListView.DoubleClick += modeGroupListView_DoubleClick;
-            modeGroupListView.KeyDown += GlobalShortcuts;
-            // 
-            // columnHeaderMgName
-            // 
-            columnHeaderMgName.Text = "Name";
-            columnHeaderMgName.Width = 400;
-            // 
-            // columnHeaderMgId
-            // 
-            columnHeaderMgId.Text = "ID";
-            columnHeaderMgId.Width = 80;
-            // 
-            // columnHeaderMgActive
-            // 
-            columnHeaderMgActive.Text = "Active Mode";
-            columnHeaderMgActive.Width = 300;
-            // 
-            // mgContextMenu
-            // 
-            mgContextMenu.ImageScalingSize = new Size(24, 24);
-            mgContextMenu.Items.AddRange(new ToolStripItem[] { mgNewMenuItem, toolStripMgSep1, mgEditMenuItem, toolStripMgSep2, mgDeleteMenuItem });
-            mgContextMenu.Name = "mgContextMenu";
-            mgContextMenu.Size = new Size(220, 120);
-            mgContextMenu.Opening += mgContextMenu_Opening;
-            // 
-            // mgNewMenuItem
-            // 
-            mgNewMenuItem.Name = "mgNewMenuItem";
-            mgNewMenuItem.Size = new Size(219, 32);
-            mgNewMenuItem.Text = "New ...";
-            mgNewMenuItem.Click += mgNewMenuItem_Click;
-            // 
-            // toolStripMgSep1
-            // 
-            toolStripMgSep1.Name = "toolStripMgSep1";
-            toolStripMgSep1.Size = new Size(216, 6);
-            // 
-            // mgEditMenuItem
-            // 
-            mgEditMenuItem.Name = "mgEditMenuItem";
-            mgEditMenuItem.Size = new Size(219, 32);
-            mgEditMenuItem.Text = "Edit Selected (double click) ...";
-            mgEditMenuItem.Click += mgEditMenuItem_Click;
-            // 
-            // toolStripMgSep2
-            // 
-            toolStripMgSep2.Name = "toolStripMgSep2";
-            toolStripMgSep2.Size = new Size(216, 6);
-            // 
-            // mgDeleteMenuItem
-            // 
-            mgDeleteMenuItem.Name = "mgDeleteMenuItem";
-            mgDeleteMenuItem.ShortcutKeys = Keys.Delete;
-            mgDeleteMenuItem.Size = new Size(219, 32);
-            mgDeleteMenuItem.Text = "Delete";
-            mgDeleteMenuItem.Click += mgDeleteMenuItem_Click;
-            // 
-            // labelModeGroups
-            // 
-            labelModeGroups.AutoSize = true;
-            labelModeGroups.Location = new Point(6, 5);
-            labelModeGroups.Name = "labelModeGroups";
-            labelModeGroups.Size = new Size(120, 25);
-            labelModeGroups.TabIndex = 1;
-            labelModeGroups.Text = "Mode Groups:";
+            labelGlobalStatuses.AutoSize = true;
+            labelGlobalStatuses.Location = new Point(6, 5);
+            labelGlobalStatuses.Name = "labelGlobalStatuses";
+            labelGlobalStatuses.Size = new Size(137, 25);
+            labelGlobalStatuses.TabIndex = 1;
+            labelGlobalStatuses.Text = "Global Statuses:";
             // 
             // globalStatusListView
             // 
@@ -764,82 +680,82 @@
             gsContextMenu.ImageScalingSize = new Size(24, 24);
             gsContextMenu.Items.AddRange(new ToolStripItem[] { gsNewMenuItem, toolStripMenuItem13, gsEditMenuItem, toolStripMenuItem14, gsDeleteMenuItem, toolStripMenuItem15, gsResetCounterMenuItem, toolStripMenuItem17, gsCopySelectedMenuItem, gsCopyAllMenuItem, toolStripMenuItem18, gsPasteOverMenuItem, gsPasteInsertMenuItem });
             gsContextMenu.Name = "gsContextMenu";
-            gsContextMenu.Size = new Size(220, 160);
+            gsContextMenu.Size = new Size(312, 290);
             gsContextMenu.Opening += gsContextMenu_Opening;
             // 
             // gsNewMenuItem
             // 
             gsNewMenuItem.Name = "gsNewMenuItem";
-            gsNewMenuItem.Size = new Size(219, 32);
+            gsNewMenuItem.Size = new Size(311, 32);
             gsNewMenuItem.Text = "New ...";
             gsNewMenuItem.Click += gsNewMenuItem_Click;
             // 
             // toolStripMenuItem13
             // 
             toolStripMenuItem13.Name = "toolStripMenuItem13";
-            toolStripMenuItem13.Size = new Size(216, 6);
+            toolStripMenuItem13.Size = new Size(308, 6);
             // 
             // gsEditMenuItem
             // 
             gsEditMenuItem.Name = "gsEditMenuItem";
-            gsEditMenuItem.Size = new Size(219, 32);
+            gsEditMenuItem.Size = new Size(311, 32);
             gsEditMenuItem.Text = "Edit Selected (double click) ...";
             gsEditMenuItem.Click += gsEditMenuItem_Click;
             // 
             // toolStripMenuItem14
             // 
             toolStripMenuItem14.Name = "toolStripMenuItem14";
-            toolStripMenuItem14.Size = new Size(216, 6);
+            toolStripMenuItem14.Size = new Size(308, 6);
             // 
             // gsDeleteMenuItem
             // 
             gsDeleteMenuItem.Name = "gsDeleteMenuItem";
             gsDeleteMenuItem.ShortcutKeys = Keys.Delete;
-            gsDeleteMenuItem.Size = new Size(219, 32);
+            gsDeleteMenuItem.Size = new Size(311, 32);
             gsDeleteMenuItem.Text = "Delete";
             gsDeleteMenuItem.Click += gsDeleteMenuItem_Click;
             // 
             // toolStripMenuItem15
             // 
             toolStripMenuItem15.Name = "toolStripMenuItem15";
-            toolStripMenuItem15.Size = new Size(216, 6);
+            toolStripMenuItem15.Size = new Size(308, 6);
             // 
             // gsResetCounterMenuItem
             // 
             gsResetCounterMenuItem.Name = "gsResetCounterMenuItem";
-            gsResetCounterMenuItem.Size = new Size(219, 32);
+            gsResetCounterMenuItem.Size = new Size(311, 32);
             gsResetCounterMenuItem.Text = "Reset ID Counter";
             gsResetCounterMenuItem.Click += gsResetCounterMenuItem_Click;
             // 
             // toolStripMenuItem17
             // 
             toolStripMenuItem17.Name = "toolStripMenuItem17";
-            toolStripMenuItem17.Size = new Size(216, 6);
+            toolStripMenuItem17.Size = new Size(308, 6);
             // 
             // gsCopySelectedMenuItem
             // 
             gsCopySelectedMenuItem.Name = "gsCopySelectedMenuItem";
             gsCopySelectedMenuItem.ShortcutKeys = Keys.Control | Keys.C;
-            gsCopySelectedMenuItem.Size = new Size(219, 32);
+            gsCopySelectedMenuItem.Size = new Size(311, 32);
             gsCopySelectedMenuItem.Text = "Copy Selected";
             gsCopySelectedMenuItem.Click += gsCopySelectedMenuItem_Click;
             // 
             // gsCopyAllMenuItem
             // 
             gsCopyAllMenuItem.Name = "gsCopyAllMenuItem";
-            gsCopyAllMenuItem.Size = new Size(219, 32);
+            gsCopyAllMenuItem.Size = new Size(311, 32);
             gsCopyAllMenuItem.Text = "Copy All";
             gsCopyAllMenuItem.Click += gsCopyAllMenuItem_Click;
             // 
             // toolStripMenuItem18
             // 
             toolStripMenuItem18.Name = "toolStripMenuItem18";
-            toolStripMenuItem18.Size = new Size(216, 6);
+            toolStripMenuItem18.Size = new Size(308, 6);
             // 
             // gsPasteOverMenuItem
             // 
             gsPasteOverMenuItem.Name = "gsPasteOverMenuItem";
-            gsPasteOverMenuItem.Size = new Size(219, 32);
+            gsPasteOverMenuItem.Size = new Size(311, 32);
             gsPasteOverMenuItem.Text = "Paste Over";
             gsPasteOverMenuItem.Click += gsPasteOverMenuItem_Click;
             // 
@@ -847,18 +763,99 @@
             // 
             gsPasteInsertMenuItem.Name = "gsPasteInsertMenuItem";
             gsPasteInsertMenuItem.ShortcutKeys = Keys.Control | Keys.V;
-            gsPasteInsertMenuItem.Size = new Size(219, 32);
+            gsPasteInsertMenuItem.Size = new Size(311, 32);
             gsPasteInsertMenuItem.Text = "Paste Insert";
             gsPasteInsertMenuItem.Click += gsPasteInsertMenuItem_Click;
             // 
-            // labelGlobalStatuses
+            // tabModes
             // 
-            labelGlobalStatuses.AutoSize = true;
-            labelGlobalStatuses.Location = new Point(6, 5);
-            labelGlobalStatuses.Name = "labelGlobalStatuses";
-            labelGlobalStatuses.Size = new Size(130, 25);
-            labelGlobalStatuses.TabIndex = 1;
-            labelGlobalStatuses.Text = "Global Statuses:";
+            tabModes.Controls.Add(labelModeGroups);
+            tabModes.Controls.Add(modeGroupListView);
+            tabModes.Location = new Point(4, 34);
+            tabModes.Name = "tabModes";
+            tabModes.Padding = new Padding(3);
+            tabModes.Size = new Size(1215, 598);
+            tabModes.TabIndex = 4;
+            tabModes.Text = "Modes";
+            // 
+            // labelModeGroups
+            // 
+            labelModeGroups.AutoSize = true;
+            labelModeGroups.Location = new Point(6, 5);
+            labelModeGroups.Name = "labelModeGroups";
+            labelModeGroups.Size = new Size(126, 25);
+            labelModeGroups.TabIndex = 1;
+            labelModeGroups.Text = "Mode Groups:";
+            // 
+            // modeGroupListView
+            // 
+            modeGroupListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            modeGroupListView.Columns.AddRange(new ColumnHeader[] { columnHeaderMgName, columnHeaderMgId, columnHeaderMgActive });
+            modeGroupListView.ContextMenuStrip = mgContextMenu;
+            modeGroupListView.FullRowSelect = true;
+            modeGroupListView.Location = new Point(6, 33);
+            modeGroupListView.Name = "modeGroupListView";
+            modeGroupListView.Size = new Size(1199, 559);
+            modeGroupListView.TabIndex = 0;
+            modeGroupListView.UseCompatibleStateImageBehavior = false;
+            modeGroupListView.View = View.Details;
+            modeGroupListView.DoubleClick += modeGroupListView_DoubleClick;
+            modeGroupListView.KeyDown += GlobalShortcuts;
+            // 
+            // columnHeaderMgName
+            // 
+            columnHeaderMgName.Text = "Name";
+            columnHeaderMgName.Width = 400;
+            // 
+            // columnHeaderMgId
+            // 
+            columnHeaderMgId.Text = "ID";
+            columnHeaderMgId.Width = 80;
+            // 
+            // columnHeaderMgActive
+            // 
+            columnHeaderMgActive.Text = "Active Mode";
+            columnHeaderMgActive.Width = 300;
+            // 
+            // mgContextMenu
+            // 
+            mgContextMenu.ImageScalingSize = new Size(24, 24);
+            mgContextMenu.Items.AddRange(new ToolStripItem[] { mgNewMenuItem, toolStripMgSep1, mgEditMenuItem, toolStripMgSep2, mgDeleteMenuItem });
+            mgContextMenu.Name = "mgContextMenu";
+            mgContextMenu.Size = new Size(312, 112);
+            mgContextMenu.Opening += mgContextMenu_Opening;
+            // 
+            // mgNewMenuItem
+            // 
+            mgNewMenuItem.Name = "mgNewMenuItem";
+            mgNewMenuItem.Size = new Size(311, 32);
+            mgNewMenuItem.Text = "New ...";
+            mgNewMenuItem.Click += mgNewMenuItem_Click;
+            // 
+            // toolStripMgSep1
+            // 
+            toolStripMgSep1.Name = "toolStripMgSep1";
+            toolStripMgSep1.Size = new Size(308, 6);
+            // 
+            // mgEditMenuItem
+            // 
+            mgEditMenuItem.Name = "mgEditMenuItem";
+            mgEditMenuItem.Size = new Size(311, 32);
+            mgEditMenuItem.Text = "Edit Selected (double click) ...";
+            mgEditMenuItem.Click += mgEditMenuItem_Click;
+            // 
+            // toolStripMgSep2
+            // 
+            toolStripMgSep2.Name = "toolStripMgSep2";
+            toolStripMgSep2.Size = new Size(308, 6);
+            // 
+            // mgDeleteMenuItem
+            // 
+            mgDeleteMenuItem.Name = "mgDeleteMenuItem";
+            mgDeleteMenuItem.ShortcutKeys = Keys.Delete;
+            mgDeleteMenuItem.Size = new Size(311, 32);
+            mgDeleteMenuItem.Text = "Delete";
+            mgDeleteMenuItem.Click += mgDeleteMenuItem_Click;
             // 
             // tabXBox
             // 
@@ -869,7 +866,8 @@
             tabXBox.Padding = new Padding(3);
             tabXBox.Size = new Size(1215, 598);
             tabXBox.TabIndex = 1;
-            tabXBox.Text = "XBox Axis Binding";            // 
+            tabXBox.Text = "XBox Axis Binding";
+            // 
             // bindingListView
             // 
             bindingListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -1024,6 +1022,29 @@
             textNotes.TabIndex = 0;
             textNotes.TextChanged += textNotes_TextChanged;
             // 
+            // tabSettings
+            // 
+            tabSettings.BackColor = SystemColors.Control;
+            tabSettings.Controls.Add(chkHideControllers);
+            tabSettings.Location = new Point(4, 34);
+            tabSettings.Name = "tabSettings";
+            tabSettings.Padding = new Padding(3);
+            tabSettings.Size = new Size(1215, 598);
+            tabSettings.TabIndex = 5;
+            tabSettings.Text = "Settings";
+            // 
+            // chkHideControllers
+            // 
+            chkHideControllers.AutoSize = true;
+            chkHideControllers.Enabled = false;
+            chkHideControllers.Location = new Point(10, 10);
+            chkHideControllers.Name = "chkHideControllers";
+            chkHideControllers.Size = new Size(362, 29);
+            chkHideControllers.TabIndex = 0;
+            chkHideControllers.Text = "Hide controllers from games when active";
+            chkHideControllers.UseVisualStyleBackColor = true;
+            chkHideControllers.CheckedChanged += chkHideControllers_CheckedChanged;
+            // 
             // statusStrip1
             // 
             statusStrip1.ImageScalingSize = new Size(24, 24);
@@ -1072,14 +1093,17 @@
             tabEvents.PerformLayout();
             tabGlobalStatuses.ResumeLayout(false);
             tabGlobalStatuses.PerformLayout();
+            gsContextMenu.ResumeLayout(false);
             tabModes.ResumeLayout(false);
             tabModes.PerformLayout();
+            mgContextMenu.ResumeLayout(false);
             tabXBox.ResumeLayout(false);
             tabXBox.PerformLayout();
             bindingContextMenu.ResumeLayout(false);
-            gsContextMenu.ResumeLayout(false);
             tabNotes.ResumeLayout(false);
             tabNotes.PerformLayout();
+            tabSettings.ResumeLayout(false);
+            tabSettings.PerformLayout();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             ResumeLayout(false);
@@ -1141,7 +1165,6 @@
         private ToolStripMenuItem suspendSelectedToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem7;
         private ToolStripMenuItem editControllerFamiliesToolStripMenuItem;
-        private ToolStripMenuItem hideDevicesToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem8;
         private TabControl tabControl;
         private TabPage tabEvents;
@@ -1201,5 +1224,7 @@
         private ColumnHeader columnHeader8;
         private TabPage tabNotes;
         private TextBox textNotes;
+        private TabPage tabSettings;
+        private CheckBox chkHideControllers;
     }
 }

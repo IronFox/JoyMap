@@ -220,47 +220,44 @@ namespace JoyMap
         private void Rebuild()
         {
             var hasName = !string.IsNullOrWhiteSpace(textName.Text);
-            var hasTriggers = Triggers.Count > 0;
             var hasActions = actionListView.Items.Count > 0;
-            btnOk.Enabled = hasName && hasTriggers && hasActions;
-            if (btnOk.Enabled)
-            {
-                var actions = actionListView.Items.ToEnumerable()
-                        .Select(x => x.Tag as EventAction!)
-                        .Where(x => x is not null).ToList();
-                var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, this.Triggers.Select(x => x.Trigger).ToList(), GlobalResolvers, out var combinerError);
-                if (tCombiner is null)
-                {
-                    SetStatus(combinerError ?? "Invalid combiner expression.", isError: true);
-                    btnOk.Enabled = false;
-                    Result = null;
-                    return;
-                }
 
-                SetStatus("");
-                var eventObj = new EventInstance(
-                    Event: new(
-                        TriggerCombiner: triggerCombiner.Text,
-                        Name: textName.Text.Trim(),
-                        Triggers: this.Triggers.Select(x => x.Trigger.Trigger).ToList(),
-                        Actions: actions!
-                    ),
-                    TriggerInstances: this.Triggers.Select(x => x.Trigger).ToList(),
-                    IsTriggered: tCombiner
-                    )
-                {
-                    IsSuspended = Suspended
-                };
-                Result = eventObj;
-            }
-            else
+            if (!hasName || !hasActions)
             {
-                var reason = !hasName ? "A name is required."
-                    : !hasTriggers ? "Add at least one trigger."
-                    : "Add at least one action.";
-                SetStatus(reason);
+                btnOk.Enabled = false;
+                SetStatus(!hasName ? "A name is required." : "Add at least one action.");
                 Result = null;
+                return;
             }
+
+            var triggerList = this.Triggers.Select(x => x.Trigger).ToList();
+            var tCombiner = EventProcessor.BuildTriggerCombiner(triggerCombiner.Text, triggerList, GlobalResolvers, out var combinerError);
+            if (tCombiner is null)
+            {
+                SetStatus(combinerError ?? "Invalid combiner expression.", isError: true);
+                btnOk.Enabled = false;
+                Result = null;
+                return;
+            }
+
+            SetStatus("");
+            btnOk.Enabled = true;
+            var actions = actionListView.Items.ToEnumerable()
+                .Select(x => x.Tag as EventAction!)
+                .Where(x => x is not null).ToList();
+            Result = new EventInstance(
+                Event: new(
+                    TriggerCombiner: triggerCombiner.Text,
+                    Name: textName.Text.Trim(),
+                    Triggers: triggerList.Select(x => x.Trigger).ToList(),
+                    Actions: actions!
+                ),
+                TriggerInstances: triggerList,
+                IsTriggered: tCombiner
+                )
+            {
+                IsSuspended = Suspended
+            };
         }
 
         private void SetStatus(string message, bool isError = false)

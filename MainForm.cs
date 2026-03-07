@@ -67,6 +67,7 @@ namespace JoyMap
         protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e)
         {
             base.OnFormClosed(e);
+            HidHideService.RevealSessionBlocked();
             GlobalKeyboardHook.Uninstall();
             InputMonitor.Dispose();
         }
@@ -178,7 +179,10 @@ namespace JoyMap
 
                     row.Bind(bound, false);
                 }
+                chkHideControllers.Checked = profile.HideControllers;
+                chkHideControllers.Enabled = true;
             });
+            ApplyHidingForCurrentProfile();
         }
 
         private void btnAddPickWindow_Click(object sender, EventArgs e)
@@ -258,6 +262,9 @@ namespace JoyMap
             btnUp.Enabled = false;
             btnDown.Enabled = false;
             btnDeleteCurrentProfile.Enabled = false;
+            chkHideControllers.Checked = false;
+            chkHideControllers.Enabled = false;
+            HidHideService.RevealSessionBlocked();
         }
 
         private void eventListView_SelectedIndexChanged(object sender, EventArgs e)
@@ -370,8 +377,12 @@ namespace JoyMap
 
                 if (match != null && match.Profile.Id != ActiveProfile.Id)
                 {
-                    cbProfile.SelectedIndex = cbProfile.Items.ToEnumerable().ToList().FindIndex(x => (x as ProfileSelection)?.Profile.Id == match.Profile.Id);
-                    //LoadProfile(WorkProfile.Load(match));
+                    var switchProfile = Registry.ToWorkProfile(match);
+                    if (switchProfile is not null)
+                    {
+                        cbProfile.SelectedIndex = cbProfile.Items.ToEnumerable().ToList().FindIndex(x => (x as ProfileSelection)?.Profile.Id == match.Profile.Id);
+                        LoadProfile(switchProfile);
+                    }
                 }
                 GameNotFocused =
                     SuppressIfGameIsNotFocused && (match is null || !match.Is(focusedWindow));
@@ -779,10 +790,46 @@ namespace JoyMap
             form.ShowDialog(this);
         }
 
-        private void hideDevicesToolStripMenuItem_Click(object sender, EventArgs e)
+        internal void ApplyHidingForCurrentProfile()
         {
-            using var form = new HideDevicesForm();
-            form.ShowDialog(this);
+            if (ActiveProfile?.HideControllers == true)
+            {
+                HidHideService.RevealSessionBlocked();
+                var guids = CollectProductGuids(ActiveProfile);
+                HidHideService.HideForProfile(guids);
+            }
+            else
+                HidHideService.RevealSessionBlocked();
+        }
+
+        private static IReadOnlyList<Guid> CollectProductGuids(IProfileInstance p)
+        {
+            var guids = new HashSet<Guid>();
+            foreach (var b in p.XBoxAxisBindings)
+                foreach (var i in b.InputInstances)
+                {
+                    var guid = i.Input.InputId.ControllerId.ProductGuid;
+                    if (guid != Guid.Empty)
+                        guids.Add(guid);
+                }
+            foreach (var ev in p.EventInstances)
+                foreach (var t in ev.TriggerInstances)
+                {
+                    var guid = t.Trigger.InputId.ControllerId.ProductGuid;
+                    if (guid != Guid.Empty)
+                        guids.Add(guid);
+                }
+            return [.. guids];
+        }
+
+        private void chkHideControllers_CheckedChanged(object sender, EventArgs e)
+        {
+            if (NoEventFlag)
+                return;
+            if (ActiveProfile is null)
+                return;
+            ActiveProfile.History.ExecuteAction(
+                new SetHideControllersAction(this, ActiveProfile, chkHideControllers, chkHideControllers.Checked));
         }
 
         internal static void Log(string status, Exception? ex = null)

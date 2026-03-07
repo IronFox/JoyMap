@@ -212,7 +212,8 @@ namespace JoyMap.Profile
                 NextGlobalStatusId = profile.Profile.NextGlobalStatusId,
                 ModeGroups = [.. profile.ModeGroupInstances],
                 NextModeGroupId = profile.Profile.NextModeGroupId,
-                NextModeEntryId = profile.Profile.NextModeEntryId
+                NextModeEntryId = profile.Profile.NextModeEntryId,
+                HideControllers = profile.Profile.HideControllers
             };
             if (slot is not null)
                 slot.WorkProfile = workProfile;
@@ -220,34 +221,6 @@ namespace JoyMap.Profile
                 Profiles[workProfile.Id] = new() { Id = workProfile.Id, Profile = profile.Profile, Loaded = profile, WorkProfile = workProfile };
 
             return workProfile;
-        }
-
-        public static void SaveHiddenProducts(IEnumerable<ControllerTracking.Product> products)
-        {
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = Path.Combine(documents, "JoyMap");
-            Directory.CreateDirectory(dir);
-            var path = Path.Combine(dir, "HiddenDevices.json");
-            var json = JsonUtil.Serialize(products);
-            File.WriteAllText(path, json);
-        }
-
-        public static IReadOnlyList<ControllerTracking.Product> LoadHiddenProducts()
-        {
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = Path.Combine(documents, "JoyMap");
-            var path = Path.Combine(dir, "HiddenDevices.json");
-            if (!File.Exists(path))
-                return [];
-            var json = File.ReadAllText(path);
-            try
-            {
-                return JsonUtil.Deserialize<List<ControllerTracking.Product>>(json);
-            }
-            catch (JsonException)
-            {
-                return [];
-            }
         }
     }
 }
