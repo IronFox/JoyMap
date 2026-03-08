@@ -69,7 +69,7 @@ The **Settings** tab contains additional per-profile options.
 
 The most obvious reason is to prevent duplicate inputs when JoyMap is emitting a virtual Xbox 360 controller: without hiding, the game would see both the physical joystick and the virtual Xbox controller and process both simultaneously.
 
-A less obvious reason is that some games treat *any* connected controller as an Xbox controller regardless of what it actually is. This is rare, but when it occurs the game will attempt to read the physical joystick using the Xbox axis/button layout, producing scrambled or unintended input — and hiding becomes the only way to use JoyMap with that game at all. Hiding the physical controller forces the game to interact solely with JoyMap's properly-mapped virtual Xbox controller, even when JoyMap is not using any Xbox axis bindings.
+A less obvious reason is that some games treat *any* connected controller as an Xbox controller regardless of what it actually is. This is rare, but when it occurs the game will attempt to read the physical joystick using the Xbox axis/button layout, producing scrambled or unintended input. Hiding the physical controller removes it from the game's view entirely, eliminating the scrambled input — leaving only whatever JoyMap actually provides (keyboard/mouse actions, a virtual Xbox controller if configured, or both).
 
 **Profile Selection:**
 - Use the **Profile:** dropdown to manually switch profiles
