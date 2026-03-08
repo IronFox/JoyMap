@@ -55,6 +55,22 @@ A **profile** is the core configuration that defines all input mappings for a sp
 - **Window Name Regex**: Regular expression matching the window title
 - **Note**: At least one regex (process or window) must match for auto-activation. Empty regex matches everything.
 
+#### Settings Tab
+
+The **Settings** tab contains additional per-profile options.
+
+**Hide controllers from games when active:**
+- When checked, JoyMap uses the **HidHide** driver to hide all physical controllers referenced in this profile's triggers and axis bindings from other applications while the profile is active
+- Games will no longer see the physical joystick/gamepad at all while the profile is active
+- When the profile deactivates (window unfocused or profile switched), the physical controllers are automatically made visible again
+- The checkbox is disabled if HidHide is not detected; install the driver from https://github.com/nefarius/HidHide/releases to enable it
+
+**Why hiding is useful:**
+
+The most obvious reason is to prevent duplicate inputs when JoyMap is emitting a virtual Xbox 360 controller: without hiding, the game would see both the physical joystick and the virtual Xbox controller and process both simultaneously.
+
+A less obvious reason is that some games treat *any* connected controller as an Xbox controller regardless of what it actually is. This is rare, but when it occurs the game will attempt to read the physical joystick using the Xbox axis/button layout, producing scrambled or unintended input — and hiding becomes the only way to use JoyMap with that game at all. Hiding the physical controller forces the game to interact solely with JoyMap's properly-mapped virtual Xbox controller, even when JoyMap is not using any Xbox axis bindings.
+
 **Profile Selection:**
 - Use the **Profile:** dropdown to manually switch profiles
 - Profiles auto-activate when you focus a matching window
@@ -701,6 +717,34 @@ Input: 80% ┌────────┐┌────────┐┌──
 | Timing: Hold=300ms, Gap=100ms | Key held 300ms, gap 100ms, repeating while active |
 | Timing: Hold=200ms, Gap=200ms, delay 500ms | Holds Space 500ms, then cycles 200ms on / 200ms off |
 | Timing: Hold=500ms, Gap=50ms, limit 3 | 3 slow presses (500ms held, 50ms gap each), last press held |
+
+#### On-Change Action
+
+The Action Dialog has a second mode — **On-Change** — available via its second tab. Instead of holding a key for the duration of the event, On-Change fires a brief key press on each edge transition of the event combiner.
+
+**Configuration:**
+| Field | Description | Default |
+|-------|-------------|---------|
+| **Name** | Action identifier | - |
+| **Initial Delay (ms)** | Wait X ms before the first (rising) press fires | 0 |
+| **Rising Key/Button** | Key pressed when the event activates (false → true transition) | None |
+| **Different Falling Key** | When checked, use a separate key for deactivation | Off |
+| **Falling Key/Button** | Key pressed when the event deactivates (true → false transition); only if **Different Falling Key** is checked | (same as rising) |
+| **Press Duration (ms)** | How long each triggered key press is held before release | 100 |
+
+**How it works:**
+- On the **rising edge** (combiner transitions inactive → active), the rising key is pressed for `Press Duration` ms and then released
+- On the **falling edge** (combiner transitions active → inactive), the falling key (or the same rising key if no separate falling key is set) is pressed for `Press Duration` ms and then released
+- No key is held between edges; each transition produces exactly one brief press
+- The `Initial Delay` postpones the first rising press; the falling press is never delayed
+
+**Common use case:** A game that uses a single key to **toggle** between walk and run. Map that toggle key to an On-Change action: one press fires when the stick crosses the trigger threshold (rising edge), and one press fires when it falls back below it (falling edge).
+
+> ⚠ **Reliability and resynchronization:** On-change triggers are of **low reliability** by nature. JoyMap fires key presses on transitions of its own combiner state, but has no visibility into the game's internal state — the game receives blind key presses with no acknowledgement. If any press is missed (during loading, a cutscene, a brief window-focus loss, or any in-game input suppression), JoyMap's edge timing and the game's actual toggle state will **diverge**. Every subsequent press will then toggle the wrong direction until the states are manually re-aligned.
+>
+> Resynchronization requires a deliberate player action — a full character stop, a manual key press, or any other action that forces the game back to a known state. Expect this to become necessary when using on-change triggers regularly.
+>
+> **Recommendation:** Check your game's settings for a **"hold to run"** (or "hold to walk", or any toggle → hold equivalent) option. Most — though not all — games provide this. Switching to a hold-based control scheme eliminates all synchronization issues entirely: the physical input is held while the stick is pushed, and the game mirrors that state directly. If your game supports it, prefer **Hold Mode** over On-Change triggers.
 
 ### Undo/Redo
 
