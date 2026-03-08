@@ -43,11 +43,14 @@ namespace JoyMap.Profile
     }
 
     public record ChangeTriggerInputEffect(
-        KeyOrButton Keys
+        KeyOrButton Keys,
+        KeyOrButton? FallingKeys = null,
+        float PressDurationMs = 100f
         ) : IJsonCompatible
     {
         [JsonIgnore]
-        public string Action =>
-                $"On Change: {Keys}";
+        public string Action => FallingKeys is null || FallingKeys.Value == Keys
+            ? $"On Change: {Keys} ({PressDurationMs}ms)"
+            : $"On Change: \u2191{Keys} \u2193{FallingKeys} ({PressDurationMs}ms)";
     }
 }

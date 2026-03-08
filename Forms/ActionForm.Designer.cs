@@ -48,9 +48,15 @@
             btnSimplePickKey = new Button();
             label3 = new Label();
             tpTrigger = new TabPage();
-            comboOnChangeKey = new ComboBox();
-            btnChangeTriggerKeySelect = new Button();
-            label4 = new Label();
+            labelOnChangePressDuration = new Label();
+            textOnChangePressDurationMs = new TextBox();
+            labelOnChangeRisingKey = new Label();
+            comboOnChangeRisingKey = new ComboBox();
+            btnOnChangeRisingKeyPick = new Button();
+            cbOnChangeDifferentFallingKey = new CheckBox();
+            labelOnChangeFallingKey = new Label();
+            comboOnChangeFallingKey = new ComboBox();
+            btnOnChangeFallingKeyPick = new Button();
             label1 = new Label();
             textDelay = new TextBox();
             textName = new TextBox();
@@ -274,9 +280,15 @@
             // 
             // tpTrigger
             // 
-            tpTrigger.Controls.Add(comboOnChangeKey);
-            tpTrigger.Controls.Add(btnChangeTriggerKeySelect);
-            tpTrigger.Controls.Add(label4);
+            tpTrigger.Controls.Add(labelOnChangePressDuration);
+            tpTrigger.Controls.Add(textOnChangePressDurationMs);
+            tpTrigger.Controls.Add(labelOnChangeRisingKey);
+            tpTrigger.Controls.Add(comboOnChangeRisingKey);
+            tpTrigger.Controls.Add(btnOnChangeRisingKeyPick);
+            tpTrigger.Controls.Add(cbOnChangeDifferentFallingKey);
+            tpTrigger.Controls.Add(labelOnChangeFallingKey);
+            tpTrigger.Controls.Add(comboOnChangeFallingKey);
+            tpTrigger.Controls.Add(btnOnChangeFallingKeyPick);
             tpTrigger.Location = new Point(4, 34);
             tpTrigger.Name = "tpTrigger";
             tpTrigger.Padding = new Padding(3);
@@ -284,35 +296,94 @@
             tpTrigger.TabIndex = 1;
             tpTrigger.Text = "On Change Trigger";
             // 
-            // comboOnChangeKey
+            // labelOnChangePressDuration
             // 
-            comboOnChangeKey.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboOnChangeKey.FormattingEnabled = true;
-            comboOnChangeKey.Location = new Point(148, 10);
-            comboOnChangeKey.Name = "comboOnChangeKey";
-            comboOnChangeKey.Size = new Size(499, 33);
-            comboOnChangeKey.TabIndex = 37;
-            comboOnChangeKey.SelectedIndexChanged += AnyInputChanged;
+            labelOnChangePressDuration.AutoSize = true;
+            labelOnChangePressDuration.Location = new Point(6, 9);
+            labelOnChangePressDuration.Name = "labelOnChangePressDuration";
+            labelOnChangePressDuration.TabIndex = 29;
+            labelOnChangePressDuration.Text = "Press Duration (ms):";
             // 
-            // btnChangeTriggerKeySelect
+            // textOnChangePressDurationMs
             // 
-            btnChangeTriggerKeySelect.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnChangeTriggerKeySelect.Location = new Point(653, 8);
-            btnChangeTriggerKeySelect.Name = "btnChangeTriggerKeySelect";
-            btnChangeTriggerKeySelect.Size = new Size(112, 34);
-            btnChangeTriggerKeySelect.TabIndex = 31;
-            btnChangeTriggerKeySelect.Text = "Pick ...";
-            btnChangeTriggerKeySelect.UseVisualStyleBackColor = true;
-            btnChangeTriggerKeySelect.Click += btnChangeTriggerKeySelect_Click;
+            textOnChangePressDurationMs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            textOnChangePressDurationMs.Location = new Point(180, 6);
+            textOnChangePressDurationMs.Name = "textOnChangePressDurationMs";
+            textOnChangePressDurationMs.Size = new Size(582, 31);
+            textOnChangePressDurationMs.TabIndex = 30;
+            textOnChangePressDurationMs.Text = "100";
+            textOnChangePressDurationMs.TextChanged += AnyInputChanged;
             // 
-            // label4
+            // labelOnChangeRisingKey
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(6, 13);
-            label4.Name = "label4";
-            label4.Size = new Size(104, 25);
-            label4.TabIndex = 29;
-            label4.Text = "Key/Button:";
+            labelOnChangeRisingKey.AutoSize = true;
+            labelOnChangeRisingKey.Location = new Point(6, 47);
+            labelOnChangeRisingKey.Name = "labelOnChangeRisingKey";
+            labelOnChangeRisingKey.TabIndex = 31;
+            labelOnChangeRisingKey.Text = "Rising Key:";
+            // 
+            // comboOnChangeRisingKey
+            // 
+            comboOnChangeRisingKey.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboOnChangeRisingKey.FormattingEnabled = true;
+            comboOnChangeRisingKey.Location = new Point(148, 44);
+            comboOnChangeRisingKey.Name = "comboOnChangeRisingKey";
+            comboOnChangeRisingKey.Size = new Size(499, 33);
+            comboOnChangeRisingKey.TabIndex = 32;
+            comboOnChangeRisingKey.SelectedIndexChanged += AnyInputChanged;
+            // 
+            // btnOnChangeRisingKeyPick
+            // 
+            btnOnChangeRisingKeyPick.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnOnChangeRisingKeyPick.Location = new Point(653, 42);
+            btnOnChangeRisingKeyPick.Name = "btnOnChangeRisingKeyPick";
+            btnOnChangeRisingKeyPick.Size = new Size(112, 34);
+            btnOnChangeRisingKeyPick.TabIndex = 33;
+            btnOnChangeRisingKeyPick.Text = "Pick ...";
+            btnOnChangeRisingKeyPick.UseVisualStyleBackColor = true;
+            btnOnChangeRisingKeyPick.Click += btnOnChangeRisingKeyPick_Click;
+            // 
+            // cbOnChangeDifferentFallingKey
+            // 
+            cbOnChangeDifferentFallingKey.AutoSize = true;
+            cbOnChangeDifferentFallingKey.Location = new Point(6, 84);
+            cbOnChangeDifferentFallingKey.Name = "cbOnChangeDifferentFallingKey";
+            cbOnChangeDifferentFallingKey.TabIndex = 34;
+            cbOnChangeDifferentFallingKey.Text = "Different key for falling flank:";
+            cbOnChangeDifferentFallingKey.UseVisualStyleBackColor = true;
+            cbOnChangeDifferentFallingKey.CheckedChanged += cbOnChangeDifferentFallingKey_CheckedChanged;
+            // 
+            // labelOnChangeFallingKey
+            // 
+            labelOnChangeFallingKey.AutoSize = true;
+            labelOnChangeFallingKey.Enabled = false;
+            labelOnChangeFallingKey.Location = new Point(6, 123);
+            labelOnChangeFallingKey.Name = "labelOnChangeFallingKey";
+            labelOnChangeFallingKey.TabIndex = 35;
+            labelOnChangeFallingKey.Text = "Falling Key:";
+            // 
+            // comboOnChangeFallingKey
+            // 
+            comboOnChangeFallingKey.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboOnChangeFallingKey.Enabled = false;
+            comboOnChangeFallingKey.FormattingEnabled = true;
+            comboOnChangeFallingKey.Location = new Point(148, 120);
+            comboOnChangeFallingKey.Name = "comboOnChangeFallingKey";
+            comboOnChangeFallingKey.Size = new Size(499, 33);
+            comboOnChangeFallingKey.TabIndex = 36;
+            comboOnChangeFallingKey.SelectedIndexChanged += AnyInputChanged;
+            // 
+            // btnOnChangeFallingKeyPick
+            // 
+            btnOnChangeFallingKeyPick.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnOnChangeFallingKeyPick.Enabled = false;
+            btnOnChangeFallingKeyPick.Location = new Point(653, 118);
+            btnOnChangeFallingKeyPick.Name = "btnOnChangeFallingKeyPick";
+            btnOnChangeFallingKeyPick.Size = new Size(112, 34);
+            btnOnChangeFallingKeyPick.TabIndex = 37;
+            btnOnChangeFallingKeyPick.Text = "Pick ...";
+            btnOnChangeFallingKeyPick.UseVisualStyleBackColor = true;
+            btnOnChangeFallingKeyPick.Click += btnOnChangeFallingKeyPick_Click;
             // 
             // label1
             // 
@@ -416,10 +487,16 @@
         private TextBox textSimpleAutoTriggerDelayedStartMs;
         private CheckBox cbSimpleAutoTriggerDelayedStart;
         private TabPage tpTrigger;
-        private Button btnChangeTriggerKeySelect;
-        private Label label4;
+        private Label labelOnChangePressDuration;
+        private TextBox textOnChangePressDurationMs;
+        private Label labelOnChangeRisingKey;
+        private ComboBox comboOnChangeRisingKey;
+        private Button btnOnChangeRisingKeyPick;
+        private CheckBox cbOnChangeDifferentFallingKey;
+        private Label labelOnChangeFallingKey;
+        private ComboBox comboOnChangeFallingKey;
+        private Button btnOnChangeFallingKeyPick;
         private ComboBox comboSimpleKey;
-        private ComboBox comboOnChangeKey;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel;
         private CheckBox cbSimpleAutoTriggerTiming;
