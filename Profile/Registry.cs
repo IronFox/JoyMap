@@ -83,22 +83,14 @@ namespace JoyMap.Profile
             {
                 var list = JsonUtil.Deserialize<List<Profile>>(json);
                 Profiles.Clear();
-                bool anyDropped = false;
                 foreach (var p in list)
                 {
-                    if (p.Events.Count == 0)
-                    {
-                        anyDropped = true;
-                        continue;
-                    }
                     Profiles[p.Id] = new()
                     {
                         Id = p.Id,
                         Profile = p,
                     };
                 }
-                if (anyDropped)
-                    SaveAll();
             }
             catch (JsonException)
             {

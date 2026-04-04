@@ -2,6 +2,7 @@ using JoyMap.ControllerTracking;
 using JoyMap.Extensions;
 using JoyMap.Forms;
 using JoyMap.Profile;
+using JoyMap.Undo;
 using JoyMap.Undo.Action;
 using JoyMap.Undo.Action.Binding;
 using JoyMap.Undo.Action.EventAction;
@@ -23,12 +24,14 @@ namespace JoyMap
         }
 
 
+        internal UndoHistory GlobalHistory { get; } = new();
+
         internal InputMonitor InputMonitor { get; }
 
 
-        public void RefreshProfileList()
+        public void RefreshProfileList(Guid? selectId = null)
         {
-            var selectedProfileId = ActiveProfile?.Id;
+            var selectedProfileId = selectId ?? ActiveProfile?.Id;
             var allProfiles = Registry.GetAllProfiles().Select(x => new ProfileSelection(x)).ToArray();
             cbProfile.Items.Clear();
             cbProfile.Items.AddRange(allProfiles);
@@ -51,6 +54,7 @@ namespace JoyMap
         {
             Instance = this;
             InitializeComponent();
+            try { Directory.CreateDirectory(Path.GetDirectoryName(LogFilePath)!); File.WriteAllText(LogFilePath, ""); } catch { }
             var families = Registry.LoadAll();
                 InputMonitor = new InputMonitor(Handle, families);
                 GlobalKeyboardHook.Install();
@@ -244,7 +248,7 @@ namespace JoyMap
             }
         }
 
-        private void Flush()
+        internal void Flush()
         {
             if (ActiveProfile is not null)
                 ProfileExecution.Stop();
@@ -337,12 +341,15 @@ namespace JoyMap
 
         }
 
+        private string _lastDiagnostic = "";
+
         private void statusTimer_Tick(object sender, EventArgs e)
         {
             if (ActiveProfile is null)
                 return;
-            var lastOpenedForm = Application.OpenForms.Cast<Form>().Last();
-            JoyMapIsFocused = lastOpenedForm.ContainsFocus;
+            var focusedWindow = FocusPredicate.Get();
+            var fgHwnd = focusedWindow.Focused?.WindowHandle ?? IntPtr.Zero;
+            JoyMapIsFocused = WindowReference.AnyOwnedByProcess(fgHwnd, Environment.ProcessId);
 
             if (JoyMapIsFocused)
             {
@@ -367,9 +374,6 @@ namespace JoyMap
                     row.SubItems[2].Text = GetGatedOutput(map, BuildGlobalStatusRefs());
                 }
             }
-
-
-            var focusedWindow = FocusPredicate.Get();
             if (focusedWindow.Any)
             {
 
@@ -386,6 +390,17 @@ namespace JoyMap
                 }
                 GameNotFocused =
                     SuppressIfGameIsNotFocused && (match is null || !match.Is(focusedWindow));
+
+                var diag = $"JoyMapFocused={JoyMapIsFocused} GameNotFocused={GameNotFocused} " +
+                           $"Focused={focusedWindow.Focused?.ProcessName ?? "null"} " +
+                           $"TopMost={focusedWindow.TopMost?.ProcessName ?? "null"} " +
+                           $"Match={match?.Profile.Name ?? "null"} " +
+                           $"Active={ProfileExecution.IsActive}";
+                if (diag != _lastDiagnostic)
+                {
+                    _lastDiagnostic = diag;
+                    Log(diag);
+                }
             }
             else
                 GameNotFocused = SuppressIfGameIsNotFocused;
@@ -707,16 +722,36 @@ namespace JoyMap
 
         private void btnDeleteCurrentProfile_Click(object sender, EventArgs e)
         {
+            deleteCurrentProfileMenuItem_Click(sender, e);
+        }
+
+        private void deleteCurrentProfileMenuItem_Click(object sender, EventArgs e)
+        {
             if (ActiveProfile is null)
                 return;
-            if (MessageBox.Show(this, $"Are you sure you want to delete profile '{ActiveProfile.Name}'? This operation cannot be undone!", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            if (MessageBox.Show(this, $"Are you sure you want to delete profile '{ActiveProfile.Name}'?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                var profileId = ActiveProfile.Id;
-                Flush();
-                Registry.DeleteProfile(profileId);
-                RefreshProfileList();
+                GlobalHistory.ExecuteAction(new DeleteProfileAction(this, ActiveProfile));
             }
+        }
 
+        private void profilesToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            deleteCurrentProfileMenuItem.Enabled = ActiveProfile is not null;
+            profileUndoMenuItem.Enabled = GlobalHistory.CanUndo;
+            profileRedoMenuItem.Enabled = GlobalHistory.CanRedo;
+            profileUndoMenuItem.Text = GlobalHistory.NextUndoName is not null ? $"Undo {GlobalHistory.NextUndoName}" : "Undo Profile Deletion";
+            profileRedoMenuItem.Text = GlobalHistory.NextRedoName is not null ? $"Redo {GlobalHistory.NextRedoName}" : "Redo Profile Deletion";
+        }
+
+        private void profileUndoMenuItem_Click(object sender, EventArgs e)
+        {
+            GlobalHistory.Undo();
+        }
+
+        private void profileRedoMenuItem_Click(object sender, EventArgs e)
+        {
+            GlobalHistory.Redo();
         }
 
 
@@ -832,6 +867,10 @@ namespace JoyMap
                 new SetHideControllersAction(this, ActiveProfile, chkHideControllers, chkHideControllers.Checked));
         }
 
+        private static readonly string LogFilePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            "JoyMap", "joymap.log");
+
         internal static void Log(string status, Exception? ex = null)
         {
             if (Instance is null)
@@ -843,11 +882,19 @@ namespace JoyMap
                 return;
             }
 
-            var timestamp = DateTime.Now.ToString("HH:mm:ss");
+            var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+            string line;
             if (ex is not null)
-                Instance.toolStripStatusLabel1.Text = $"[{timestamp}] {status}: {ex.Message}";
+            {
+                line = $"[{timestamp}] {status}: {ex.Message}";
+                Instance.toolStripStatusLabel1.Text = line;
+            }
             else
-                Instance.toolStripStatusLabel1.Text = $"[{timestamp}] {status}";
+            {
+                line = $"[{timestamp}] {status}";
+                Instance.toolStripStatusLabel1.Text = line;
+            }
+            try { File.AppendAllText(LogFilePath, line + Environment.NewLine); } catch { }
         }
 
         private void tsmEditBinding_Click(object sender, EventArgs e)

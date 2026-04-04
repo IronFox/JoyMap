@@ -46,6 +46,11 @@
             profilesToolStripMenuItem = new ToolStripMenuItem();
             newToolStripMenuItem = new ToolStripMenuItem();
             newEmptyToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItemDeleteProfileSep = new ToolStripSeparator();
+            deleteCurrentProfileMenuItem = new ToolStripMenuItem();
+            toolStripMenuItemProfileUndoSep = new ToolStripSeparator();
+            profileUndoMenuItem = new ToolStripMenuItem();
+            profileRedoMenuItem = new ToolStripMenuItem();
             toolStripMenuItem5 = new ToolStripSeparator();
             runOnlyWhenGameIsFocusedToolStripMenuItem = new ToolStripMenuItem();
             editToolStripMenuItem = new ToolStripMenuItem();
@@ -215,10 +220,11 @@
             // 
             // profilesToolStripMenuItem
             // 
-            profilesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { newToolStripMenuItem, newEmptyToolStripMenuItem, toolStripMenuItem5, runOnlyWhenGameIsFocusedToolStripMenuItem });
+            profilesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { newToolStripMenuItem, newEmptyToolStripMenuItem, toolStripMenuItemDeleteProfileSep, deleteCurrentProfileMenuItem, toolStripMenuItemProfileUndoSep, profileUndoMenuItem, profileRedoMenuItem, toolStripMenuItem5, runOnlyWhenGameIsFocusedToolStripMenuItem });
             profilesToolStripMenuItem.Name = "profilesToolStripMenuItem";
             profilesToolStripMenuItem.Size = new Size(86, 29);
             profilesToolStripMenuItem.Text = "Profiles";
+            profilesToolStripMenuItem.DropDownOpening += profilesToolStripMenuItem_DropDownOpening;
             // 
             // newToolStripMenuItem
             // 
@@ -233,6 +239,37 @@
             newEmptyToolStripMenuItem.Size = new Size(373, 34);
             newEmptyToolStripMenuItem.Text = "New Empty";
             newEmptyToolStripMenuItem.Click += newEmptyToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItemDeleteProfileSep
+            // 
+            toolStripMenuItemDeleteProfileSep.Name = "toolStripMenuItemDeleteProfileSep";
+            toolStripMenuItemDeleteProfileSep.Size = new Size(370, 6);
+            // 
+            // deleteCurrentProfileMenuItem
+            // 
+            deleteCurrentProfileMenuItem.Name = "deleteCurrentProfileMenuItem";
+            deleteCurrentProfileMenuItem.Size = new Size(373, 34);
+            deleteCurrentProfileMenuItem.Text = "Delete Current Profile ...";
+            deleteCurrentProfileMenuItem.Click += deleteCurrentProfileMenuItem_Click;
+            // 
+            // toolStripMenuItemProfileUndoSep
+            // 
+            toolStripMenuItemProfileUndoSep.Name = "toolStripMenuItemProfileUndoSep";
+            toolStripMenuItemProfileUndoSep.Size = new Size(370, 6);
+            // 
+            // profileUndoMenuItem
+            // 
+            profileUndoMenuItem.Name = "profileUndoMenuItem";
+            profileUndoMenuItem.Size = new Size(373, 34);
+            profileUndoMenuItem.Text = "Undo";
+            profileUndoMenuItem.Click += profileUndoMenuItem_Click;
+            // 
+            // profileRedoMenuItem
+            // 
+            profileRedoMenuItem.Name = "profileRedoMenuItem";
+            profileRedoMenuItem.Size = new Size(373, 34);
+            profileRedoMenuItem.Text = "Redo";
+            profileRedoMenuItem.Click += profileRedoMenuItem_Click;
             // 
             // toolStripMenuItem5
             // 
@@ -1156,6 +1193,11 @@
         private Label label5;
         private ToolStripSeparator toolStripMenuItem5;
         private ToolStripMenuItem runOnlyWhenGameIsFocusedToolStripMenuItem;
+        private ToolStripSeparator toolStripMenuItemDeleteProfileSep;
+        private ToolStripMenuItem deleteCurrentProfileMenuItem;
+        private ToolStripSeparator toolStripMenuItemProfileUndoSep;
+        private ToolStripMenuItem profileUndoMenuItem;
+        private ToolStripMenuItem profileRedoMenuItem;
         private ToolStripMenuItem saveDebugOnlyToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem6;
         private ToolStripMenuItem editSelectedToolStripMenuItem;
