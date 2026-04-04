@@ -172,6 +172,14 @@ public record WindowReference(
         return null;
     }
 
+    internal static bool AnyOwnedByProcess(IntPtr foregroundHwnd, int processId)
+    {
+        if (foregroundHwnd == IntPtr.Zero)
+            return false;
+        GetWindowThreadProcessId(foregroundHwnd, out uint fgPid);
+        return (int)fgPid == processId;
+    }
+
     internal static WindowReference? OfFocused()
     {
         var hWnd = GetForegroundWindow();
