@@ -27,7 +27,7 @@ namespace JoyMap.Windows
             return "None";
         }
         public static KeyOrButton None { get; } = default;
-        public static KeyOrButton[] All { get; } = [.. EnumerateAll()];
+        public static KeyOrButton[] All { get; } = [.. EnumerateAll().OrderBy(x => x.ToString())];
 
         private static IEnumerable<KeyOrButton> EnumerateAll()
         {
