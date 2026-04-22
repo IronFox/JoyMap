@@ -37,6 +37,7 @@ namespace JoyMap.Profile
         private DateTime Started { get; set; }
         private int TriggerCount { get; set; }
         private int TriggerLimit { get; }
+        private bool SkipGap { get; set; }
 
         public void Dispose()
         {
@@ -47,6 +48,8 @@ namespace JoyMap.Profile
         {
             if (triggerStatus)
             {
+                if (Effect.AutoTriggerTiming is not null && !Key.IsPressed)
+                    SkipGap = true;
                 Started = DateTime.Now;
                 TriggerCount = 0;
             }
@@ -84,9 +87,10 @@ namespace JoyMap.Profile
             }
             else
             {
-                var currentInterval = Key.IsPressed ? HoldInterval : ReleaseInterval;
+                var currentInterval = Key.IsPressed ? HoldInterval : (SkipGap ? TimeSpan.Zero : ReleaseInterval);
                 if (Key.TimeSinceLastChange > currentInterval)
                 {
+                    SkipGap = false;
                     Key.Toggle();
                     if (Key.IsPressed)
                         TriggerCount++;
