@@ -1,3 +1,4 @@
+using JoyMap.Config;
 using JoyMap.ControllerTracking;
 using JoyMap.Extensions;
 using JoyMap.Forms;
@@ -53,6 +54,7 @@ namespace JoyMap
         public MainForm()
         {
             Instance = this;
+            AppConfig.Load();
             InitializeComponent();
             try { Directory.CreateDirectory(Path.GetDirectoryName(LogFilePath)!); File.WriteAllText(LogFilePath, ""); } catch { }
             var families = Registry.LoadAll();
@@ -867,9 +869,7 @@ namespace JoyMap
                 new SetHideControllersAction(this, ActiveProfile, chkHideControllers, chkHideControllers.Checked));
         }
 
-        private static readonly string LogFilePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-            "JoyMap", "joymap.log");
+        private static string LogFilePath => AppConfig.Instance.GetLogFilePath();
 
         internal static void Log(string status, Exception? ex = null)
         {

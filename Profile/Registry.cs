@@ -1,4 +1,5 @@
-﻿using JoyMap.ControllerTracking;
+﻿using JoyMap.Config;
+using JoyMap.ControllerTracking;
 using JoyMap.Util;
 using JoyMap.Windows;
 using System.Text.Json;
@@ -72,10 +73,8 @@ namespace JoyMap.Profile
 
         public static IReadOnlyList<JsonControllerFamily> LoadAll()
         {
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = Path.Combine(documents, "JoyMap");
-            Directory.CreateDirectory(dir);
-            var path = Path.Combine(dir, "Profiles.json");
+            var path = AppConfig.Instance.GetProfilesFilePath();
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             if (!File.Exists(path))
                 return LoadControllerFamilies();
             var json = File.ReadAllText(path);
@@ -102,11 +101,8 @@ namespace JoyMap.Profile
 
         public static void SaveAll()
         {
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = Path.Combine(documents, "JoyMap");
-            Directory.CreateDirectory(dir);
-
-            var path = Path.Combine(dir, "Profiles.json");
+            var path = AppConfig.Instance.GetProfilesFilePath();
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
 
             var json = JsonUtil.Serialize(Profiles.Values.Select(x => x.Profile));
             File.WriteAllText(path, json);
@@ -114,21 +110,17 @@ namespace JoyMap.Profile
 
         public static void SaveAllFamilies(InputMonitor monitor)
         {
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = Path.Combine(documents, "JoyMap");
-            Directory.CreateDirectory(dir);
+            var path = AppConfig.Instance.GetControllerFamiliesFilePath();
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
 
-            var path = Path.Combine(dir, "ControllerFamilies.json");
             var json = JsonUtil.Serialize(monitor.ExportAllFamilies());
             File.WriteAllText(path, json);
         }
 
         public static IReadOnlyList<JsonControllerFamily> LoadControllerFamilies()
         {
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = Path.Combine(documents, "JoyMap");
-            Directory.CreateDirectory(dir);
-            var path = Path.Combine(dir, "ControllerFamilies.json");
+            var path = AppConfig.Instance.GetControllerFamiliesFilePath();
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             if (!File.Exists(path))
                 return [];
             var json = File.ReadAllText(path);
