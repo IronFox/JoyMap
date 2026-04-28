@@ -9,6 +9,7 @@
     <ApplicationIcon>joystick.ico</ApplicationIcon>
     <!-- Disable auto assembly attribute generation so we can emit our own with the computed version -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
