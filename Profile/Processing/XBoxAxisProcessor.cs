@@ -14,6 +14,7 @@ namespace JoyMap.Profile.Processing
                         var getter = mi.GetValue;
                         return (Func<float?>)(() => mi.IsSuspended ? 0f : getter());
                     });
+            MainForm.Log($"XBoxAxisProcessor created with {xBoxMappingInstance.Count} bindings: {string.Join(", ", xBoxMappingInstance.Select(m => m.Binding.OutAxis.ToString()))}");
             Emulator.SignalStart();
         }
 

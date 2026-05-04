@@ -39,7 +39,7 @@ namespace JoyMap.Profile
             Mappings = profileInstance.XBoxAxisBindings;
             GlobalStatuses = profileInstance.GlobalStatusInstances;
             ModeGroups = profileInstance.ModeGroupInstances;
-            MainForm.Log($"Profile execution started with {Events.Count} events");
+            MainForm.Log($"Profile execution started: {Events.Count} events, {Mappings.Count} axis bindings, {GlobalStatuses.Count} global statuses, {ModeGroups.Count} mode groups");
 
 
             ListenCancel = new CancellationTokenSource();

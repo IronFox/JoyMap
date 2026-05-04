@@ -40,6 +40,10 @@ namespace JoyMap.ControllerTracking
             {
                 // Expected on cancellation
             }
+            catch (Exception ex)
+            {
+                MainForm.Log("DevicePoller fatal error", ex);
+            }
 
             di.Dispose();
         }

@@ -12,6 +12,7 @@ namespace JoyMap
             comboSimpleKey.Configure(KeyOrButton.All);
             comboOnChangeRisingKey.Configure(KeyOrButton.All);
             comboOnChangeFallingKey.Configure([KeyOrButton.None, .. KeyOrButton.All]);
+            SetupTooltips();
 
 
 
@@ -74,6 +75,85 @@ namespace JoyMap
         private KeyOrButton FallingTriggerKey { get; set; }
 
         public EventAction? Result { get; private set; }
+
+        private void SetupTooltips()
+        {
+            var tt = new ToolTip { AutoPopDelay = 10000, InitialDelay = 400, ReshowDelay = 200 };
+            tt.MakeDark();
+
+            tt.SetToolTip(textName, "A descriptive name for this action. Auto-generated from the key selection if left unchanged.");
+
+            tt.SetToolTip(label1,
+                "Initial Delay: how long (ms) to wait before firing this action after the trigger activates.\n" +
+                "Use for sequential macros — e.g., 0ms, 200ms, 400ms delays on successive actions.");
+            tt.SetToolTip(textDelay,
+                "Delay in milliseconds before the action fires.\n" +
+                "Use sequential delays (0ms, 200ms, 400ms) to build macro sequences.");
+
+            // Simple Trigger tab
+            tt.SetToolTip(tpSimple,
+                "Simple Trigger: holds or auto-fires a key/button while the trigger condition is active.");
+
+            tt.SetToolTip(label3, "The keyboard key or gamepad button this action will press.");
+            tt.SetToolTip(comboSimpleKey, "Select the key or button to press when this action fires.");
+            tt.SetToolTip(btnSimplePickKey, "Open the key picker to choose a keyboard key or mouse button.");
+
+            tt.SetToolTip(cbSimpleAutoTriggerFrequency,
+                "Auto-fire: repeatedly press and release the key at the given frequency (Hz) while the trigger is active.\n" +
+                "Match to game FPS: 30 FPS → 10–15 Hz, 60 FPS → 20–30 Hz, 120+ FPS → 30–60 Hz.\n" +
+                "Lower frequency in low-FPS games to prevent missed inputs.");
+            tt.SetToolTip(textSimpleAutoTriggerFrequency,
+                "Auto-fire frequency in Hz.\n" +
+                "FPS-aware: lower values are safer in low-FPS games.\n" +
+                "30 FPS games: 10–15 Hz | 60 FPS: 20–30 Hz | 120+ FPS: 30–60 Hz | Variable FPS: use lowest expected FPS ÷ 2.");
+
+            tt.SetToolTip(cbSimpleAutoTriggerTiming,
+                "Auto-Trigger Timing: use explicit hold and gap durations instead of a frequency.\n" +
+                "Useful when exact hold/gap durations matter more than a press rate.\n" +
+                "This mode is wall-clock based and unaffected by game FPS.");
+            tt.SetToolTip(labelSimpleAutoTriggerHoldMs, "How long (ms) the key is held down each auto-trigger cycle.");
+            tt.SetToolTip(textSimpleAutoTriggerHoldMs,
+                "Hold duration in milliseconds per auto-trigger cycle.\n" +
+                "Example: 300ms hold, 100ms gap for precise timing.");
+            tt.SetToolTip(labelSimpleAutoTriggerReleaseMs, "How long (ms) the key is released between auto-trigger cycles (the gap).");
+            tt.SetToolTip(textSimpleAutoTriggerReleaseMs,
+                "Gap duration in milliseconds between auto-trigger presses.\n" +
+                "Example: 300ms hold, 100ms gap.");
+
+            tt.SetToolTip(cbSimpleAutoTriggerLimit,
+                "Limit the total number of auto-trigger cycles. Great for combo sequences (e.g., 3× rapid tap, then hold).\n" +
+                "Note: Limit = 1 behaves like Hold Mode — use Limit ≥ 2 for actual repetition.");
+            tt.SetToolTip(numericSimpleAutoTriggerLimit,
+                "Maximum number of auto-trigger cycles before stopping.\n" +
+                "Use Limit ≥ 2 for actual repetition. Limit = 1 fires once and holds.");
+
+            tt.SetToolTip(cbSimpleAutoTriggerDelayedStart,
+                "Delay the start of auto-triggering by the specified number of milliseconds.\n" +
+                "Use for sequential macros (e.g., 0ms, 200ms, 400ms delays).");
+            tt.SetToolTip(textSimpleAutoTriggerDelayedStartMs,
+                "Milliseconds to wait after trigger activation before the first auto-fire cycle begins.");
+
+            // On Change Trigger tab
+            tt.SetToolTip(tpTrigger,
+                "On Change Trigger: fires a key press on the rising flank (activation) and optionally a different key on the falling flank (deactivation).");
+
+            tt.SetToolTip(labelOnChangePressDuration, "How long (ms) the key is held on each flank transition.");
+            tt.SetToolTip(textOnChangePressDurationMs,
+                "Press duration in milliseconds for each flank (rising or falling) transition.\n" +
+                "The key is held for this long then released.");
+
+            tt.SetToolTip(labelOnChangeRisingKey, "Key pressed when the trigger activates (rising flank).");
+            tt.SetToolTip(comboOnChangeRisingKey, "Select the key or button to press on the rising (activation) flank.");
+            tt.SetToolTip(btnOnChangeRisingKeyPick, "Open the key picker to choose a key for the rising flank.");
+
+            tt.SetToolTip(cbOnChangeDifferentFallingKey,
+                "Use a different key for the falling flank (trigger deactivation).\n" +
+                "If unchecked, the same key is used for both rising and falling flanks.");
+
+            tt.SetToolTip(labelOnChangeFallingKey, "Key pressed when the trigger deactivates (falling flank).");
+            tt.SetToolTip(comboOnChangeFallingKey, "Select the key or button to press on the falling (deactivation) flank.");
+            tt.SetToolTip(btnOnChangeFallingKeyPick, "Open the key picker to choose a key for the falling flank.");
+        }
 
         private void btnSimplePickKey_Click(object sender, EventArgs e)
         {

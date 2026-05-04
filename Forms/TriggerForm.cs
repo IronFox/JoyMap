@@ -9,6 +9,7 @@ namespace JoyMap
         public TriggerForm(TriggerInstance? t = null)
         {
             InitializeComponent();
+            SetupTooltips();
             if (t is not null)
             {
                 SuspendEvents = true;
@@ -45,6 +46,68 @@ namespace JoyMap
         private bool SuspendEvents { get; set; }
         private DeviceEvent? Event { get; set; }
 
+        private void SetupTooltips()
+        {
+            var tt = new ToolTip { AutoPopDelay = 10000, InitialDelay = 400, ReshowDelay = 200 };
+            tt.MakeDark();
+
+            tt.SetToolTip(btnPickDeviceInput,
+                "Pick the physical device and axis/button that will serve as the input source for this trigger.");
+
+            tt.SetToolTip(textMin,
+                "Minimum axis value (as a percentage) required to activate the trigger.\n" +
+                "Use 10–15% deadzone for analog sticks to avoid accidental activation.");
+
+            tt.SetToolTip(textMax,
+                "Maximum axis value (as a percentage) that keeps the trigger active.\n" +
+                "Values outside [Min%, Max%] deactivate the trigger.");
+
+            tt.SetToolTip(label4, "Minimum axis percentage required to activate the trigger.");
+            tt.SetToolTip(label5, "Maximum axis percentage that keeps the trigger active.");
+
+            tt.SetToolTip(cbAutoReleaseActive,
+                "Automatically deactivate the trigger after this many milliseconds, even if the physical input is still held.\n" +
+                "Useful for sequential macros.");
+
+            tt.SetToolTip(textAutoReleaseMs,
+                "Duration in milliseconds after which the trigger auto-releases.\n" +
+                "Example: use 200ms, 400ms delays for sequential macro steps.");
+
+            tt.SetToolTip(cbDelayRelease,
+                "Delay the release of the trigger by this many milliseconds after the physical input drops out of range.\n" +
+                "Helps smooth out brief dropouts.");
+
+            tt.SetToolTip(textDelayReleaseMs,
+                "How long (ms) to wait before releasing the trigger after the input leaves the active range.");
+
+            tt.SetToolTip(tabRange,
+                "Range mode: the trigger fires while the axis value stays within [Min%, Max%].\n" +
+                "Best for buttons and simple axis thresholds.");
+
+            tt.SetToolTip(tabDither,
+                "Dither mode: modulates the trigger using a PWM-style duty cycle derived from the axis value.\n" +
+                "Use for analog-to-digital conversion (e.g., gradual throttle → repeated keypress).\n" +
+                "Frequency is FPS-dependent — for 60 FPS games use 20–30 Hz; for 30 FPS games use 10–15 Hz.");
+
+            tt.SetToolTip(label1,
+                "Axis percentage at which the dither duty cycle starts (0% duty cycle below this value).");
+            tt.SetToolTip(textRampStart,
+                "Ramp Start %: axis value at which dithering begins.\n" +
+                "Below this the action is never triggered.");
+
+            tt.SetToolTip(label7,
+                "Axis percentage at which the dither duty cycle reaches 100%.");
+            tt.SetToolTip(textRampMax,
+                "Ramp Max %: axis value at which dithering reaches full (100%) duty cycle.\n" +
+                "Above this the action fires every cycle.");
+
+            tt.SetToolTip(label9, "Dither frequency in Hz (cycles per second).");
+            tt.SetToolTip(textDitherFrequency,
+                "How many times per second the dither cycle repeats.\n" +
+                "Match to game FPS: 30 FPS → 10–15 Hz, 60 FPS → 20–30 Hz, 120+ FPS → 30–60 Hz.\n" +
+                "FPS-aware: lower frequency in low-FPS games to prevent missed inputs.\n" +
+                "Timing mode is wall-clock based and unaffected by game FPS.");
+        }
 
         private void btnPickDeviceInput_Click(object sender, EventArgs e)
         {

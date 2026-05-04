@@ -14,7 +14,10 @@ namespace JoyMap.XBox
                 Controller?.Dispose();
                 Controller = null;
             }
-            catch { }   //dont care
+            catch (Exception ex)
+            {
+                MainForm.Log("Failed to destroy XBox controller", ex);
+            }
         }
         internal static void SignalEnd()
         {
@@ -46,9 +49,21 @@ namespace JoyMap.XBox
             }
         }
 
+        private static bool WarnedNoController { get; set; }
+
         internal static void UpdateAxisState(IReadOnlyDictionary<XBoxAxis, Func<float?>> feed)
         {
-            Controller?.UpdateFromInputState(feed);
+            if (Controller is null)
+            {
+                if (!WarnedNoController)
+                {
+                    WarnedNoController = true;
+                    MainForm.Log("UpdateAxisState: no controller available — axis updates will be dropped");
+                }
+                return;
+            }
+            WarnedNoController = false;
+            Controller.UpdateFromInputState(feed);
         }
 
         internal static void UpdateButtonState(XBoxButton value, bool nowDown)

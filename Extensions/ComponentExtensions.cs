@@ -102,5 +102,48 @@ namespace JoyMap.Extensions
             comboBox.FlatStyle = FlatStyle.Flat;
         }
 
+        /// <summary>
+        /// Enables owner-draw on a ToolTip so it renders with a dark background and light text.
+        /// </summary>
+        public static void MakeDark(this ToolTip toolTip)
+        {
+            toolTip.OwnerDraw = true;
+            toolTip.Draw += static (sender, e) =>
+            {
+                var backColor = Color.FromArgb(30, 30, 30);
+                var foreColor = Color.FromArgb(220, 220, 220);
+                var borderColor = Color.FromArgb(90, 90, 90);
+
+                using var backBrush = new SolidBrush(backColor);
+                using var foreBrush = new SolidBrush(foreColor);
+                using var borderPen = new Pen(borderColor);
+
+                e.Graphics.FillRectangle(backBrush, e.Bounds);
+                e.Graphics.DrawRectangle(borderPen, new Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 1, e.Bounds.Height - 1));
+
+                var textBounds = new RectangleF(
+                    e.Bounds.X + 4,
+                    e.Bounds.Y + 3,
+                    e.Bounds.Width - 8,
+                    e.Bounds.Height - 6);
+
+                e.Graphics.DrawString(e.ToolTipText, e.Font ?? SystemFonts.DefaultFont, foreBrush, textBounds);
+            };
+            toolTip.Popup += static (sender, e) =>
+            {
+                // Measure the text so the balloon fits correctly with the custom padding
+                if (sender is not ToolTip tt) return;
+                var text = e.AssociatedControl is not null
+                    ? (tt.GetToolTip(e.AssociatedControl))
+                    : null;
+                if (string.IsNullOrEmpty(text)) return;
+
+                using var g = e.AssociatedControl!.CreateGraphics();
+                var font = e.AssociatedControl.Font ?? SystemFonts.DefaultFont;
+                var measured = g.MeasureString(text, font, 400);
+                e.ToolTipSize = new Size((int)Math.Ceiling(measured.Width) + 12, (int)Math.Ceiling(measured.Height) + 8);
+            };
+        }
+
     }
 }

@@ -91,12 +91,11 @@ namespace JoyMap.Profile
                     };
                 }
             }
-            catch (JsonException)
+            catch (JsonException ex)
             {
-                // ignore
+                MainForm.Log($"Failed to load profiles from {path}", ex);
             }
             return LoadControllerFamilies();
-
         }
 
         public static void SaveAll()
@@ -129,8 +128,9 @@ namespace JoyMap.Profile
                 var list = JsonUtil.Deserialize<List<JsonControllerFamily>>(json);
                 return list;
             }
-            catch (JsonException)
+            catch (JsonException ex)
             {
+                MainForm.Log($"Failed to load controller families from {path}", ex);
                 return [];
             }
         }
