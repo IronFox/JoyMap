@@ -31,14 +31,14 @@ namespace JoyMap.ControllerTracking
                 Joystick.Acquire();
                 IsAcquired = true;
 
+                MainForm.Log($"Joystick acquired: {Device.ProductName} [{Device.InstanceGuid}]");
                 TargetStatus.SignalBegin(Device.InstanceGuid);
 
                 Task.Run(() => RunAsync(cancel).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
-                // Handle exception (e.g., log it)
-                System.Diagnostics.Debug.WriteLine($"Failed to initialize joystick: {ex.Message}");
+                MainForm.Log($"Failed to initialize joystick [{Device.ProductName}]", ex);
             }
         }
 

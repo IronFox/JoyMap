@@ -99,6 +99,7 @@ namespace JoyMap.ControllerTracking
             if (svc is null)
                 return;
             var currentlyBlocked = new HashSet<string>(svc.BlockedInstanceIds, StringComparer.OrdinalIgnoreCase);
+            MainForm.Log($"HidHide currently blocking {currentlyBlocked.Count} device(s): {string.Join(", ", currentlyBlocked)}");
             var sessionBlocked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var guid in productGuids)
                 foreach (var instance in FindHidInstancesForProduct(guid))
@@ -106,6 +107,7 @@ namespace JoyMap.ControllerTracking
                     if (!currentlyBlocked.Contains(instance.InstanceId))
                         svc.AddBlockedInstanceId(instance.InstanceId);
                     sessionBlocked.Add(instance.InstanceId);
+                    MainForm.Log($"HidHide blocking: {instance.FriendlyName} [{instance.InstanceId}]");
                 }
             if (sessionBlocked.Count > 0)
             {
@@ -139,7 +141,12 @@ namespace JoyMap.ControllerTracking
             try
             {
                 if (!svc.ApplicationPaths.Any(p => string.Equals(p, exePath, StringComparison.OrdinalIgnoreCase)))
+                {
                     svc.AddApplicationPath(exePath, throwIfInvalid: false);
+                    MainForm.Log($"HidHide: whitelisted app: {exePath}");
+                }
+                else
+                    MainForm.Log($"HidHide: app already whitelisted: {exePath}");
             }
             catch (Exception ex)
             {
