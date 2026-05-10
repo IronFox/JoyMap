@@ -130,6 +130,11 @@
             mgEditMenuItem = new ToolStripMenuItem();
             toolStripMgSep2 = new ToolStripSeparator();
             mgDeleteMenuItem = new ToolStripMenuItem();
+            toolStripMgSep3 = new ToolStripSeparator();
+            mgCopySelectedMenuItem = new ToolStripMenuItem();
+            toolStripMgSep4 = new ToolStripSeparator();
+            mgPasteOverMenuItem = new ToolStripMenuItem();
+            mgPasteInsertMenuItem = new ToolStripMenuItem();
             tabXBox = new TabPage();
             bindingListView = new ListView();
             columnHeader1 = new ColumnHeader();
@@ -857,7 +862,7 @@
             // mgContextMenu
             // 
             mgContextMenu.ImageScalingSize = new Size(24, 24);
-            mgContextMenu.Items.AddRange(new ToolStripItem[] { mgNewMenuItem, toolStripMgSep1, mgEditMenuItem, toolStripMgSep2, mgDeleteMenuItem });
+            mgContextMenu.Items.AddRange(new ToolStripItem[] { mgNewMenuItem, toolStripMgSep1, mgEditMenuItem, toolStripMgSep2, mgDeleteMenuItem, toolStripMgSep3, mgCopySelectedMenuItem, toolStripMgSep4, mgPasteOverMenuItem, mgPasteInsertMenuItem });
             mgContextMenu.Name = "mgContextMenu";
             mgContextMenu.Size = new Size(312, 112);
             mgContextMenu.Opening += mgContextMenu_Opening;
@@ -893,6 +898,39 @@
             mgDeleteMenuItem.Size = new Size(311, 32);
             mgDeleteMenuItem.Text = "Delete";
             mgDeleteMenuItem.Click += mgDeleteMenuItem_Click;
+            // 
+            // toolStripMgSep3
+            // 
+            toolStripMgSep3.Name = "toolStripMgSep3";
+            toolStripMgSep3.Size = new Size(308, 6);
+            // 
+            // mgCopySelectedMenuItem
+            // 
+            mgCopySelectedMenuItem.Name = "mgCopySelectedMenuItem";
+            mgCopySelectedMenuItem.ShortcutKeys = Keys.Control | Keys.C;
+            mgCopySelectedMenuItem.Size = new Size(311, 32);
+            mgCopySelectedMenuItem.Text = "Copy Selected";
+            mgCopySelectedMenuItem.Click += mgCopySelectedMenuItem_Click;
+            // 
+            // toolStripMgSep4
+            // 
+            toolStripMgSep4.Name = "toolStripMgSep4";
+            toolStripMgSep4.Size = new Size(308, 6);
+            // 
+            // mgPasteOverMenuItem
+            // 
+            mgPasteOverMenuItem.Name = "mgPasteOverMenuItem";
+            mgPasteOverMenuItem.Size = new Size(311, 32);
+            mgPasteOverMenuItem.Text = "Paste Over";
+            mgPasteOverMenuItem.Click += mgPasteOverMenuItem_Click;
+            // 
+            // mgPasteInsertMenuItem
+            // 
+            mgPasteInsertMenuItem.Name = "mgPasteInsertMenuItem";
+            mgPasteInsertMenuItem.ShortcutKeys = Keys.Control | Keys.V;
+            mgPasteInsertMenuItem.Size = new Size(311, 32);
+            mgPasteInsertMenuItem.Text = "Paste Insert";
+            mgPasteInsertMenuItem.Click += mgPasteInsertMenuItem_Click;
             // 
             // tabXBox
             // 
@@ -1222,6 +1260,11 @@
         private ToolStripMenuItem mgEditMenuItem;
         private ToolStripSeparator toolStripMgSep2;
         private ToolStripMenuItem mgDeleteMenuItem;
+        private ToolStripSeparator toolStripMgSep3;
+        private ToolStripMenuItem mgCopySelectedMenuItem;
+        private ToolStripSeparator toolStripMgSep4;
+        private ToolStripMenuItem mgPasteOverMenuItem;
+        private ToolStripMenuItem mgPasteInsertMenuItem;
         private Label labelModeGroups;
         private ListView globalStatusListView;
         private ColumnHeader columnHeaderGsName;

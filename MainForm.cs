@@ -1164,6 +1164,45 @@ namespace JoyMap
                     this, ActiveProfile, insertIndex, copied));
             }
 
+            private void mgCopySelectedMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                modeGroupListView.SelectedItems.ToEnumerable()
+                    .Select(item => item.Tag)
+                    .OfType<ModeGroupInstance>()
+                    .Select(mg => mg.Group)
+                    .ToList()
+                    .CopyToClipboard();
+            }
+
+            private void mgPasteOverMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                var copied = ClipboardUtil.GetCopied<ModeGroup>();
+                if (copied is null || copied.Count != modeGroupListView.SelectedItems.Count)
+                    return;
+                ActiveProfile.History.ExecuteAction(new PasteOverModeGroupAction(
+                    this, ActiveProfile,
+                    modeGroupListView.SelectedItems.ToEnumerable().Select(item => item.Index).ToList(),
+                    copied));
+            }
+
+            private void mgPasteInsertMenuItem_Click(object sender, EventArgs e)
+            {
+                if (ActiveProfile is null)
+                    return;
+                var copied = ClipboardUtil.GetCopied<ModeGroup>();
+                if (copied is null)
+                    return;
+                int insertIndex = modeGroupListView.SelectedItems.Count > 0
+                    ? modeGroupListView.SelectedItems[modeGroupListView.SelectedItems.Count - 1].Index + 1
+                    : modeGroupListView.Items.Count;
+                ActiveProfile.History.ExecuteAction(new PasteInsertModeGroupAction(
+                    this, ActiveProfile, insertIndex, copied));
+            }
+
             private void mgNewMenuItem_Click(object sender, EventArgs e)
             {
                 if (ActiveProfile is null)
@@ -1223,6 +1262,10 @@ namespace JoyMap
             {
                 mgEditMenuItem.Enabled = modeGroupListView.SelectedItems.Count == 1;
                 mgDeleteMenuItem.Enabled = modeGroupListView.SelectedItems.Count > 0;
+                mgCopySelectedMenuItem.Enabled = modeGroupListView.SelectedItems.Count > 0;
+                var copied = ClipboardUtil.GetCopied<ModeGroup>();
+                mgPasteOverMenuItem.Enabled = copied?.Count == modeGroupListView.SelectedItems.Count && copied.Count > 0;
+                mgPasteInsertMenuItem.Enabled = copied is not null;
             }
 
             private void gsContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
