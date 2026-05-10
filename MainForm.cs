@@ -65,6 +65,7 @@ namespace JoyMap
             saveDebugOnlyToolStripMenuItem.Enabled = false;
 #endif
             Log("Ready");
+            XBox.Emulator.EnsureStarted();
         }
 
         public bool SuppressIfGameIsNotFocused { get; private set; } = true;

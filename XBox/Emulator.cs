@@ -13,17 +13,26 @@ namespace JoyMap.XBox
             {
                 Controller?.Dispose();
                 Controller = null;
+                TriedCreate = false;
             }
             catch (Exception ex)
             {
                 MainForm.Log("Failed to destroy XBox controller", ex);
             }
         }
+
+        /// <summary>
+        /// Creates the virtual controller eagerly at app startup so it is visible
+        /// to games before they enumerate XInput devices.
+        /// </summary>
+        internal static void EnsureStarted()
+        {
+            SignalStart();
+        }
+
         internal static void SignalEnd()
         {
-            //let's keep it
-            //_controller?.Dispose();
-            //_controller = null;
+            //let's keep it alive so games that already enumerated it can still use it
         }
 
         internal static void SignalStart()
