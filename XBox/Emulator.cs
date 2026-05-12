@@ -32,7 +32,9 @@ namespace JoyMap.XBox
 
         internal static void SignalEnd()
         {
-            //let's keep it alive so games that already enumerated it can still use it
+            // Keep the controller alive so the game keeps seeing it,
+            // but zero all axes/buttons so inputs don't stick.
+            Controller?.ResetState();
         }
 
         internal static void SignalStart()

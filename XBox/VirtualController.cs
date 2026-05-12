@@ -55,6 +55,19 @@ namespace JoyMap.XBox
             SubmitSafe();
         }
 
+        public void ResetState()
+        {
+            Controller.SetAxisValue(Xbox360Axis.LeftThumbX, 0);
+            Controller.SetAxisValue(Xbox360Axis.LeftThumbY, 0);
+            Controller.SetAxisValue(Xbox360Axis.RightThumbX, 0);
+            Controller.SetAxisValue(Xbox360Axis.RightThumbY, 0);
+            Controller.SetSliderValue(Xbox360Slider.LeftTrigger, 0);
+            Controller.SetSliderValue(Xbox360Slider.RightTrigger, 0);
+            foreach (Xbox360Button btn in Enum.GetValues(typeof(Xbox360Button)).Cast<Xbox360Button>())
+                Controller.SetButtonState(btn, false);
+            SubmitSafe();
+        }
+
         private void ApplySlider(XBoxAxis inTriggerAxis, Xbox360Slider outSlider, IReadOnlyDictionary<XBoxAxis, Func<float?>> feed)
         {
             if (feed.TryGetValue(inTriggerAxis, out var get))
