@@ -70,22 +70,16 @@ namespace JoyMap.XBox
 
         private void ApplySlider(XBoxAxis inTriggerAxis, Xbox360Slider outSlider, IReadOnlyDictionary<XBoxAxis, Func<float?>> feed)
         {
-            if (feed.TryGetValue(inTriggerAxis, out var get))
-            {
-                var v = get();
-                if (v.HasValue)
-                    Controller.SetSliderValue(outSlider, (byte)Math.Clamp(v.Value * 255, 0, 255));
-            }
+            var value = feed.TryGetValue(inTriggerAxis, out var get) ? get() : 0f;
+            Controller.SetSliderValue(
+                outSlider,
+                value.HasValue ? (byte)Math.Clamp(value.Value * 255, 0, 255) : (byte)0);
         }
 
         private void ApplyAxis(XBoxAxis inAxis, Xbox360Axis outAxis, IReadOnlyDictionary<XBoxAxis, Func<float?>> feed)
         {
-            if (feed.TryGetValue(inAxis, out var get))
-            {
-                var v = get();
-                if (v.HasValue)
-                    Controller.SetAxisValue(outAxis, NormalizeAxis(v.Value));
-            }
+            var value = feed.TryGetValue(inAxis, out var get) ? get() : 0f;
+            Controller.SetAxisValue(outAxis, value.HasValue ? NormalizeAxis(value.Value) : (short)0);
         }
 
         private const int SlowSubmitThresholdMs = 50;
