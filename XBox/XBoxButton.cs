@@ -12,6 +12,10 @@
         ShoulderLeft,
         ShoulderRight,
         ThumbLeft,
-        ThumbRight
+        ThumbRight,
+        DPadUp,
+        DPadDown,
+        DPadLeft,
+        DPadRight
     }
 }

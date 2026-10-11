@@ -28,10 +28,15 @@ namespace JoyMap.XBox
                 XBoxButton.Y => Xbox360Button.Y,
                 XBoxButton.Back => Xbox360Button.Back,
                 XBoxButton.Start => Xbox360Button.Start,
+                XBoxButton.Guide => Xbox360Button.Guide,
                 XBoxButton.ShoulderLeft => Xbox360Button.LeftShoulder,
                 XBoxButton.ShoulderRight => Xbox360Button.RightShoulder,
                 XBoxButton.ThumbLeft => Xbox360Button.LeftThumb,
                 XBoxButton.ThumbRight => Xbox360Button.RightThumb,
+                XBoxButton.DPadUp => Xbox360Button.Up,
+                XBoxButton.DPadDown => Xbox360Button.Down,
+                XBoxButton.DPadLeft => Xbox360Button.Left,
+                XBoxButton.DPadRight => Xbox360Button.Right,
                 _ => throw new ArgumentOutOfRangeException(nameof(button), $"Unhandled button: {button}"),
             };
             Controller.SetButtonState(xboxButton, pressed);
