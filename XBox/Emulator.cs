@@ -74,7 +74,22 @@ namespace JoyMap.XBox
                 return;
             }
             WarnedNoController = false;
-            Controller.UpdateFromInputState(feed);
+            lock (Lock)
+                Controller.UpdateFromInputState(feed);
+        }
+
+        /// <summary>
+        /// Forces the given axis to 1 while <paramref name="forced"/> is true.
+        /// When released, the axis returns to its natural (mapped) value.
+        /// Callers aggregate overlapping sources; this receives only the combined state.
+        /// </summary>
+        internal static void SetAxisOverride(XBoxAxis axis, bool forced)
+        {
+            SignalStart();
+            if (Controller is null)
+                return;
+            lock (Lock)
+                Controller.SetAxisOverride(axis, forced);
         }
 
         internal static void UpdateButtonState(XBoxButton value, bool nowDown)

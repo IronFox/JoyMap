@@ -10,7 +10,8 @@ namespace JoyMap.Windows
     [JsonConverter(typeof(KeyOrButtonJsonConverter))]
     public readonly record struct KeyOrButton(
         Keys? Key,
-        XBoxButton? XBoxButton
+        XBoxButton? XBoxButton,
+        XBoxAxis? XBoxAxis = null
         )
     {
         public override string ToString()
@@ -23,6 +24,10 @@ namespace JoyMap.Windows
             if (IsXBoxButton)
             {
                 return "XBox:" + XBoxButton;
+            }
+            if (IsXBoxAxis)
+            {
+                return "XBox:" + XBoxAxis + "=1";
             }
             return "None";
         }
@@ -47,6 +52,12 @@ namespace JoyMap.Windows
             {
                 yield return From(button);
             }
+
+            // Enumerate all XBoxAxis enum values (pressed = axis forced to 1)
+            foreach (XBoxAxis axis in Enum.GetValues<XBoxAxis>())
+            {
+                yield return From(axis);
+            }
         }
 
         [JsonIgnore]
@@ -54,7 +65,9 @@ namespace JoyMap.Windows
             ? (int)Key.Value
             : XBoxButton is not null
                 ? 1024 + (int)XBoxButton.Value
-                : -1;
+                : XBoxAxis is not null
+                    ? 1024 + 16 + (int)XBoxAxis.Value
+                    : -1;
         [JsonIgnore]
         [MemberNotNullWhen(true, nameof(Key))]
         public bool IsMouseOrKeyboard => Key is not null;
@@ -63,8 +76,14 @@ namespace JoyMap.Windows
         [MemberNotNullWhen(true, nameof(XBoxButton))]
         public bool IsXBoxButton => XBoxButton is not null;
 
+        [JsonIgnore]
+        [MemberNotNullWhen(true, nameof(XBoxAxis))]
+        public bool IsXBoxAxis => XBoxAxis is not null;
+
         internal static KeyOrButton From(XBoxButton button)
             => new(null, button);
+        internal static KeyOrButton From(XBoxAxis axis)
+            => new(null, null, axis);
         internal static KeyOrButton From(Keys keys)
         {
             if (keys == Keys.None)
@@ -75,12 +94,12 @@ namespace JoyMap.Windows
 
     internal static class KeyOrButtonDispatch
     {
-        private static readonly int[] keyStates = new int[1024 + 16];
+        private static readonly int[] keyStates = new int[1024 + 16 + 16];
 
         internal static void Change(KeyOrButton kb, bool nowDown, bool reassert = false)
         {
             int idx = kb.LinearIndex;
-            if (idx >= keyStates.Length)
+            if (idx < 0 || idx >= keyStates.Length)
                 return;
 
             bool isDown = keyStates[idx] > 0;
@@ -97,6 +116,8 @@ namespace JoyMap.Windows
             }
             if (kb.IsXBoxButton)
                 Emulator.UpdateButtonState(kb.XBoxButton!.Value, nowDown);
+            else if (kb.IsXBoxAxis)
+                Emulator.SetAxisOverride(kb.XBoxAxis!.Value, isDown);
             else if (kb.IsMouseOrKeyboard)
             {
                 var keys = kb.Key!.Value;

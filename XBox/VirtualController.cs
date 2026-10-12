@@ -43,10 +43,32 @@ namespace JoyMap.XBox
             SubmitSafe();
         }
 
+        private static IReadOnlyDictionary<XBoxAxis, Func<float?>> EmptyFeed { get; } = new Dictionary<XBoxAxis, Func<float?>>();
+
+        /// <summary>
+        /// The most recent analog feed, re-applied when an axis override changes outside of the regular update loop.
+        /// </summary>
+        private IReadOnlyDictionary<XBoxAxis, Func<float?>> LastFeed { get; set; } = EmptyFeed;
+
+        /// <summary>
+        /// Axes currently forced to 1 by event actions. A forced axis ignores its natural feed value.
+        /// </summary>
+        private bool[] AxisOverrides { get; } = new bool[Enum.GetValues<XBoxAxis>().Length];
+
+        public void SetAxisOverride(XBoxAxis axis, bool forced)
+        {
+            if (AxisOverrides[(int)axis] == forced)
+                return;
+            AxisOverrides[(int)axis] = forced;
+            UpdateFromInputState(LastFeed);
+        }
+
         public void UpdateFromInputState(
             IReadOnlyDictionary<XBoxAxis, Func<float?>> analogFeed
             )
         {
+            LastFeed = analogFeed;
+
             // Map axes (normalize from [0,1] to short range)
             ApplyAxis(XBoxAxis.MoveX, Xbox360Axis.LeftThumbX, analogFeed);
             ApplyAxis(XBoxAxis.MoveY, Xbox360Axis.LeftThumbY, analogFeed);
@@ -62,6 +84,7 @@ namespace JoyMap.XBox
 
         public void ResetState()
         {
+            LastFeed = EmptyFeed;
             Controller.SetAxisValue(Xbox360Axis.LeftThumbX, 0);
             Controller.SetAxisValue(Xbox360Axis.LeftThumbY, 0);
             Controller.SetAxisValue(Xbox360Axis.RightThumbX, 0);
@@ -73,9 +96,16 @@ namespace JoyMap.XBox
             SubmitSafe();
         }
 
+        private float? GetValue(XBoxAxis axis, IReadOnlyDictionary<XBoxAxis, Func<float?>> feed)
+        {
+            if (AxisOverrides[(int)axis])
+                return 1f;
+            return feed.TryGetValue(axis, out var get) ? get() : 0f;
+        }
+
         private void ApplySlider(XBoxAxis inTriggerAxis, Xbox360Slider outSlider, IReadOnlyDictionary<XBoxAxis, Func<float?>> feed)
         {
-            var value = feed.TryGetValue(inTriggerAxis, out var get) ? get() : 0f;
+            var value = GetValue(inTriggerAxis, feed);
             Controller.SetSliderValue(
                 outSlider,
                 value.HasValue ? (byte)Math.Clamp(value.Value * 255, 0, 255) : (byte)0);
@@ -83,7 +113,7 @@ namespace JoyMap.XBox
 
         private void ApplyAxis(XBoxAxis inAxis, Xbox360Axis outAxis, IReadOnlyDictionary<XBoxAxis, Func<float?>> feed)
         {
-            var value = feed.TryGetValue(inAxis, out var get) ? get() : 0f;
+            var value = GetValue(inAxis, feed);
             Controller.SetAxisValue(outAxis, value.HasValue ? NormalizeAxis(value.Value) : (short)0);
         }
 
