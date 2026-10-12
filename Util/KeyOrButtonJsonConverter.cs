@@ -29,6 +29,7 @@ namespace JoyMap.Util
 
             Keys? key = null;
             XBoxButton? xboxButton = null;
+            XBoxAxis? xboxAxis = null;
 
             while (reader.Read())
             {
@@ -66,10 +67,23 @@ namespace JoyMap.Util
                             xboxButton = (XBoxButton)reader.GetInt32();
                         }
                     }
+                    else if (string.Equals(propName, "XBoxAxis", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (reader.TokenType == JsonTokenType.String)
+                        {
+                            var str = reader.GetString();
+                            if (Enum.TryParse<XBoxAxis>(str, out var xa))
+                                xboxAxis = xa;
+                        }
+                        else if (reader.TokenType == JsonTokenType.Number)
+                        {
+                            xboxAxis = (XBoxAxis)reader.GetInt32();
+                        }
+                    }
                 }
             }
 
-            return new KeyOrButton(Key: key, XBoxButton: xboxButton);
+            return new KeyOrButton(Key: key, XBoxButton: xboxButton, XBoxAxis: xboxAxis);
         }
 
         public override void Write(Utf8JsonWriter writer, KeyOrButton value, JsonSerializerOptions options)
@@ -79,6 +93,8 @@ namespace JoyMap.Util
                 writer.WriteString("Key", value.Key.Value.ToString());
             if (value.XBoxButton is not null)
                 writer.WriteString("XBoxButton", value.XBoxButton.Value.ToString());
+            if (value.XBoxAxis is not null)
+                writer.WriteString("XBoxAxis", value.XBoxAxis.Value.ToString());
             writer.WriteEndObject();
         }
     }
